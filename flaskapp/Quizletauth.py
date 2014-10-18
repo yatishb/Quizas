@@ -11,7 +11,7 @@ def auth1():
 	redirectUrl = "http://54.169.123.39:5000/quizletauthstep2"
 	randomStateString = "quiwas"
 	# clientID = 'p8UvFSHYUd' # use for localhost testing
-	redirectUrl = 'http://127.0.0.1:5000/quizletauthstep2' # use for localhost testing
+	# redirectUrl = 'http://127.0.0.1:5000/quizletauthstep2' # use for localhost testing
 	authorizeUrl = "https://quizlet.com/authorize?client_id=" +clientID + "&response_type=code&scope=read%20write_set"
 
 	url = authorizeUrl + "&state=" + randomStateString +"&redirect_uri=" + redirectUrl
@@ -33,7 +33,8 @@ def authparam():
 
 	code = request.args.get('code')
 	grant_type = "authorization_code"
-	redirect_uri = 'http://127.0.0.1:5000/quizletauthstep2'
+	# redirect_uri = 'http://127.0.0.1:5000/quizletauthstep2' # use for localhost testing
+	redirect_uri = "http://54.169.123.39:5000/quizletauthstep2"
 	payload = {'code' : code, 'grant_type' : grant_type, 'redirect_uri' : redirect_uri}
 
 	req = requests.post(tokenUrl, data=payload, auth=(clientID, keySecret))
