@@ -9,6 +9,13 @@
 # `package` uses apt-get. You can check the following make sense
 # on http://packages.ubuntu.com/
 
+# From http://stackoverflow.com/questions/5339690/installing-multiple-packages-via-vagrant-chef
+execute "update package index" do
+  command "apt-get update"
+  ignore_failure true
+  action :nothing
+end.run_action(:run)
+
 %w(git ruby-dev).each do |pack|
     # Fuck chef_gem
     # This needs to be this syntax, so that it gets installed
@@ -75,17 +82,13 @@ python_pip "flask"
 # Even though we take care of *that*, it seems that
 # this needs to have happened before reading this recipe.`
 
-# Set any relevant settings for MariaDB here?
 
+node.set['mysql']['server_root_password'] = 'yolo'
+node.set['mysql']['port'] = '3308'
+node.set['mysql']['data_dir'] = '/data'
 
-# Runs the recipe, right?
-include_recipe "mariadb"
+include_recipe 'mysql::server'
 
-# To use the `database` cookbook
-include_recipe "mariadb::ruby"
-
-# Output passwords and such to some file,
-# so that our Flask app can reference it.
 
 
 # -- How can we, say, have different databases

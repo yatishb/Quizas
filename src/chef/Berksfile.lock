@@ -1,26 +1,27 @@
 DEPENDENCIES
-  mariadb
-    git: https://github.com/joerocklin/chef-mariadb.git
-    revision: cb19e8be2caa6d4e7d9da3528e36c0a3a3ce7ec0
+  database
+  mysql (= 5.5.3)
   nginx
-    git: https://github.com/miketheman/nginx.git
-    revision: e128a0ad7322b0d406857aac5efc7a1c1cb824cd
   python
-    git: https://github.com/poise/python.git
-    revision: 234852013622673c106a21c0abaa291280e46c4e
 
 GRAPH
   apt (2.6.0)
+  aws (2.4.0)
   bluepill (2.3.1)
     rsyslog (>= 0.0.0)
-  build-essential (2.1.0)
+  build-essential (2.1.2)
   chef-sugar (2.4.1)
-  mariadb (2.1.0)
-    apt (~> 2.0)
-    build-essential (~> 2.0)
-    openssl (~> 2.0)
-    yum (~> 3.0)
-    yum-epel (>= 0.0.0)
+  database (2.3.0)
+    aws (>= 0.0.0)
+    mysql (>= 5.0.0)
+    mysql-chef_gem (>= 0.0.0)
+    postgresql (>= 1.0.0)
+    xfs (>= 0.0.0)
+  mysql (5.5.3)
+    yum-mysql-community (>= 0.0.0)
+  mysql-chef_gem (0.0.5)
+    build-essential (>= 0.0.0)
+    mysql (>= 0.0.0)
   nginx (2.7.4)
     apt (~> 2.2)
     bluepill (~> 2.3)
@@ -31,7 +32,11 @@ GRAPH
   ohai (2.0.1)
   openssl (2.0.0)
     chef-sugar (>= 0.0.0)
-  python (1.4.7)
+  postgresql (3.4.10)
+    apt (>= 1.9.0)
+    build-essential (>= 0.0.0)
+    openssl (>= 0.0.0)
+  python (1.4.6)
     build-essential (>= 0.0.0)
     yum-epel (>= 0.0.0)
   rsyslog (1.12.2)
@@ -39,6 +44,9 @@ GRAPH
     build-essential (>= 0.0.0)
     yum (~> 3.0)
     yum-epel (>= 0.0.0)
-  yum (3.3.2)
+  xfs (1.1.0)
+  yum (3.4.0)
   yum-epel (0.5.1)
     yum (~> 3.0)
+  yum-mysql-community (0.1.10)
+    yum (>= 3.0)

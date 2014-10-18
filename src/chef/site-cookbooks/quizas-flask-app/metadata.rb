@@ -7,5 +7,7 @@ long_description 'Installs/Configures quizas-flask-app'
 version          '0.1.0'
 
 depends "python"
-depends "mariadb"
+# depends "mariadb"
 depends "nginx"
+depends "mysql"
+depends "database"
