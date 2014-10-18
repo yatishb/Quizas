@@ -3,6 +3,8 @@
 # Recipe:: default
 #
 
+flaskapp_user = node["flask-app"]["user"]
+flaskapp_dir  = node["flask-app"]["dir"]
 
 
 # Ensure we have Python (and whatever else we need) installed
@@ -32,9 +34,9 @@ end
    latest
    staticfiles.git
    staticfiles}.each do |dir|
-    directory "/home/vagrant/flask-app/#{dir}" do
-        owner "vagrant"
-        group "vagrant"
+    directory "#{flaskapp_dir}/#{dir}" do
+        owner flaskapp_user
+        group flaskapp_user
         mode "0755"
         action :create
 
@@ -52,14 +54,14 @@ end
 #  resources. Cloning an empty repo isn't its thing).
 bash "setup staticfiles repos" do
     user "vagrant"
-    cwd "/home/vagrant/flask-app/"
+    cwd flaskapp_dir
     code <<-EOH
     git init staticfiles.git --bare
     git clone staticfiles.git staticfiles
     EOH
 
     # Idempotent my arse
-    not_if {Dir.exists?("/home/vagrant/flask-app/staticfiles/.git")}
+    not_if {Dir.exists?("#{flaskapp_dir}/staticfiles/.git")}
 end
 
 
@@ -98,11 +100,13 @@ include_recipe 'mysql::server'
 # See
 # https://supermarket.getchef.com/cookbooks/database
 
+include_recipe "database::mysql"
+
 # Externalize conection info in a ruby hash
 mysql_connection_info = {
   :host     => 'localhost',
   :username => 'root',
-  :port     => node['mysql']['port'],
+  :port     => Integer(node['mysql']['port']),
   :password => node['mysql']['server_root_password']
 }
 
