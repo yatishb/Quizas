@@ -217,7 +217,15 @@ app_nginx_block "my-flaskapp-site" do
     proxy_pass "http://localhost:8080/"
 end
 
+
+
 # Ensure the webapp can be run??
 # (Like, that there's a TMux session-stuff for it?).
+
+# Files can be copied from the COOKBOOK/files/default/ dir
+# using the `cookbook_file` resource.
+# See
+# http://docs.getchef.com/resource_cookbook_file.html
+
 
 
