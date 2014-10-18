@@ -6,6 +6,7 @@
 flaskapp_user = node["flask-app"]["user"]
 flaskapp_dir  = node["flask-app"]["dir"]
 
+flaskapp_db = "flaskapp"
 
 # Ensure we have Python (and whatever else we need) installed
 # `package` uses apt-get. You can check the following make sense
@@ -68,8 +69,11 @@ end
 
 # See http://docs.getchef.com/opscode_cookbooks_python.html
 include_recipe "python"
+
 # Use pip to install Flask.
 python_pip "flask"
+python_pip "sqlalchemy"
+python_pip "flask-sqlalchemy"
 
 
 
@@ -117,7 +121,31 @@ mysql_connection_info = {
 #   password 'super_secret'
 #   action :create
 # end
-# 
+
+mysql_database flaskapp_db do
+  connection mysql_connection_info
+  action :create
+end
+
+# Database URIs
+# (Easiest to directly give our Flask App a 
+#  Database URI with username + password).
+# See
+# http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html#database-urls
+
+# As a file, in Python can simply read all the contents of a file
+# with
+# `db_uri = open("/path/to/flask_db.uri", "r").read()
+db_user = 'root'
+db_passwd = node['mysql']['server_root_password']
+file "#{flaskapp_dir}/flask_db.uri" do
+    owner flaskapp_user
+    group flaskapp_user
+    mode "0755"
+    content "mysql://#{db_user}:#{db_passwd}@localhost:#{node['mysql']['port']}/#{flaskapp_db}"
+    action :create_if_missing
+end
+
 # # grant select,update,insert privileges to all tables in foo db from all hosts, requiring connections over SSL
 # mysql_database_user 'foo_user' do
 #   connection mysql_connection_info
@@ -128,11 +156,6 @@ mysql_connection_info = {
 #   require_ssl true
 #   action :grant
 # end
-
-mysql_database 'foo' do
-  connection mysql_connection_info
-  action :create
-end
 
 # We could pre-fill a database like the following:
 # # Query a database
