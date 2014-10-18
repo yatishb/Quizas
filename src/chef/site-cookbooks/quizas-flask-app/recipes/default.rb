@@ -189,7 +189,10 @@ end
 # https://supermarket.getchef.com/cookbooks/application_nginx
 # http://docs.getchef.com/lwrp_application_nginx.html
 
-
+app_nginx_block "my-flaskapp-site" do
+    server_name "www.quizas.me"
+    proxy_pass "http://localhost:8080/"
+end
 
 # Ensure the webapp can be run??
 # (Like, that there's a TMux session-stuff for it?).
