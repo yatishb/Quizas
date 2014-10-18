@@ -53,7 +53,7 @@ end
 # (the `git` chef resource is for cloning existing
 #  resources. Cloning an empty repo isn't its thing).
 bash "setup staticfiles repos" do
-    user "vagrant"
+    user flaskapp_user
     cwd flaskapp_dir
     code <<-EOH
     git init staticfiles.git --bare
