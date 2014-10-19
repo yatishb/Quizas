@@ -16,6 +16,8 @@ flaskapp_db = "flaskapp"
 # on http://packages.ubuntu.com/
 
 # From http://stackoverflow.com/questions/5339690/installing-multiple-packages-via-vagrant-chef
+
+# This takes ~20s, and our run time is down to ~40s.
 execute "update package index" do
   command "apt-get update"
   ignore_failure true
@@ -28,7 +30,11 @@ end.run_action(:run)
     # Fuck chef_gem
     # This needs to be this syntax, so that it gets installed
     # at 'compile time'
-    package(pack).run_action(:install)
+    # See, e.g.
+    # https://www.getchef.com/blog/2013/09/04/demystifying-common-idioms-in-chef-recipes/
+
+    # Quicker to :upgrade than :install
+    package(pack).run_action(:upgrade)
 end
 
 
