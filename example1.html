@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+ <head>
+	<meta name="viewport" content="width=device-width, user-scalable=no" />
+	<title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src='http://cdn.html5quintus.com/v0.2.0/quintus-all.js'></script>
+    <!-- <script src='example1.js'></script> -->
+	<link rel="stylesheet" type="text/css" href="example1.css">
+ </head>
+ 
+ <body>
+	<script>
+	window.addEventListener("load",function() {
+ 
+	var Q = window.Q = Quintus()
+    .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
+    .setup({
+		maximize: true
+	}).touch();
+    
+	// Flash Card
+	Q.UI.FlashCard = Q.UI.Text.extend('UI.FlashCard', {
+		// default position is question
+		init: function(p) {
+			this._super(p, {
+				color: "white",
+				x: 	0,
+				y: 	0,
+				id: 'fc-null',
+				question: 'q-null',
+				answer: 'a-null',
+				isQuestion: true
+			});
+		},
+	
+	// load flashcard properties
+		generate: function(pId, pQns, pAns, pIsQ) { // later change this to accept a single JSON FlashCard object
+			this.p.id = pId;
+			this.p.question = pQns;
+			this.p.answer = pAns;
+			this.p.isQuestion = pIsQ;
+			if (this.p.isQuestion) {
+				this.p.label = this.p.question;
+			} else {
+				this.p.label = this.p.answer;
+			}
+		},
+	});
+	
+	//answer button
+		Q.UI.AnswButton = Q.UI.Button.extend('UI.AnswButton', {
+		init: function(p) {
+			this._super(Q._defaults(p, {
+				fill: "#FFFFFF",
+				border: 2,
+				shadow: 3,
+				shadowColor: "rgba(0,0,0,0.5)",
+				w: 40,
+				h: 40
+			}),                     
+			function() {
+				var currAnsw;
+				if(this.p.answerLabel.p.label === '') {
+					currAnsw = 0;
+				}
+				else {
+					currAnsw = parseInt(this.p.answerLabel.p.label);
+				}
+				
+				if(currAnsw < 1000000000) {
+					this.p.answerLabel.p.label = ""+(currAnsw*10+parseInt(this.p.label));
+				}
+					
+			}
+			);
+		}
+		});
+	
+	// set scene
+	Q.scene("scene1",function(stage) {
+	
+    //current question
+		var qContainer = stage.insert(new Q.UI.Container({
+			fill: "gray",
+			x: 160,
+			y: 130,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			w: 250,
+			h: 150
+		}));
+		
+		var aContainer = stage.insert(new Q.UI.Container({
+			fill: "gray",
+			x: 160,
+			y: 430,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			w: 125,
+			h: 150
+		}));
+    
+		var question = stage.insert(new Q.UI.FlashCard(),qContainer);  
+		question.generate(5, 'F=??', 'M x A', true);
+	
+	});
+	
+	// stage scene
+	Q.stageScene("scene1");
+	
+	
+     
+});
+	</script>
+ </body>
+</html>
