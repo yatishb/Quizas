@@ -200,17 +200,9 @@ include_recipe "nginx"
 # Disable default site,
 # Create and enable sites for other site(s)
 
-# # Disable 'default' site
-# nginx_site 'default' do
-#   enable false
-# end
-
-# node['nginx']['dir'] is path to nginx conf dir
-
-service 'nginx' do
-    # http://docs.getchef.com/resource_service.html
-    # 'reload' reloads conf
-    action :reload
+# Disable 'default' site
+nginx_site 'default' do
+  enable false
 end
 
 # For definition of app_nginx_block
@@ -228,7 +220,15 @@ app_nginx_block "my-flaskapp-site" do
     static_root "#{flaskapp_dir}/current/html"
 end
 
+nginx_site "my-flaskapp-site" do
+  enable true
+end
 
+service 'nginx' do
+    # http://docs.getchef.com/resource_service.html
+    # 'reload' reloads conf
+    action :reload
+end
 
 # Ensure the webapp can be run??
 # (Like, that there's a TMux session-stuff for it?).
