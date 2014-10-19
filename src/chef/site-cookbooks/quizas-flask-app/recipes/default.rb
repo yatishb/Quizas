@@ -6,6 +6,9 @@
 flaskapp_user = node["flask-app"]["user"]
 flaskapp_dir  = node["flask-app"]["dir"]
 
+# TODO: Customise app port; (in Flask app, in node, in this conf)
+flaskapp_port = '5000'
+
 flaskapp_db = "flaskapp"
 
 # Ensure we have Python (and whatever else we need) installed
@@ -196,25 +199,25 @@ include_recipe "nginx"
 
 # node['nginx']['dir'] is path to nginx conf dir
 
-# Use Templates or files for our nginx conf files??
-
 service 'nginx' do
     # http://docs.getchef.com/resource_service.html
     # 'reload' reloads conf
     action :reload
 end
 
-# Do we need a cookbook to do this?
-# -- Now, if we want multiple blocks, I think
-#    the best thing to do would be to have a
-#    template an iterate over this.
-# SEE
-# https://supermarket.getchef.com/cookbooks/application_nginx
-# http://docs.getchef.com/lwrp_application_nginx.html
+# For definition of app_nginx_block
+# See ../definitions/app_nginx_block.rb
+#
+# For the template nginx conf used by the definition
+# See ../templates/default/my_nginx_site.erb
 
+# TODO: WebSockets
+
+# Create /etc/nginx/sites-available/my-flaskapp-site
 app_nginx_block "my-flaskapp-site" do
     server_name "www.quizas.me"
-    proxy_pass "http://localhost:8080/"
+    proxy_pass "http://localhost:#{flaskapp_port}/"
+    static_root "#{flaskapp_dir}/current/html"
 end
 
 
