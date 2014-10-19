@@ -1,0 +1,198 @@
+body {
+  background: #99cfb7;
+  background-color: #99cfb7;
+  font-family: 'Open Sans', sans-serif;
+}
+
+img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+@font-face {
+    font-family: font_logo;
+    src:  url(../font/urban.ttf) format("truetype");
+    /*src: url('urban.ttf');*/
+}
+
+.jqm-list .ui-btn-up-d.ui-btn-active, 
+.jqm-list .ui-btn-hover-d.ui-btn-active, 
+.jqm-list .ui-btn-down-d.ui-btn-active {
+  background-color: #51BEEE;
+  background-image: none;
+  color: #fff;
+  text-shadow: 0 1px 0 #369;  
+}
+
+.jqm-list .ui-btn-active a.ui-link-inherit,
+.jqm-list .ui-btn-active .ui-li-heading,
+.jqm-list .ui-btn-active .ui-li-desc {
+  color: #fff;
+}
+
+/* Header - swatch F */
+.ui-bar-f,
+.jqm-header {
+  border: 1px solid #86D641;
+  background: #6ABA2F;
+  color: #fff;
+  text-shadow: 0 1px 1px #335413; 
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+}
+.ui-bar-f h1.ui-title {
+  font-weight: 300;
+  margin-top: .5em;
+  margin-bottom: .6em;
+}
+.ui-bar-f,
+.ui-bar-f .ui-link-inherit,
+.ui-bar-f .ui-link {
+  color: #fff;
+}
+.ui-btn-up-f {
+  border: 1px solid #3B6F07;
+  background: #56A00E;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 1px 1px #234403;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#74b042), to(#56A00E)); /* Saf4+, Chrome */
+  background-image: -webkit-linear-gradient(#74b042, #56A00E); /* Chrome 10+, Saf5.1+ */
+  background-image: -moz-linear-gradient(#74b042, #56A00E); /* FF3.6 */
+  background-image: -ms-linear-gradient(#74b042, #56A00E); /* IE10 */
+  background-image: -o-linear-gradient(#74b042, #56A00E); /* Opera 11.10+ */
+  background-image: linear-gradient(#74b042, #56A00E);
+}
+.ui-btn-up-f a.ui-link-inherit {
+  color: #fff;
+}
+.ui-btn-hover-f {
+  border: 1px solid #3B6F07;
+  background: #6EBC1F;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 1px 1px #234403;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#8FC963), to(#6EBC1F)); /* Saf4+, Chrome */
+  background-image: -webkit-linear-gradient(#8FC963, #6EBC1F); /* Chrome 10+, Saf5.1+ */
+  background-image: -moz-linear-gradient(#8FC963, #6EBC1F); /* FF3.6 */
+  background-image: -ms-linear-gradient(#8FC963, #6EBC1F); /* IE10 */
+  background-image: -o-linear-gradient(#8FC963, #6EBC1F); /* Opera 11.10+ */
+  background-image: linear-gradient(#8FC963, #6EBC1F);
+}
+.ui-btn-hover-f a.ui-link-inherit {
+  color: #fff;
+}
+.ui-btn-down-f {
+  border: 1px solid #3B6F07;
+  background: #3d3d3d;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 1px 1px #234403;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#56A00E), to(#64A234)); /* Saf4+, Chrome */
+  background-image: -webkit-linear-gradient(#56A00E, #64A234); /* Chrome 10+, Saf5.1+ */
+  background-image: -moz-linear-gradient(#56A00E, #64A234); /* FF3.6 */
+  background-image: -ms-linear-gradient(#56A00E, #64A234); /* IE10 */
+  background-image: -o-linear-gradient(#56A00E, #64A234); /* Opera 11.10+ */
+  background-image: linear-gradient(#56A00E, #64A234);
+}
+.ui-btn-down-f a.ui-link-inherit {
+  color: #fff;
+}
+.ui-btn-up-f,
+.ui-btn-hover-f,
+.ui-btn-down-f {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+  text-decoration: none;
+}
+
+/* Homepage header */
+.jqm-demos-home .jqm-header p.jqm-version {
+  margin: .2em 15px;
+  text-align: right;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+  font-size: .9em;
+  color: #fff;
+}
+.jqm-demos-home h1#jqm-logo {
+  font-size: 1em;
+  margin: 1em 15px;
+}
+.jqm-demos-home #jqm-logo img {
+  width: 275px;
+}
+
+/* Footer */
+.jqm-footer {
+  background: none;
+  border-top-width: 1px;
+  border-bottom-width: 0;
+  border-style: solid;
+  border-color: #e5e5e5;
+  border-color: rgba(0, 0, 0, .1);
+  color: #777;
+}
+.jqm-footer p {
+  font-size: .8em;
+  font-weight: normal;
+  margin: .7em 15px;  
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+}
+.jqm-footer p.jqm-version {
+  font-weight: bold;
+}
+
+.logo {
+  width: 75%;
+  max-width: 300px;
+  margin: auto;
+}
+
+.logo:before{
+    content: "";
+    display: relative;
+    padding-top: 100%;  /* initial ratio of 1:1*/
+}
+
+.logo_text {
+  font-family: font_logo, sans-serif;
+  color: white;
+  opacity: 0.8;
+  text-align: center;
+  font-size: 500%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.btn_social {
+  position: relative;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  width: 30%;
+  margin: auto;
+  margin-top: 30px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 18px;
+  line-height: 1.33;
+  border-radius: 6px;
+  padding: 10px 16px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn_fb {
+  padding-left: 61px;
+  color: white;
+  background-color: #3b5998;
+  border-color: rgba(0,0,0,0.2);
+}
+
+.list_option {
+  cursor: pointer;
+}
