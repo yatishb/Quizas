@@ -33,8 +33,16 @@ end
 # Folders for the Web app
 # within the %w{}, list the folders we want
 # within the `flask-app` folder.
+#
+# Assumptions/Expectations:
+# * Static served in current/html/
+#   * See below for assumptions about static src in repo.
+# * Flask app served from current/py
 %w{current
    current/html
+   current/html/js
+   current/html/css
+   current/py
    latest
    staticfiles.git
    staticfiles}.each do |dir|
@@ -230,5 +238,20 @@ end
 # See
 # http://docs.getchef.com/resource_cookbook_file.html
 
+# Assumptions:
+# * `static_serve_dir` MUST be the same as `static_root`
+#   for  `app_nginx_block`.
+# * `static_src_dirs` is a list of src folders (from repo,
+#   pushed to APPDIR/staticfiles.git) to copy static files from.
 
-
+template "#{flaskapp_dir}/staticfiles.git/hooks/post-receive" do
+    owner flaskapp_user
+    group flaskapp_user
+    mode "0755"
+    source "CopyStaticToProduction.sh.erb"
+    variables({
+        "app_dir" => flaskapp_dir,
+        "static_serve_dir" => "#{flaskapp_dir}/current/html",
+        "static_src_dirs" => %w{src/html src/html/js src/html/css}
+    })
+end
