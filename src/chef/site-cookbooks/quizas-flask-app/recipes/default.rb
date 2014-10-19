@@ -255,3 +255,15 @@ template "#{flaskapp_dir}/staticfiles.git/hooks/post-receive" do
         "static_src_dirs" => %w{src/html src/html/js src/html/css}
     })
 end
+
+
+
+template "#{flaskapp_dir}/UpdateFlask.sh" do
+    owner flaskapp_user
+    group flaskapp_user
+    mode "0755"
+    source "UpdateFlask.sh.erb"
+    variables({
+        "app_dir" => flaskapp_dir
+    })
+end

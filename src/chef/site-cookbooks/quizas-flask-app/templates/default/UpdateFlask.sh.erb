@@ -1,0 +1,51 @@
+#!/bin/bash
+
+<%
+# ERB template variables
+# app_dir          - `flaskapp_dir`
+#
+# Binary assumed to be in app_dir/current/py
+%>
+
+# This file expects to be in
+#   <%= @app_dir %>/UpdateBinary.sh
+#
+# Also make sure it's executable, with
+#   $ chmod +x UpdateBinary.sh
+
+echo "** UPDATING THE FLASK APP **"
+
+APPDIR=<%= @app_dir %>
+
+# Expects file to be scp'd to:
+#   <%= @app_dir %>/latest/flaskapp.tar.gz
+
+
+
+# Unzip the file
+echo "* Unzipping *"
+gunzip $APPDIR/latest/flaskapp.tar.gz
+
+# Untar will replace old files
+tar -xf $APPDIR/latest/flaskapp.tar -C <%= @app_dir %>/current/py
+
+# Remove, so next gunzip won't blow up
+rm $APPDIR/latest/flaskapp.tar
+
+
+
+# Flask apps run in "Debug mode" will check for updates in
+# the *.py files, and will recompile / re-run accordingly.
+
+# # Replace the currently running binary in the tmux pane.
+# # This assumes a tmux session is running with:
+# session_name=yesodapp
+# window=${session_name}:0
+# pane=${window}.0
+# 
+# # Let's replace the currently running yesodapp.
+# echo "* Replacing *"
+# echo $pane
+# replace_cmd="/bin/bash -c 'cd $APPDIR/current; $APPDIR/current/yesodapp Production'"
+# echo $replace_cmd
+# tmux respawn-pane -t $pane -k "$replace_cmd"
