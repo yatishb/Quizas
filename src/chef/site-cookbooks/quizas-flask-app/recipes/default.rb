@@ -22,6 +22,8 @@ execute "update package index" do
   action :nothing
 end.run_action(:run)
 
+# TODO: Chef. I think this slows things down, if it installs
+#             each time. Can we improve this??
 %w(git ruby-dev).each do |pack|
     # Fuck chef_gem
     # This needs to be this syntax, so that it gets installed
@@ -30,6 +32,11 @@ end.run_action(:run)
 end
 
 
+# TODO: User. `flask-app` user which can run the app but isn't
+#       in sudoers file.
+
+
+# TODO: FOREACH (stage, production)
 # Folders for the Web app
 # within the %w{}, list the folders we want
 # within the `flask-app` folder.
@@ -61,6 +68,7 @@ end
 
 
 
+# TODO: FOREACH (stage, production)
 # Ensure there is a bare git repo there
 # (the `git` chef resource is for cloning existing
 #  resources. Cloning an empty repo isn't its thing).
@@ -125,6 +133,7 @@ mysql_connection_info = {
   :password => node['mysql']['server_root_password']
 }
 
+# TODO: FOREACH (stage, production)
 # Can create users
 # # create a mysql user but grant no privileges
 # mysql_database_user 'disenfranchised' do
@@ -133,6 +142,7 @@ mysql_connection_info = {
 #   action :create
 # end
 
+# TODO: FOREACH (stage, production)
 mysql_database flaskapp_db do
   connection mysql_connection_info
   action :create
@@ -144,6 +154,7 @@ end
 # See
 # http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html#database-urls
 
+# TODO: FOREACH (stage, production)
 # As a file, in Python can simply read all the contents of a file
 # with
 # `db_uri = open("/path/to/flask_db.uri", "r").read()
@@ -213,6 +224,7 @@ end
 
 # TODO: WebSockets
 
+# TODO: FOREACH (stage, production)
 # Create /etc/nginx/sites-available/my-flaskapp-site
 app_nginx_block "my-flaskapp-site" do
     server_name "www.quizas.me"
@@ -220,6 +232,7 @@ app_nginx_block "my-flaskapp-site" do
     static_root "#{flaskapp_dir}/current/html"
 end
 
+# TODO: FOREACH (stage, production)
 nginx_site "my-flaskapp-site" do
   enable true
 end
@@ -244,6 +257,7 @@ end
 # * `static_src_dirs` is a list of src folders (from repo,
 #   pushed to APPDIR/staticfiles.git) to copy static files from.
 
+# TODO: FOREACH (stage, production)
 template "#{flaskapp_dir}/staticfiles.git/hooks/post-receive" do
     owner flaskapp_user
     group flaskapp_user
@@ -258,6 +272,7 @@ end
 
 
 
+# TODO: FOREACH (stage, production)
 template "#{flaskapp_dir}/UpdateFlask.sh" do
     owner flaskapp_user
     group flaskapp_user
