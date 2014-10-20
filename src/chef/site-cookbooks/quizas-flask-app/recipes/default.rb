@@ -17,15 +17,20 @@ flaskapp_db = "flaskapp"
 
 # From http://stackoverflow.com/questions/5339690/installing-multiple-packages-via-vagrant-chef
 
-# This takes ~20s, and our run time is down to ~40s.
+# This takes ~20s if we don't skip it.
+# So, cheapo way is to make a file after we have run this,
+# check for that file (and don't run if it exists).
 execute "update package index" do
   command "apt-get update"
   ignore_failure true
   action :nothing
+  not_if { File.exists?("/root/packages_have_been_upgraded.txt") }
 end.run_action(:run)
 
-# TODO: Chef. I think this slows things down, if it installs
-#             each time. Can we improve this??
+file "/root/packages_have_been_upgraded.txt" do
+    content "Just so we don't have to run `apt-get update` everytime"
+end
+
 %w(git ruby-dev).each do |pack|
     # Fuck chef_gem
     # This needs to be this syntax, so that it gets installed
@@ -95,10 +100,13 @@ end
 # See http://docs.getchef.com/opscode_cookbooks_python.html
 include_recipe "python"
 
+# Could shave ~3 seconds by skipping this if
+# pip stuff already installed. Tidier not to.
+
 # Use pip to install Flask.
-python_pip "flask"
-python_pip "sqlalchemy"
-python_pip "flask-sqlalchemy"
+%w{flask sqlalchemy flask-sqlalchemy}.each do |pypac|
+    python_pip pypac
+end
 
 
 
