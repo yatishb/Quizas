@@ -3,14 +3,6 @@
 # Recipe:: default
 #
 
-flaskapp_user = node["flask-app"]["user"]
-flaskapp_dir  = node["flask-app"]["dir"]
-
-# TODO: Customise app port; (in Flask app, in node, in this conf)
-flaskapp_port = '5000'
-
-flaskapp_db = "flaskapp"
-
 # Ensure we have Python (and whatever else we need) installed
 # `package` uses apt-get. You can check the following make sense
 # on http://packages.ubuntu.com/
@@ -47,53 +39,7 @@ end
 #       in sudoers file.
 
 
-# TODO: FOREACH (stage, production)
-# Folders for the Web app
-# within the %w{}, list the folders we want
-# within the `flask-app` folder.
-#
-# Assumptions/Expectations:
-# * Static served in current/html/
-#   * See below for assumptions about static src in repo.
-# * Flask app served from current/py
-%w{current
-   current/html
-   current/html/js
-   current/html/css
-   current/py
-   latest
-   staticfiles.git
-   staticfiles}.each do |dir|
-    directory "#{flaskapp_dir}/#{dir}" do
-        owner flaskapp_user
-        group flaskapp_user
-        mode "0755"
-        action :create
 
-        # Genius, this doesn't use `owner` recursively
-        # So.. cannot later create anything in
-        # `flask-app` dir. :|
-        recursive true
-    end
-end
-
-
-
-# TODO: FOREACH (stage, production)
-# Ensure there is a bare git repo there
-# (the `git` chef resource is for cloning existing
-#  resources. Cloning an empty repo isn't its thing).
-bash "setup staticfiles repos" do
-    user flaskapp_user
-    cwd flaskapp_dir
-    code <<-EOH
-    git init staticfiles.git --bare
-    git clone staticfiles.git staticfiles
-    EOH
-
-    # Idempotent my arse
-    not_if {Dir.exists?("#{flaskapp_dir}/staticfiles/.git")}
-end
 
 
 
@@ -138,49 +84,6 @@ include_recipe 'mysql::server'
 # https://supermarket.getchef.com/cookbooks/database
 
 include_recipe "database::mysql"
-
-# Externalize conection info in a ruby hash
-mysql_connection_info = {
-  :host     => 'localhost',
-  :username => 'root',
-  :port     => Integer(node['mysql']['port']),
-  :password => node['mysql']['server_root_password']
-}
-
-# TODO: FOREACH (stage, production)
-# Can create users
-# # create a mysql user but grant no privileges
-# mysql_database_user 'disenfranchised' do
-#   connection mysql_connection_info
-#   password 'super_secret'
-#   action :create
-# end
-
-# TODO: FOREACH (stage, production)
-mysql_database flaskapp_db do
-  connection mysql_connection_info
-  action :create
-end
-
-# Database URIs
-# (Easiest to directly give our Flask App a 
-#  Database URI with username + password).
-# See
-# http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html#database-urls
-
-# TODO: FOREACH (stage, production)
-# As a file, in Python can simply read all the contents of a file
-# with
-# `db_uri = open("/path/to/flask_db.uri", "r").read()
-db_user = 'root'
-db_passwd = node['mysql']['server_root_password']
-file "#{flaskapp_dir}/flask_db.uri" do
-    owner flaskapp_user
-    group flaskapp_user
-    mode "0755"
-    content "mysql://#{db_user}:#{db_passwd}@localhost:#{node['mysql']['port']}/#{flaskapp_db}"
-    action :create_if_missing
-end
 
 # # grant select,update,insert privileges to all tables in foo db from all hosts, requiring connections over SSL
 # mysql_database_user 'foo_user' do
@@ -230,33 +133,6 @@ nginx_site 'default' do
   enable false
 end
 
-# For definition of app_nginx_block
-# See ../definitions/app_nginx_block.rb
-#
-# For the template nginx conf used by the definition
-# See ../templates/default/my_nginx_site.erb
-
-# TODO: WebSockets
-
-# TODO: FOREACH (stage, production)
-# Create /etc/nginx/sites-available/my-flaskapp-site
-app_nginx_block "my-flaskapp-site" do
-    server_name "www.quizas.me"
-    proxy_pass "http://localhost:#{flaskapp_port}/"
-    static_root "#{flaskapp_dir}/current/html"
-end
-
-# TODO: FOREACH (stage, production)
-nginx_site "my-flaskapp-site" do
-  enable true
-end
-
-service 'nginx' do
-    # http://docs.getchef.com/resource_service.html
-    # 'reload' reloads conf
-    action :reload
-end
-
 # Ensure the webapp can be run??
 # (Like, that there's a TMux session-stuff for it?).
 
@@ -265,34 +141,4 @@ end
 # See
 # http://docs.getchef.com/resource_cookbook_file.html
 
-# Assumptions:
-# * `static_serve_dir` MUST be the same as `static_root`
-#   for  `app_nginx_block`.
-# * `static_src_dirs` is a list of src folders (from repo,
-#   pushed to APPDIR/staticfiles.git) to copy static files from.
-
-# TODO: FOREACH (stage, production)
-template "#{flaskapp_dir}/staticfiles.git/hooks/post-receive" do
-    owner flaskapp_user
-    group flaskapp_user
-    mode "0755"
-    source "CopyStaticToProduction.sh.erb"
-    variables({
-        "app_dir" => flaskapp_dir,
-        "static_serve_dir" => "#{flaskapp_dir}/current/html",
-        "static_src_dirs" => %w{src/html src/html/js src/html/css}
-    })
-end
-
-
-
-# TODO: FOREACH (stage, production)
-template "#{flaskapp_dir}/UpdateFlask.sh" do
-    owner flaskapp_user
-    group flaskapp_user
-    mode "0755"
-    source "UpdateFlask.sh.erb"
-    variables({
-        "app_dir" => flaskapp_dir
-    })
-end
+quizas_app "default"

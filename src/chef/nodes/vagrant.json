@@ -1,7 +1,14 @@
 {
     "flask-app": {
         "user": "vagrant",
-        "dir": "/home/vagrant/flask-app"
+        "dir": "/home/vagrant/flask-app",
+        "port": "5000",
+        "database_name": "flaskapp",
+        "nginx_sitename": "my-flaskapp-site",
+        "nginx_site_server_name": "www.quizas.me",
+        "nginx_site_proxy_pass": "http://localhost:5000/",
+        "nginx_site_static_root": "/home/vagrant/flask-app/current/html"
+
     },
     "run_list": ["recipe[quizas-flask-app]"]
 }
