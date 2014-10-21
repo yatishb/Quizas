@@ -141,7 +141,7 @@
 		maximize: true
 	}).touch();
 	
-	Q.state.reset({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
+	Q.state.set({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
 	var deck = shuffleDeck(Q.state.get("totalQuestions"), DECK_SIZE);
 	
 	Q.UI.Score = Q.UI.Text.extend("UI.Score", { 
@@ -209,6 +209,8 @@
 		init: function(p) {
 			this._super(Q._defaults(p, {
 				fill: "#FFFFFF",
+				//highlight: "#FFFFFF",
+				fontColor: "white",
 				border: 2,
 				shadow: 3,
 				shadowColor: "rgba(0,0,0,0.5)",
@@ -228,6 +230,8 @@
 	// set scene
 	Q.scene("scene1",function(stage) {
 	
+		Q.state.reset({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
+	
 		var leScore = stage.insert(new Q.UI.Score());
 		var leQC = stage.insert(new Q.UI.QuestionCounter());
 		var ansDeck;
@@ -242,6 +246,8 @@
 					var fcAns = JSON.parse(getFlashCard(FLASH_SET, ansDeck[k])).answer;
 					aBtns[k] = stage.insert(new Q.UI.Button({
 						fill: "gray",
+						//highlight: "white",
+						fontColor: "white",
 						x: 90 + (140*j),
 						y: 360 + (130*i),
 						border: 2,
@@ -294,10 +300,33 @@
 		qCard.generate(getFlashCard(FLASH_SET, deck[Q.state.get("currentQuestion") - 1]));
 		
 		Q.state.on("change.currentQuestion", function() {
+			if (Q.state.get("currentQuestion") == TOTAL_QUESTIONS) {
+				Q.stageScene("scene2");
+			} 
 			qCard.generate(getFlashCard(FLASH_SET, deck[Q.state.get("currentQuestion") - 1]));
 			destroyAnswers(aBtns);
 			aBtns = generateAnswers();
 		});
+		
+	});
+	
+	// set scene
+	Q.scene("scene2",function(stage) {
+	
+		var ReplayBtn = stage.insert(new Q.UI.Button({
+			fill: "gray",
+			x: 160,
+			y: 160,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			w: 110,
+			h: 100,
+			label: 'Replay',
+		}, function() {
+			Q.stageScene("scene1");
+		}));
+		
 		
 	});
 	
