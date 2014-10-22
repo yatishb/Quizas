@@ -1,5 +1,6 @@
 import requests
 import ast
+import json
 
 import secrets
 
@@ -41,4 +42,7 @@ def authparam():
 		receivedPayload = ast.literal_eval(req.text)
 		accessToken = receivedPayload['access_token']
 		userId = receivedPayload['user_id']
-		return accessToken
+		jsonData = {}
+		jsonData['id'] = userId
+		jsonData['token'] = accessToken
+		return json.dumps(jsonData)
