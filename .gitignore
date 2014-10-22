@@ -68,3 +68,7 @@ docs/_build/
 # PyBuilder
 target/
 
+
+
+# Ignore this. 'cause it's Secret.
+secrets.py
