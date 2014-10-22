@@ -1,0 +1,13 @@
+{
+    "flask-app": {
+        "user": "ubuntu",
+        "dir": "/home/ubuntu/flask-app",
+        "port": "5000",
+        "database_name": "flaskapp",
+        "nginx_sitename": "my-flaskapp-site",
+        "nginx_site_server_name": "www.quizas.me",
+        "nginx_site_proxy_pass": "http://localhost:5000/",
+        "nginx_site_static_root": "/home/ubuntu/flask-app/current/html"
+    },
+    "run_list": ["recipe[quizas-flask-app]"]
+}

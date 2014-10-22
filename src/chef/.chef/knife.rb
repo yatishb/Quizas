@@ -4,6 +4,8 @@ role_path        "roles"
 environment_path "environments"
 data_bag_path    "data_bags"
 
+knife[:bootstrap_version] = '11'
+
 # Let's use the same .pem as AWS gave us
 # (for simplicity).
 # Gotta know where this is, so.. look either at
