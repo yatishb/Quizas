@@ -1,5 +1,5 @@
 from flask import Flask
-from Quizletauth import quizletauth
+from quizletauth import quizletauth
 
 app = Flask(__name__)
 app.register_blueprint(quizletauth)

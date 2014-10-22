@@ -1,20 +1,20 @@
 import requests
 import ast
 
+import secrets
+
 from flask import Blueprint
 from flask import request, redirect
 quizletauth = Blueprint('quizletauth', __name__)
 
 @quizletauth.route("/quizletauth")
 def auth1():
-	clientID = "bgT4xYAXqK"
-	redirectUrl = "http://54.169.123.39:5000/quizletauthstep2"
+	clientID = secrets.quizlet_client_id
+	redirectUrl = secrets.quizlet_redirect_url
 	randomStateString = "quiwas"
-	# clientID = 'p8UvFSHYUd' # use for localhost testing
-	# redirectUrl = 'http://127.0.0.1:5000/quizletauthstep2' # use for localhost testing
-	authorizeUrl = "https://quizlet.com/authorize?client_id=" +clientID + "&response_type=code&scope=read%20write_set"
+	authorizeUrl = "https://quizlet.com/authorize?client_id=" + clientID + "&response_type=code&scope=read%20write_set"
 
-	url = authorizeUrl + "&state=" + randomStateString +"&redirect_uri=" + redirectUrl
+	url = authorizeUrl + "&state=" + randomStateString + "&redirect_uri=" + redirectUrl
 	return redirect(url)
 
 
@@ -22,10 +22,8 @@ def auth1():
 def authparam():
 	tokenUrl = "https://api.quizlet.com/oauth/token"
 	randomStateString = "quiwas"
-	clientID = "bgT4xYAXqK"
-	keySecret = "62FgV2eBuE6EATxncscuek"
-	# clientID = 'p8UvFSHYUd' # use for localhost testing
-	# keySecret = 'fAzdhfBnTPkGvgBqPwbHTX' # use for localhost testing
+	clientID = secrets.quizlet_client_id
+	keySecret = secrets.quizlet_key_secret
 
 	state = request.args.get('state')
 	if state != randomStateString :
@@ -33,8 +31,7 @@ def authparam():
 
 	code = request.args.get('code')
 	grant_type = "authorization_code"
-	# redirect_uri = 'http://127.0.0.1:5000/quizletauthstep2' # use for localhost testing
-	redirect_uri = "http://54.169.123.39:5000/quizletauthstep2"
+	redirect_uri = secrets.quizlet_redirect_url
 	payload = {'code' : code, 'grant_type' : grant_type, 'redirect_uri' : redirect_uri}
 
 	req = requests.post(tokenUrl, data=payload, auth=(clientID, keySecret))
