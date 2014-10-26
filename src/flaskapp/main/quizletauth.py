@@ -4,11 +4,10 @@ import json
 
 import secrets
 
-from flask import Blueprint
 from flask import request, redirect
-quizletauth = Blueprint('quizletauth', __name__)
+from . import main
 
-@quizletauth.route("/quizletauth")
+@main.route("/quizletauth")
 def auth1():
 	clientID = secrets.quizlet_client_id
 	redirectUrl = secrets.quizlet_redirect_url
@@ -19,7 +18,7 @@ def auth1():
 	return redirect(url)
 
 
-@quizletauth.route("/quizletauthstep2")
+@main.route("/quizletauthstep2")
 def authparam():
 	tokenUrl = "https://api.quizlet.com/oauth/token"
 	randomStateString = "quiwas"
