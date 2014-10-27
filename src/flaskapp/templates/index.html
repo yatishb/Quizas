@@ -36,11 +36,15 @@
                 return false;
             });
             $('form#join').submit(function(event) {
-                socket.emit('join', {room: $('#join_room').val()});
+                socket.emit('joinroom', {room: $('#join_room').val()});
                 return false;
             });
             $('form#leave').submit(function(event) {
-                socket.emit('leave', {room: $('#leave_room').val()});
+                socket.emit('leaveroom');//, {room: $('#leave_room').val()});
+                return false;
+            });
+            $('form#clear').submit(function(event) {
+                socket.emit('clearroom', {room: $('#clear_room').val()});
                 return false;
             });
             $('form#send_room').submit(function(event) {
@@ -76,6 +80,10 @@
     <form id="leave" method='POST' action='#'>
         <input type="text" name="leave_room" id="leave_room" placeholder="Room Name">
         <input type="submit" value="Leave Room">
+    </form>
+    <form id="clear" method='POST' action='#'>
+        <input type="text" name="clear_room" id="clear_room" placeholder="Room Name">
+        <input type="submit" value="Clear Room">
     </form>
     <form id="send_room" method='POST' action='#'>
         <input type="text" name="room_name" id="room_name" placeholder="Room Name">
