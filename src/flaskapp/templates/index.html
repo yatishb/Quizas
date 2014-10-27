@@ -48,7 +48,7 @@
                 return false;
             });
             $('form#send_room').submit(function(event) {
-                socket.emit('my room event', {room: $('#room_name').val(), data: $('#room_data').val()});
+                socket.emit('readanswer', {qid: $('#room_name').val(), answer: $('#room_data').val()});
                 return false;
             });
             $('form#client_uuid').submit(function(event) {
@@ -86,9 +86,9 @@
         <input type="submit" value="Clear Room">
     </form>
     <form id="send_room" method='POST' action='#'>
-        <input type="text" name="room_name" id="room_name" placeholder="Room Name">
-        <input type="text" name="room_data" id="room_data" placeholder="Message">
-        <input type="submit" value="Send to Room">
+        <input type="text" name="room_name" id="room_name" placeholder="Question id">
+        <input type="text" name="room_data" id="room_data" placeholder="Answer">
+        <input type="submit" value="Answer Room">
     </form>
     <form id="client_uuid" method='POST' action='#'>
         <input type="text" name="clientuuid" id="clientuuid" placeholder="Client UUID">
