@@ -7,10 +7,14 @@ import secrets
 from flask import request, redirect
 from . import main
 
+CONSUMER_TOKEN  = secrets.quizlet_client_id
+CONSUMER_SECRET = secrets.quizlet_key_secret
+CALLBACK_URL    = secrets.quizlet_redirect_url
+
 @main.route("/quizletauth")
 def auth1():
-	clientID = secrets.quizlet_client_id
-	redirectUrl = secrets.quizlet_redirect_url
+	clientID = CONSUMER_TOKEN
+	redirectUrl = CALLBACK_URL
 	randomStateString = "quiwas"
 	authorizeUrl = "https://quizlet.com/authorize?client_id=" + clientID + "&response_type=code&scope=read%20write_set"
 
@@ -22,8 +26,8 @@ def auth1():
 def authparam():
 	tokenUrl = "https://api.quizlet.com/oauth/token"
 	randomStateString = "quiwas"
-	clientID = secrets.quizlet_client_id
-	keySecret = secrets.quizlet_key_secret
+	clientID = CONSUMER_TOKEN
+	keySecret = CONSUMER_SECRET
 
 	state = request.args.get('state')
 	if state != randomStateString :
@@ -31,7 +35,7 @@ def authparam():
 
 	code = request.args.get('code')
 	grant_type = "authorization_code"
-	redirect_uri = secrets.quizlet_redirect_url
+	redirect_uri = CALLBACK_URL
 	payload = {'code' : code, 'grant_type' : grant_type, 'redirect_uri' : redirect_uri}
 
 	req = requests.post(tokenUrl, data=payload, auth=(clientID, keySecret))

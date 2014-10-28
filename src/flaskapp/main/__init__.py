@@ -2,4 +2,6 @@ from flask import Blueprint
 
 main = Blueprint('main', __name__)
 
-import quizletauth, flaskmain, sockets
+import twitterauth
+import quizletauth
+import flaskmain, sockets

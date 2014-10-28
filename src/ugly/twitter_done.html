@@ -7,7 +7,7 @@ Cookies:<br/>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 <script>
-var cookVal = $.cookie('quizas_access_token');
+var cookVal = $.cookie('twitter_user_id');
 console.log("Cookie[foo] is " + cookVal);
 $("#cookieVal").html(cookVal);
 </script>
@@ -16,8 +16,8 @@ $("#cookieVal").html(cookVal);
 <br/>
 
 
-Quizlet API Call Response:<br/>
-<div id="apiResponse"></div>
+Twitter API Call Response:<br/>
+<div id="apiResponse">TODO, lol</div>
 <br/>
 
 <!-- From: http://www.ajax-cross-origin.com/ -->
@@ -27,31 +27,6 @@ Quizlet API Call Response:<br/>
 var username = $.cookie('quizas_user_id');
 var accessToken = $.cookie('quizas_access_token');
 var reqUrl = "http://dev.localhost/quizlet/2.0/users/" + username;
-
-// Set Authorization header.
-// See:
-// http://stackoverflow.com/questions/14010851/set-request-header-jquery-ajax
-// and
-// https://quizlet.com/api/2.0/docs/making_api_calls#user-authenticated-calls
-$.ajax({
-url: reqUrl,
-type: 'GET',
-crossDomain: true,
-// beforeSend: function (xhr) {
-//     xhr.setRequestHeader('Authorization', "Bearer " + accessToken);
-// },
-headers: {
-	"Authorization": "Bearer " + accessToken
-},
-data: {},
-success: function (res) {
-	$("#apiResponse").text(JSON.stringify(res));
-	// $("#apiResponse").text(res);
-},
-error: function (err) {
-	console.log("API Call Error: " + err);
-}
-});
 
 
 </script>

@@ -15,7 +15,9 @@ import secrets
 
 from flask import Blueprint
 from flask import request, redirect
-twitterauth = Blueprint('twitterauth', __name__)
+
+# Use the main blueprint, so that the code is in general tidier.
+from . import main
 
 
 CONSUMER_TOKEN  = secrets.auth["twitter"]["client_id"]
@@ -27,11 +29,11 @@ session = dict()
 db = dict() #you can save these values to a database
 
 
-@twitterauth.route("/twitterauth")
+@main.route("/twitterauth")
 def send_token():
-	auth = tweepy.OAuthHandler(secrets.auth["twitter"]["client_id"],
-	                           secrets.auth["twitter"]["key_secret"],
-	                           secrets.auth["twitter"]["redirect_url"])
+	auth = tweepy.OAuthHandler(CONSUMER_TOKEN,
+	                           CONSUMER_SECRET,
+	                           CALLBACK_URL)
 	
 	try:
 		# get the request tokens
@@ -48,7 +50,7 @@ def send_token():
 
 
 # The Callback
-@twitterauth.route("/twitterauthstep2")
+@main.route("/twitterauthstep2")
 def get_verification():
 	
 	#get the verifier key from the request url
