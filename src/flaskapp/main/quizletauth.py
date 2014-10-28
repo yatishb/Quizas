@@ -4,7 +4,7 @@ import json
 
 import secrets
 
-from flask import request, redirect
+from flask import request, redirect, make_response
 from . import main
 
 CONSUMER_TOKEN  = secrets.quizlet_client_id
@@ -48,4 +48,10 @@ def authparam():
 		jsonData = {}
 		jsonData['id'] = userId
 		jsonData['token'] = accessToken
-		return json.dumps(jsonData)
+
+		resp = make_response(json.dumps(jsonData))
+
+		resp.set_cookie("quizlet_user_id", userId)
+		resp.set_cookie("quizlet_access_token", accessToken)
+
+		return resp
