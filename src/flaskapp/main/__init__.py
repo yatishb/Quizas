@@ -9,4 +9,3 @@ import flaskmain
 import sockets
 import models
 import testdb
-# testdb.createDB()

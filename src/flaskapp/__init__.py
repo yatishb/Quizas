@@ -18,4 +18,10 @@ def create_app(debug=False):
 
     socketio.init_app(app)
     db.init_app(app)
+    # Adopted from : http://stackoverflow.com/questions/19437883/when-scattering-flask-models-runtimeerror-application-not-registered-on-db
+    with app.app_context():
+        # Extensions like Flask-SQLAlchemy now know what the "current" app
+        # is while within this block. Therefore, you can now run........
+        db.create_all()
+
     return app
