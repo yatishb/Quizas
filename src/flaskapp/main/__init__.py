@@ -5,4 +5,8 @@ main = Blueprint('main', __name__)
 import twitterauth
 import quizletauth
 import quizletsets
-import flaskmain, sockets
+import flaskmain
+import sockets
+import models
+import testdb
+# testdb.createDB()
