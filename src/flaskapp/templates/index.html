@@ -44,7 +44,7 @@
                 return false;
             });
             $('form#clear').submit(function(event) {
-                socket.emit('clearroom', {room: $('#clear_room').val()});
+                socket.emit('clearroom');//, {room: $('#clear_room').val()});
                 return false;
             });
             $('form#send_room').submit(function(event) {
