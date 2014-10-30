@@ -79,7 +79,6 @@ def clearRoom():
 					socket['/test'].session['room'] = defaultRoom
 					socket['/test'].leave_room(room)
 					socket['/test'].base_emit('my response', {'data': "cleared room"})
-					socket['/test'].base_emit('my response', {'data': socket['/test'].session['room']})
 		emit('my response', {'data': "checking for room"}, room=room) # This doesn't send message to any client. Verified
 	else:
 		emit('my response', {'data': 'no such room'})
