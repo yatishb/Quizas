@@ -40,13 +40,17 @@ class FlashCardInGame(db.Model):
 	flashcardId = db.Column(db.Integer)
 	user1Ans = db.Column(db.String(20))
 	user2Ans = db.Column(db.String(20))
+	user1Correct = db.Column(db.Boolean)
+	user2Correct = db.Column(db.Boolean)
 
-	def __init__(self, gameId, flashsetId, flashcardId, user1Ans, user2Ans):
+	def __init__(self, gameId, flashsetId, flashcardId, user1Ans, user2Ans, user1Correct, user2Correct):
 		self.gameId = gameId
 		self.flashsetId = flashsetId
 		self.flashcardId = flashcardId
 		self.user1 = user1Ans
 		self.user2 = user2Ans
+		self.user1Correct = user1Correct
+		self.user2Correct = user2Correct
 
 	def __repr__(self):
 		return '<Game ID %r FlashCardId %r>' % (self.gameId, self.flashcardId)
