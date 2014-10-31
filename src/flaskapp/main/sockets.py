@@ -2,6 +2,7 @@ import uuid, json
 from flask import Flask, render_template, session, request
 from flask.ext.socketio import emit, join_room, leave_room
 from .. import socketio
+import accessdb
 
 socketRooms = {}
 roomClientAnswers = {}
@@ -71,8 +72,16 @@ def leaveRoom():
 def clearRoom():
 	room = session['room']
 	if socketRooms.has_key(room) == True:
+		# Write all answers to db first
+		# Get flashsetid here first
+		# Verify if quiz is genuinely completed. If not do not write to db
+		if roomClientAnswers.has_key(room) == True:
+			accessdb.documentGame(room, roomClientAnswers.get(room), 1)
+			del roomClientAnswers[room]
+
 		usersInRoom = socketRooms.get(room)
 		del socketRooms[room]
+
 		for eachUser in usersInRoom :
 			for sessid, socket in request.namespace.socket.server.sockets.items():
 				if socket['/test'].session['id'] == eachUser:

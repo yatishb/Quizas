@@ -20,22 +20,20 @@ class FlashGame(db.Model):
 	flashsetId = db.Column(db.Integer)
 	user1 = db.Column(db.String(20))
 	user2 = db.Column(db.String(20))
-	questionsArray = db.Column(db.String(100))
 
-	def __init__(self, gameId, flashsetId, user1, user2, questionsArray):
+	def __init__(self, gameId, flashsetId, user1, user2):
 		self.gameId = gameId
 		self.flashsetId = flashsetId
 		self.user1 = user1
 		self.user2 = user2
-		self.questionsArray = questionsArray
 
 	def __repr__(self):
-		return '<Game ID %r>' % self.gameId
+		return '<Game ID %r>' % self.gameId	
 
 
 class FlashCardInGame(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	gameId = db.Column(db.String(40), unique=True)
+	gameId = db.Column(db.String(40))
 	flashsetId = db.Column(db.Integer)
 	flashcardId = db.Column(db.Integer)
 	user1Ans = db.Column(db.String(20))
@@ -47,8 +45,8 @@ class FlashCardInGame(db.Model):
 		self.gameId = gameId
 		self.flashsetId = flashsetId
 		self.flashcardId = flashcardId
-		self.user1 = user1Ans
-		self.user2 = user2Ans
+		self.user1Ans = user1Ans
+		self.user2Ans = user2Ans
 		self.user1Correct = user1Correct
 		self.user2Correct = user2Correct
 
