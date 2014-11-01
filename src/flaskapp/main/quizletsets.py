@@ -6,8 +6,10 @@ import json
 
 import secrets
 
+from models import UserFlashSet
 from flask import request, redirect, abort
 from . import main
+from .. import db
 
 CONSUMER_TOKEN  = secrets.auth["quizlet"]["client_id"]
 CONSUMER_SECRET = secrets.auth["quizlet"]["key_secret"]
@@ -58,8 +60,31 @@ def get_quizlet_set(set_id):
 
 
 # /user/#user-id/sets
+@main.route('/user/<user_id>/sets')
+def get_user_sets(user_id):
+	result = UserFlashSet.query.filter_by(user = user_id).all()
+	set_ids = [user_flashset.flashsetId for user_flashset in result]
+	return json.dumps(set_ids)
 
 # /user/#user-id/sets/#set-id
+@main.route('/user/<user_id>/sets/<set_id>', methods=['PUT', 'DELETE'])
+def modify_user_sets(user_id, set_id):
+	# ACTION = PUT, DELETE
+
+	current = UserFlashSet.query \
+	                      .filter_by(user = user_id, flashsetId = set_id) \
+	                      .all()
+	if request.method == 'PUT':
+		if len(current) == 0:
+			user_flashset = UserFlashSet(user_id, set_id)
+			db.session.add(user_flashset)
+	if request.method == 'DELETE':
+		db.session.delete(current[0])
+
+	db.session.commit()
+
+	return json.dumps({"result": "ok"})
+
 
 # /sets/search/#query
 # See:
