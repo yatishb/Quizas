@@ -13,19 +13,18 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
-
+# Having a single user by row means redundant data
+# This going to lead to more space usage but possible reduction in query time
 class FlashGame(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	gameId = db.Column(db.String(40), unique=True)
+	gameId = db.Column(db.String(40))
 	flashsetId = db.Column(db.Integer)
-	user1 = db.Column(db.String(20))
-	user2 = db.Column(db.String(20))
+	user = db.Column(db.String(80))
 
-	def __init__(self, gameId, flashsetId, user1, user2):
+	def __init__(self, gameId, flashsetId, user):
 		self.gameId = gameId
 		self.flashsetId = flashsetId
-		self.user1 = user1
-		self.user2 = user2
+		self.user = user
 
 	def __repr__(self):
 		return '<Game ID %r>' % self.gameId	
@@ -36,19 +35,17 @@ class FlashCardInGame(db.Model):
 	gameId = db.Column(db.String(40))
 	flashsetId = db.Column(db.Integer)
 	flashcardId = db.Column(db.Integer)
-	user1Ans = db.Column(db.String(20))
-	user2Ans = db.Column(db.String(20))
-	user1Correct = db.Column(db.Boolean)
-	user2Correct = db.Column(db.Boolean)
+	user = db.Column(db.String(80))
+	userAns = db.Column(db.String(40))
+	isCorrect = db.Column(db.Boolean)
 
-	def __init__(self, gameId, flashsetId, flashcardId, user1Ans, user2Ans, user1Correct, user2Correct):
+	def __init__(self, gameId, flashsetId, flashcardId, user, userAns, isCorrect):
 		self.gameId = gameId
 		self.flashsetId = flashsetId
 		self.flashcardId = flashcardId
-		self.user1Ans = user1Ans
-		self.user2Ans = user2Ans
-		self.user1Correct = user1Correct
-		self.user2Correct = user2Correct
+		self.user = user
+		self.userAns = userAns
+		self.isCorrect = isCorrect
 
 	def __repr__(self):
-		return '<Game ID %r FlashCardId %r>' % (self.gameId, self.flashcardId)
+		return '<Game ID %r FlashCardId %r User %r>' % (self.gameId, self.flashcardId, self.user)
