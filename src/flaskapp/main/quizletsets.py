@@ -9,9 +9,9 @@ import secrets
 from flask import request, redirect, abort
 from . import main
 
-CONSUMER_TOKEN  = secrets.quizlet_client_id
-CONSUMER_SECRET = secrets.quizlet_key_secret
-CALLBACK_URL    = secrets.quizlet_redirect_url
+CONSUMER_TOKEN  = secrets.auth["quizlet"]["client_id"]
+CONSUMER_SECRET = secrets.auth["quizlet"]["key_secret"]
+CALLBACK_URL    = secrets.auth["quizlet"]["redirect_url"]
 
 # /sets/#set-id
 # Expects set-id as `quizlet:SET_ID`

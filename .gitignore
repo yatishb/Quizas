@@ -71,4 +71,4 @@ target/
 
 
 # Ignore this. 'cause it's Secret.
-secrets.py
+secrets.json
