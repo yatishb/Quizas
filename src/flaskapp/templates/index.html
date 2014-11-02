@@ -39,6 +39,10 @@
                 socket.emit('joinroom', {room: $('#join_room').val()});
                 return false;
             });
+            $('form#assign').submit(function(event) {
+                socket.emit('assignroom', {room: $('#assign_room').val(), user1: $('#assign_user_1').val(), user2: $('#assign_user_2').val()});
+                return false;
+            });
             $('form#leave').submit(function(event) {
                 socket.emit('leaveroom');//, {room: $('#leave_room').val()});
                 return false;
@@ -76,6 +80,12 @@
     <form id="join" method='POST' action='#'>
         <input type="text" name="join_room" id="join_room" placeholder="Room Name">
         <input type="submit" value="Join Room">
+    </form>
+    <form id="assign" method='POST' action='#'>
+        <input type="text" name="assign_room" id="assign_room" placeholder="Room Name">
+        <input type="text" name="assign_user_1" id="assign_user_1" placeholder="User 1">
+        <input type="text" name="assign_user_2" id="assign_user_2" placeholder="User 2">
+        <input type="submit" value="Assign Room">
     </form>
     <form id="leave" method='POST' action='#'>
         <input type="text" name="leave_room" id="leave_room" placeholder="Room Name">
