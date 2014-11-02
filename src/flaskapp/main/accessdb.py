@@ -1,4 +1,5 @@
 from models import User, FlashGame as FG, FlashCardInGame as FC
+from sqlalchemy import func
 from . import main
 from .. import db
 import json
@@ -75,7 +76,10 @@ def getUserWinLossStats(userid, opponentUserId = None):
 
 def getUserGames(userid):
 	# Return list of gameids of the games played by the user
-	allGamesUserPlayed = FG.query.filter(FG.user == userid).with_entities(FG.gameId)
+	allGamesUserPlayed = FG.query.with_entities(FG.gameId).\
+							group_by(FG.gameId).\
+							having(FG.user == userid).\
+							having(func.count() == 2)
 	gameIds = []
 	for eachGamePlayedByUser in allGamesUserPlayed:
 		gameIds.append(eachGamePlayedByUser.gameId)
@@ -83,8 +87,10 @@ def getUserGames(userid):
 
 def getCommonGames(userid, opponentUserId):
 	# Return list of common gameids of the games played by both
-	userGames = FG.query.filter(FG.user == userid).with_entities(FG.gameId)
-	oppoGames = FG.query.filter(FG.user == opponentUserId).with_entities(FG.gameId)
+	userGames = FG.query.filter(FG.user == userid).\
+					with_entities(FG.gameId)
+	oppoGames = FG.query.filter(FG.user == opponentUserId).\
+					with_entities(FG.gameId)
 	commonGames = []
 
 	gameIds = []
@@ -108,11 +114,13 @@ def getGameStats(userid, gameidForStats):
 	opponentUserId = ""
 	gameResult = ""
 
+	noOfQuestions = 0
 	noOfQuestionsCorrectUser = 0
 	noOfQuestionsCorrectOpponent = 0
-	noOfQuestions = len(questionsInGame) / 2
+	
 	for row in questionsInGame:
 		if row.user == userid:
+			noOfQuestions += 1
 			if row.isCorrect == True:
 				noOfQuestionsCorrectUser += 1
 		else:
@@ -137,11 +145,16 @@ def getGameStats(userid, gameidForStats):
 
 def getUserSetStats(userid, setid):
 	# Returns stats of a particular user in a particular flashset
-	allGamesUserPlayed = FG.query.filter(FG.user == userid, FG.flashsetId == setid).\
-							with_entities(FG.gameId)
+	# Get all multiplayer games played
+	allGamesUserPlayed = FG.query.with_entities(FG.gameId).\
+							group_by(FG.gameId).\
+							having(FG.user == userid).\
+							having(FG.flashsetId == setid).\
+							having(func.count() == 2)
 	noOfWins = 0
 	noOfLosses = 0
 	noOfDraws = 0
+
 	for eachGamePlayed in allGamesUserPlayed:
 		eachGameId = eachGamePlayed.gameId
 		allQuestionsInGame = FC.query.filter(FC.gameId == eachGameId).all()
