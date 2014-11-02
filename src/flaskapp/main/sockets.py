@@ -49,6 +49,29 @@ def joinRoom(room):
 		emit('my response', {'data': 'Already part of a room'})
 
 
+@socketio.on('assignroom', namespace='/test')
+def assignRoom(message):
+	room = message['room']
+	user1 = message['user1']
+	user2 = message['user2']
+	for sessid, socket in request.namespace.socket.server.sockets.items():
+		if (socket['/test'].session['id'] == user1) | (socket['/test'].session['id'] == user2):
+			if socket['/test'].session['room'] == defaultRoom:
+				socket['/test'].session['room'] = room
+				socket['/test'].join_room(room)
+				if socketRooms.has_key(room) == True :
+					usersInRoom = socketRooms.get(room)
+					usersInRoom.append(socket['/test'].session['id'])
+					socketRooms[room] = usersInRoom
+				else:
+					usersInRoom = []
+					usersInRoom.append(socket['/test'].session['id'])
+					socketRooms[room] = usersInRoom
+				socket['/test'].base_emit('my response', {'data': 'Joined room'})
+			else:
+				emit('my response', {'data': 'Already part of a room'})
+
+
 
 @socketio.on('leaveroom', namespace='/test')
 def leaveRoom():
@@ -88,7 +111,7 @@ def clearRoom():
 					socket['/test'].session['room'] = defaultRoom
 					socket['/test'].leave_room(room)
 					socket['/test'].base_emit('my response', {'data': "cleared room"})
-		emit('my response', {'data': "checking for room"}, room=room) # This doesn't send message to any client. Verified
+		# emit('my response', {'data': "checking for room"}, room=room) # This doesn't send message to any client. Verified
 	else:
 		emit('my response', {'data': 'no such room'})
 	# This is to counter some error experienced
