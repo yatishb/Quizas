@@ -2,7 +2,7 @@ from models import User, FlashGame as FG, FlashCardInGame as FC
 from sqlalchemy import func
 from . import main
 from .. import db
-import json
+import json, uuid
 
 
 def documentGame(room, roomClientAnswers, flashsetId) :
@@ -27,6 +27,24 @@ def documentGame(room, roomClientAnswers, flashsetId) :
 		cardUser2 = FC(room, flashsetId, questionId, user2, user2Ans, user2IsCorrect)
 		db.session.add(cardUser1)
 		db.session.add(cardUser2)
+
+	db.session.commit()
+
+
+def soloGameResultsWriteDb(userid, receivedData) :
+	flashsetId = receivedData['flashset']
+	cards = receivedData['cards']
+	gameId = str(uuid.uuid1())
+
+	gameUser = FG(gameId, flashsetId, userid)
+	db.session.add(gameUser)
+
+	for eachQues in cards:
+		questionId = eachQues['flashcard']
+		userAns = eachQues['answer']
+		userIsCorrect = True # Must check whether ans is correct
+		cardUser = FC(gameId, flashsetId, questionId, userid, userAns, userIsCorrect)
+		db.session.add(cardUser)
 
 	db.session.commit()
 
