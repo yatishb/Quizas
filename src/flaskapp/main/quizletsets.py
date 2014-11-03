@@ -61,14 +61,16 @@ def get_quizlet_set(set_id):
 		clientID = CONSUMER_TOKEN
 		keySecret = CONSUMER_SECRET
 
+		qzlt_set_url = "https://api.quizlet.com/2.0/sets/" + qzlt_set_id
+
 		# Get ACCESS TOKEN from Cookies
 		qzlt_access_token = request.cookies.get("quizlet_access_token")
 		if qzlt_access_token == None:
-			abort(401)
-
-		# FIXME: Not sure how to pass access token to `requests` properly
-		qzlt_set_url = "https://api.quizlet.com/2.0/sets/" + qzlt_set_id
-		req = requests.get(qzlt_set_url, headers={"Authorization": "Bearer " + qzlt_access_token})
+			# If no user access token, just use CLIENT ID to access public sets
+			req = requests.get(qzlt_set_url, params = {"client_id": clientID})
+		else:
+			# FIXME: Not sure how to pass access token to `requests` properly
+			req = requests.get(qzlt_set_url, headers = {"Authorization": "Bearer " + qzlt_access_token})
 
 		if req.status_code != 200 :
 			return "Bad Request: " + req.text

@@ -49,9 +49,10 @@ def authparam():
 		jsonData['id'] = userId
 		jsonData['token'] = accessToken
 
-		resp = redirect("/templates/study.html"); # make_response(json.dumps(jsonData))
+		# Stretching the definition of "auth" a bit here, but..
+		resp = redirect(secrets.auth["login_success_url"]); # make_response(json.dumps(jsonData))
 
-		resp.set_cookie("quizlet_user_id", userId)
-		resp.set_cookie("quizlet_access_token", accessToken)
+		resp.set_cookie("quizlet_user_id", userId, max_age = 3600*24*30)
+		resp.set_cookie("quizlet_access_token", accessToken = 3600*24*30)
 
 		return resp
