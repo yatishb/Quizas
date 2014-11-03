@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+ <head>
+	<meta name="viewport" content="width=device-width, user-scalable=no" />
+	<title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src='http://cdn.html5quintus.com/v0.2.0/quintus-all.js'></script>
+    <!-- <script src='example1.js'></script> -->
+	<link rel="stylesheet" type="text/css" href="example1.css">
+	<script>
+		// helper functions
+	
+		function parseBool(param) {
+			return (param === 'true');
+		}
+		
+		function createFlashCard(pId, pQn, pAns) {
+			var fc = JSON.stringify({
+				id: pId, 
+				question: pQn, 
+				answer: pAns, 
+			});
+			return fc;
+		}
+		
+		function createFlashSet(pId, pN, pC, pFc) {
+			var fs = JSON.stringify({
+				id: pId,
+				name: pN,
+				category: pC,
+				cards: pFc
+			});
+			return fs;
+		}
+		
+		function getFlashCard(flashSet, n) { // input fs and output fc all in JSON
+			var fs = JSON.parse(flashSet);
+			var fc = fs.cards[n];
+			return fc;
+		}
+		
+		function getDeckSize(flashSet) { // input in JSON, output in integer
+			var parsedDeck = JSON.parse(flashSet);
+			var n = parsedDeck.cards.length;
+			return n;
+		}
+		
+		function shuffle(array) { // http://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+			var currentIndex = array.length, temporaryValue, randomIndex ;
+
+			// While there remain elements to shuffle...
+			while (0 !== currentIndex) {
+
+				// Pick a remaining element...
+				randomIndex = Math.floor(Math.random() * currentIndex);
+				currentIndex -= 1;
+
+				// And swap it with the current element.
+				temporaryValue = array[currentIndex];
+				array[currentIndex] = array[randomIndex];
+				array[randomIndex] = temporaryValue;
+			}
+
+		return array;
+		}
+		
+		/**
+		 * Returns a random integer between min (inclusive) and max (inclusive)
+		 * Using Math.round() will give you a non-uniform distribution!
+		 */
+		function getRandomInt(min, max) {
+			return Math.floor(Math.random() * (max - min + 1)) + min;
+		}
+		
+		function shuffleDeck(x, n) { // x = decksize, n = totalsize
+			var deck = [];
+			for (i=0;i<n;i++) {
+				deck[i] = i;
+			}
+			var newDeck = shuffle(deck);
+			var chosenDeck = newDeck.slice(0, x);
+			return chosenDeck;
+		}
+		
+		function dealAnswers(a, n) { // a = order # of answer, n = decksize
+			var deck = [];
+			var iniCounter = 0;
+			for (i=0;i<n;i++) {
+				if (i != a) {
+					deck[iniCounter] = i;
+					iniCounter = iniCounter + 1;
+				}
+			}
+			var newDeck = shuffle(deck);
+			var chosenDeck = newDeck.slice(0, 3);
+			var finalDeck = [];
+			var hasInserted = false;
+			var deckCounter = 0;
+			for (i=0;i<4;i++) {
+				var decision = Math.random() < 0.5;
+				if (!hasInserted && (decision || i == 3)) {
+					finalDeck[i] = a;
+					hasInserted = true;
+				} else {
+					finalDeck[i] = chosenDeck[deckCounter];
+					deckCounter = deckCounter + 1;
+				}
+			}
+			return finalDeck;
+		}
+		
+	
+		// declare JSON vars for testing purposes
+		var TestFlashCard = createFlashCard('22', 'F=??', 'M x A');
+		
+		var TestFCArray = [];
+		for (i=0;i<30;i++) {
+			var stringId = i.toString();
+			var stringQn = i.toString() + ' + ' + i.toString() + ' = ??';
+			var stringAns = (i + i).toString();
+			var fc = createFlashCard(stringId, stringQn, stringAns);
+			TestFCArray[i] = fc;
+		}
+		var TestFlashSet = createFlashSet('101', 'Simple Additions', 'Mathematics', TestFCArray);
+		var TestTotalQuestions = 10;
+		
+		// fetching info from server
+		var FLASH_SET = TestFlashSet;
+		var DECK_SIZE = getDeckSize(FLASH_SET);
+		var TOTAL_QUESTIONS = TestTotalQuestions;
+		var PLAYER_SPRITE = "";
+		var ENEMY_SPRITE = "";
+	</script>
+ </head>
+ 
+ <body>
+	<script>
+	window.addEventListener("load",function() {
+ 
+	var Q = window.Q = Quintus()
+    .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
+    .setup({
+		maximize: true
+	}).touch();
+	
+	Q.state.set({playerScore: 0, enemyScore: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
+	var deck = shuffleDeck(Q.state.get("totalQuestions"), DECK_SIZE);
+	
+	Q.UI.PlayerScore = Q.UI.Text.extend("UI.PlayerScore", { 
+		init: function(p) {
+			this._super({
+			  label: Q.state.get("playerScore") + "",
+			  x: 20,
+			  y: 30
+			});
+			Q.state.on("change.playerScore",this,"score");
+		},
+		
+		score: function() {
+			this.p.label = Q.state.get("playerScore") + "";
+		}
+	});
+	
+	Q.UI.EnemyScore = Q.UI.Text.extend("UI.EnemyScore", { 
+		init: function(p) {
+			this._super({
+			  label: Q.state.get("enemyScore") + "",
+			  x: 300,
+			  y: 30
+			});
+			Q.state.on("change.enemyScore",this,"score");
+		},
+		
+		score: function() {
+			this.p.label = Q.state.get("enemyScore") + "";
+		}
+	});
+	
+	Q.UI.QuestionCounter = Q.UI.Text.extend("UI.QuestionCounter", { 
+		init: function(p) {
+			this._super({
+			  label: "[Q: 1/" + Q.state.get("totalQuestions") + "]",
+			  x: 160,
+			  y: 30
+			});
+			Q.state.on("change.currentQuestion",this,"qc");
+		},
+
+		qc: function() {
+			this.p.label = "[Q: " + Q.state.get("currentQuestion") + "/" + Q.state.get("totalQuestions") + "]";
+		}
+	});
+	
+	Q.PlayerPortrait = Q.Sprite.extend("PlayerPortrait", {
+		init: function(p) {
+			this._super(p, {
+				x: 40,
+				y: 550,
+				asset: PLAYER_SPRITE
+			});
+		},
+	});
+	
+	Q.EnemyPortrait = Q.Sprite.extend("EnemyPortrait", {
+		init: function(p) {
+			this._super(p, {
+				x: 280,
+				y: 550,
+				asset: ENEMY_SPRITE
+			});
+		},
+	});
+
+    
+	// Flash Card
+	Q.UI.FlashCard = Q.UI.Text.extend('UI.FlashCard', {
+		// default position is question
+		init: function(p) {
+			this._super(p, {
+				color: "white",
+				x: 	0,
+				y: 	0,
+				id: 'fc-null',
+				question: 'q-null',
+				answer: 'a-null',
+				isQuestion: true
+			});
+		},
+	
+	// load flashcard properties
+		generate: function(param) {
+			parsedArgument = JSON.parse(param);			
+			this.p.id = parsedArgument.id;
+			this.p.question = parsedArgument.question;
+			this.p.answer = parsedArgument.answer;
+			if (this.p.isQuestion) {
+				this.p.label = this.p.question;
+			} else {
+				this.p.label = this.p.answer;
+			}
+		},
+	});
+	
+	//answer button
+		Q.UI.AnswButton = Q.UI.Button.extend('UI.AnswButton', {
+		init: function(p) {
+			this._super(Q._defaults(p, {
+				fill: "#FFFFFF",
+				//highlight: "#FFFFFF",
+				fontColor: "white",
+				border: 2,
+				shadow: 3,
+				shadowColor: "rgba(0,0,0,0.5)",
+				w: 40,
+				h: 40
+			}),                     
+			function() {
+					
+			});
+		},
+		
+		testfunc: function() {
+			alert('test');
+		},
+		});
+	
+	// set scene
+	Q.scene("scene1",function(stage) {
+	
+		Q.state.reset({playerScore: 0, enemyScore: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
+	
+		var playerScore = stage.insert(new Q.UI.PlayerScore());
+		var enemyScore = stage.insert(new Q.UI.EnemyScore());
+		var leQC = stage.insert(new Q.UI.QuestionCounter());
+		var ansDeck;
+		
+		function generateAnswers() {
+			ansDeck = dealAnswers(deck[Q.state.get("currentQuestion") - 1], DECK_SIZE);
+		
+			var aBtns = [];
+			var k = 0;
+			for (i=0;i<2;i++) {
+				for (j=0;j<2;j++) {
+					var fcAns = JSON.parse(getFlashCard(FLASH_SET, ansDeck[k])).answer;
+					var ansColor = "red";
+					if (deck[Q.state.get("currentQuestion") - 1] == ansDeck[k]) {
+						ansColor = "green";
+					}
+					aBtns[k] = stage.insert(new Q.UI.Button({
+						fill: "gray",
+						highlight: ansColor,
+						fontColor: "white",
+						x: 90 + (140*j),
+						y: 320 + (120*i),
+						border: 2,
+						shadow: 3,
+						shadowColor: "rgba(0,0,0,0.5)",
+						w: 110,
+						h: 100,
+						label: fcAns,
+						name: k
+						}, function() {
+							// do something
+							if (deck[Q.state.get("currentQuestion") - 1] == ansDeck[this.p.name]) {
+								console.log("Placeholder Trigger: Correct");
+								Q.state.inc("playerScore", 1);
+							} else {
+								console.log("Placeholder Trigger: Wrong");
+							}
+							
+							if (Q.state.get("currentQuestion") != Q.state.get("totalQuestions")) {
+								Q.state.inc("currentQuestion", 1);
+							}
+					}));
+					k = k + 1;
+				}
+			}
+			return aBtns;
+		}
+		
+		function destroyAnswers(aBtns) {
+			for (i=0;i<aBtns.length;i++) {
+				aBtns[i].destroy();
+			}
+		}
+	
+		//current question
+		var qContainer = stage.insert(new Q.UI.Container({
+			fill: "gray",
+			x: 160,
+			y: 160,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			w: 250,
+			h: 180
+		}));
+		
+		var aBtns = generateAnswers();
+		
+		var qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
+		qCard.generate(getFlashCard(FLASH_SET, deck[Q.state.get("currentQuestion") - 1]));
+		
+		Q.state.on("change.currentQuestion", function() {
+			if (Q.state.get("currentQuestion") == TOTAL_QUESTIONS) {
+				Q.stageScene("scene2");
+			} 
+			qCard.generate(getFlashCard(FLASH_SET, deck[Q.state.get("currentQuestion") - 1]));
+			destroyAnswers(aBtns);
+			aBtns = generateAnswers();
+		});
+		
+		var player1 = stage.insert(new Q.PlayerPortrait());
+		
+		var player2 = stage.insert(new Q.EnemyPortrait());
+		
+	});
+	
+	// set scene
+	Q.scene("scene2",function(stage) {
+	
+		var leScore = stage.insert(new Q.UI.PlayerScore());
+	
+		var ReplayBtn = stage.insert(new Q.UI.Button({
+			fill: "gray",
+			fontColor: "white",
+			x: 160,
+			y: 160,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			w: 110,
+			h: 100,
+			label: 'Replay',
+		}, function() {
+			Q.stageScene("scene1");
+		}));
+		
+		var BackBtn = stage.insert(new Q.UI.Button({
+			fill: "gray",
+			fontColor: "white",
+			x: 160,
+			y: 320,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			w: 110,
+			h: 100,
+			label: 'Back',
+		}, function() {
+			// return to interface
+			window.location.href="study.html";
+		}));
+		
+		
+	});
+	
+	// stage scene
+	Q.stageScene("scene1");
+	
+	
+     
+});
+	</script>
+ </body>
+</html>
