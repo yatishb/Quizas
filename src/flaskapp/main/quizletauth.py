@@ -49,7 +49,7 @@ def authparam():
 		jsonData['id'] = userId
 		jsonData['token'] = accessToken
 
-		resp = redirect("/study.html"); # make_response(json.dumps(jsonData))
+		resp = redirect("/templates/study.html"); # make_response(json.dumps(jsonData))
 
 		resp.set_cookie("quizlet_user_id", userId)
 		resp.set_cookie("quizlet_access_token", accessToken)
