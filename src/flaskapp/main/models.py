@@ -20,7 +20,7 @@ class FlashGame(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	gameId = db.Column(db.String(40))
 	flashsetId = db.Column(db.String(40))
-	user = db.Column(db.String(80))
+	user = db.Column(db.Integer)
 
 	def __init__(self, gameId, flashsetId, user):
 		self.gameId = gameId
@@ -36,7 +36,7 @@ class FlashCardInGame(db.Model):
 	gameId = db.Column(db.String(40))
 	flashsetId = db.Column(db.String(40))
 	flashcardId = db.Column(db.String(40))
-	user = db.Column(db.String(80))
+	user = db.Column(db.Integer)
 	userAns = db.Column(db.String(40))
 	isCorrect = db.Column(db.Boolean)
 
@@ -57,7 +57,7 @@ class FlashCardInGame(db.Model):
 class UserFlashSet(db.Model):
 	# Because we need ID.
 	id = db.Column(db.Integer, primary_key=True)
-	user = db.Column(db.String(80))
+	user = db.Column(db.Integer)
 	flashsetId = db.Column(db.String(40))
 
 	# Constraint so each row is unique
