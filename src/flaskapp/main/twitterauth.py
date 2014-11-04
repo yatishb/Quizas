@@ -85,7 +85,7 @@ def get_verification():
 	# resp.set_cookie("twitter_expires_in", "???"); # Twitter tokens don't expire
 
 	# Ensure user table has an internal id.
-	authhelper.register(auth.access_token.key)
+	authhelper.register("twitter:" + auth.access_token.key)
 
 	return resp
 

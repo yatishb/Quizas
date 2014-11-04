@@ -57,6 +57,6 @@ def authparam():
 		resp.set_cookie("quizlet_access_token", accessToken, max_age = 3600*24*30)
 
 		# Ensure user has an internal user id we can use.
-		authhelper.register(userId)
+		authhelper.register("quizlet:" + userId)
 
 		return resp
