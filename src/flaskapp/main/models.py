@@ -1,5 +1,5 @@
 from flask.ext.sqlalchemy import SQLAlchemy
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import UniqueConstraint, ColumnDefault, sql
 from .. import db
 
 class User(db.Model):
@@ -73,3 +73,19 @@ class UserFlashSet(db.Model):
 
 	def __repr__(self):
 		return '<UserFlashSet %r %r>' % (self.gameId, self.flashsetId)
+
+
+class InternalUserAuth(db.Model):
+	# Because we need ID.
+	id = db.Column(db.Integer)
+	user_id = db.Column(db.String(80), primary_key=True)
+
+	__tablename__ = "InternalUserAuth"
+	def __init__(self, user):
+		self.user_id = user
+
+	def __repr__(self):
+		return '<InternalUser %r %r>' % (self.id, self.user_id)
+
+InternalUserAuth.__table__.c.id.default = ColumnDefault(sql.select([sql.func.coalesce(sql.func.max(InternalUserAuth.id) + 1, 1)]).as_scalar())
+
