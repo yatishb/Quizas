@@ -41,7 +41,7 @@ def soloGameResultsWriteDb(userid, receivedData) :
 
 	for eachQues in cards:
 		questionId = eachQues['flashcard']
-		userAns = eachQues['answer']
+		userAns = eachQues['result']
 		userIsCorrect = True # Must check whether ans is correct
 		cardUser = FC(gameId, flashsetId, questionId, userid, userAns, userIsCorrect)
 		db.session.add(cardUser)
