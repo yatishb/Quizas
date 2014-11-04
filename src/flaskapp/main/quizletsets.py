@@ -5,6 +5,7 @@ import ast
 import json
 
 import secrets
+import authhelper
 
 from models import UserFlashSet
 from flask import request, redirect, abort
@@ -15,10 +16,18 @@ CONSUMER_TOKEN  = secrets.auth["quizlet"]["client_id"]
 CONSUMER_SECRET = secrets.auth["quizlet"]["key_secret"]
 CALLBACK_URL    = secrets.auth["quizlet"]["redirect_url"]
 
+@main.route('/user/currentid')
+def get_internal_id():
+	cookie_ids = authhelper.get_cookie_user_ids()
+	return json.dumps({"internal_id": authhelper.get_current_id(),
+	                   "cookie_user_ids": cookie_ids})
+
 # /user/#user-id/sets
 @main.route('/user/<user_id>/sets')
 def get_user_sets(user_id):
-	result = UserFlashSet.query.filter_by(user = user_id).all()
+	# NOTE: ignores user_id for now
+	internal_id = authhelper.get_current_id()
+	result = UserFlashSet.query.filter_by(user = internal_id).all()
 	set_ids = [user_flashset.flashsetId for user_flashset in result]
 	return json.dumps(set_ids)
 
@@ -27,12 +36,15 @@ def get_user_sets(user_id):
 def modify_user_sets(user_id, set_id):
 	# ACTION = PUT, DELETE
 
+	# NOTE: ignores user_id for now
+	internal_id = authhelper.get_current_id()
+
 	current = UserFlashSet.query \
-	                      .filter_by(user = user_id, flashsetId = set_id) \
+	                      .filter_by(user = internal_id, flashsetId = set_id) \
 	                      .all()
 	if request.method == 'PUT':
 		if len(current) == 0:
-			user_flashset = UserFlashSet(user_id, set_id)
+			user_flashset = UserFlashSet(internal_id, set_id)
 			db.session.add(user_flashset)
 	if request.method == 'DELETE':
 		db.session.delete(current[0])
@@ -122,13 +134,19 @@ def quizlet_search(query):
 		abort(401)
 
 	# Params for the search
-	payload = {'q': query}
-
-	# FIXME: Not sure how to pass access token to `requests` properly
 	qzlt_search_url = "https://api.quizlet.com/2.0/search/sets"
-	req = requests.get(qzlt_search_url,
-	                   params = payload,
-	                   headers = {"Authorization": "Bearer " + qzlt_access_token})
+
+	# Get ACCESS TOKEN from Cookies
+	qzlt_access_token = request.cookies.get("quizlet_access_token")
+	if qzlt_access_token == None:
+		# If no user access token, just use CLIENT ID to access public sets
+		req = requests.get(qzlt_search_url,
+		                   params = {"q": query, "client_id": clientID})
+	else:
+		# FIXME: Not sure how to pass access token to `requests` properly
+		req = requests.get(qzlt_search_url,
+		                   params = {"q": query},
+		                   headers = {"Authorization": "Bearer " + qzlt_access_token})
 
 	if req.status_code != 200 :
 		return "Bad Request: " + req.text
@@ -157,6 +175,7 @@ def quizlet_user(user_id):
 
 	# Get ACCESS TOKEN from Cookies
 	# Needs to have user id also.
+	# NOTE: ignores user_id
 	qzlt_user_id = request.cookies.get("quizlet_user_id")
 	qzlt_access_token = request.cookies.get("quizlet_access_token")
 	if qzlt_access_token == None or qzlt_user_id == None:
@@ -178,6 +197,7 @@ def quizlet_user(user_id):
 # https://quizlet.com/api/2.0/docs/users
 @main.route('/user/<user_id>/sets/quizlet/created')
 def quizlet_user_created(user_id):
+	# NOTE: ignores user_id (in quizlet_user)
 	res = quizlet_user(user_id)
 	sets = res["sets"]
 	
@@ -192,6 +212,7 @@ def quizlet_user_created(user_id):
 # https://quizlet.com/api/2.0/docs/users
 @main.route('/user/<user_id>/sets/quizlet/favorites')
 def quizlet_user_favourites(user_id):
+	# NOTE: ignores user_id (in quizlet_user)
 	res = quizlet_user(user_id)
 	sets = res["favorite_sets"]
 	
