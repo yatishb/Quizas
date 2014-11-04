@@ -12,6 +12,7 @@ import json
 import tweepy
 
 import secrets
+import authhelper
 
 from flask import Blueprint
 from flask import request, redirect
@@ -82,6 +83,9 @@ def get_verification():
 	resp.set_cookie("twitter_user_id", auth.access_token.key);
 	resp.set_cookie("twitter_access_token", auth.access_token.secret);
 	# resp.set_cookie("twitter_expires_in", "???"); # Twitter tokens don't expire
+
+	# Ensure user table has an internal id.
+	authhelper.register(auth.access_token.key)
 
 	return resp
 

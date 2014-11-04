@@ -2,6 +2,7 @@ import requests
 import ast
 import json
 
+import authhelper
 import secrets
 
 from flask import request, redirect, make_response
@@ -54,5 +55,8 @@ def authparam():
 
 		resp.set_cookie("quizlet_user_id", userId, max_age = 3600*24*30)
 		resp.set_cookie("quizlet_access_token", accessToken, max_age = 3600*24*30)
+
+		# Ensure user has an internal user id we can use.
+		authhelper.register(userId)
 
 		return resp
