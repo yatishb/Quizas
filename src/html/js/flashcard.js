@@ -11,11 +11,15 @@
 // function getStudySetContent(){
 //     AjaxManager.prototype.GetContentBySetId();
 // }
+var content;
 
 $(document).ready(function() {
+    getStudySetContent();
+});
+
+$(document).ajaxComplete(function() {
     var element = $('.flashcards');
-    var content = getStudySetContent();
-    for (var i = 0; i < content.length; i++) {
+    for (var i = 0; i < content.cards.length; i++) {
         element.append(
             "<div class='simple_card' id='" +
             i +
@@ -30,14 +34,11 @@ $(document).ready(function() {
 
 function getStudySetContent(){
     $.get("/api/sets/quizlet:24957714", function(data) {
-           var content = JSON.parse(data);
-           console.log(content.cards[1].id);
-           console.log(content.cards[1].question);
-           console.log(content.cards[1].answer);
-           return content;
-           // $('.simple_card').attr("id",content.cards[1].id);
-           // $('.card_question')[0].innerHTML = content.cards[1].question;
-           // $('.card_answer')[0].innerHTML = content.cards[1].answer;
+           content = JSON.parse(data);
+           if(content != null)
+               console.log("Set data have been fetched.");
+           else
+               console.log("Failed to fetch data.");
     })
      .fail(function() {
         alert("error in getStudySetContent call back function");

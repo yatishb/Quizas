@@ -1,18 +1,19 @@
 $(document).ready(function() {
-    $('.grey_cover').hide();
-    $('.button_container').hide();
-    //document.getElementById('top_layer').style.display = "none";
+    // $('.grey_cover').hide();
+    // $('.button_container').hide();
 });
 
-$('.list_option ul li').on("tap", function() {
-    //document.getElementById('top_layer').style.display = "block";
-    $('.grey_cover').show();
+$('.list_option ul li').on("click", function() {
     $('.button_container').show();
+    $('.grey_cover').show();
+
+    console.log("Button enabled.");
 });
 
-$('.grey_cover').on("tap", function() {
-   $('.grey_cover').hide(); 
-   $('.button_container').hide();
+$('.grey_cover').on("click", function() {
+    $('.grey_cover').hide(); 
+    $('.button_container').hide();
+   console.log("Button disabled.");
 });
 
 $('#quiz').on("tap", function(){
@@ -21,4 +22,8 @@ $('#quiz').on("tap", function(){
 
 $('#flashcard').on("tap", function(){
     window.location.href="flashcard.html";
+});
+
+$('#challenge').on("tap", function(){
+    //window.location.href="challenge.html";
 });

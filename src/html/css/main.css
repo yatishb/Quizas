@@ -211,19 +211,23 @@ img {
     width: 100%;
     height: 100%;
     position: absolute;
-    z-index: 1;
+    z-index: 99;
+    display: none;
 }
 
 .button_container {
     width: 100%;
     text-align: center;
-    z-index: 500;
+    z-index: 100;
     position: fixed;
+    display: none;
 }
 
 .round_button {
-    width: 80px;
-    height: 80px;
+    width: 25vw;
+    height: 25vw;
+    max-width: 200px;
+    max-height: 200px;
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
     border-radius: 50%;
@@ -257,4 +261,18 @@ img {
   margin-right: 5%;
   /*position: absolute;
   right: 5%;*/
+}
+
+/*** Start of flashcard.html ***/
+
+.simplecard {
+
+}
+
+.card_question {
+
+}
+
+.card_answer {
+  
 }
