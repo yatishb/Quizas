@@ -264,15 +264,105 @@ img {
 }
 
 /*** Start of flashcard.html ***/
-
-.simplecard {
-
+.top_bar {
+    width: 100%;
+    height: 40px;
+    top: 0;
+    left: 0;
+    position: fixed;
+    background-color: #3e8871;
+    z-index: 100;
+    color: white;
+    text-align: center;
+    line-height: 40px;
 }
 
-.card_question {
-
+.back_button {
+    top: 0;
+    left: 0;
+    position: fixed;
+    color: white;
+    z-index: 200;
+    text-align: center;
+    line-height: 40px;
+    font-size: 30pt;
+    margin-left: 10px;
 }
 
-.card_answer {
-  
+.flashcards {
+    width: 100%;
+    height: 100%;
+    margin-top: 50px;
+}
+
+@media screen and (max-width: 500px) {
+    .simple_card {
+        margin: 10px auto 10px auto;
+    }
+}
+
+@media screen and (min-width: 500px) {
+    .simple_card {
+        display: inline-block;
+        margin: 10px 5px 10px 5px;
+    }
+}
+.simple_card {
+    width: 300px;
+    height: 200px;
+    z-index: 1;
+    -webkit-perspective: 1000;
+    perspective: 1000;
+}
+
+.flipper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-transition: all 0.5s linear;
+    transition: all 0.5s linear;
+    box-shadow: -5px 5px 5px #aaa;
+}
+
+.flipped {
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
+}
+
+.card_content {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    color: black;
+    box-sizing: border-box;
+    background-color: white;
+    position: absolute;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    z-index: 2;
+    cursor: pointer;
+    font-family: Georgia;
+    font-size: 15pt;
+    text-align: center;
+    display: table;
+}
+
+.card_content p{
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.question {
+    position: absolute;
+    z-index: 1;
+    transform: rotateY(0deg);
+    -webkit-transform: rotateY(0deg);
+}
+
+.answer {
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
 }
