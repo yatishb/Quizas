@@ -20,8 +20,15 @@ def documentGame(room, roomClientAnswers, flashsetId) :
 		bothClientResp = eachQues[1]
 		user1Ans = bothClientResp[user1]
 		user2Ans = bothClientResp[user2]
-		user1IsCorrect = True # Must check whether ans is correct
-		user2IsCorrect = True # Must check whether ans is correct
+		# Algorithm to detect if the answer chosen by the user is correct or not
+		if user1Ans == questionId:
+			user1IsCorrect = True
+		else:
+			user1IsCorrect = False
+		if user2Ans == questionId:
+			user2IsCorrect = True
+		else:
+			user2IsCorrect = False
 
 		cardUser1 = FC(room, flashsetId, questionId, user1, user1Ans, user1IsCorrect)
 		cardUser2 = FC(room, flashsetId, questionId, user2, user2Ans, user2IsCorrect)
@@ -92,8 +99,8 @@ def getUserWinLossStats(userid, opponentUserId = None):
 				'#Draws': noOfDraws})
 
 
+# Return list of gameids of the games played by the user
 def getUserGames(userid):
-	# Return list of gameids of the games played by the user
 	allGamesUserPlayed = FG.query.with_entities(FG.gameId).\
 							group_by(FG.gameId).\
 							having(FG.user == userid).\
@@ -103,8 +110,9 @@ def getUserGames(userid):
 		gameIds.append(eachGamePlayedByUser.gameId)
 	return json.dumps(gameIds)
 
+
+# Return list of common gameids of the games played by both
 def getCommonGames(userid, opponentUserId):
-	# Return list of common gameids of the games played by both
 	userGames = FG.query.filter(FG.user == userid).\
 					with_entities(FG.gameId)
 	oppoGames = FG.query.filter(FG.user == opponentUserId).\
@@ -126,8 +134,10 @@ def getCommonGames(userid, opponentUserId):
 
 
 
+# Returns stats of a particular game
+# These stats are such provided such that the 
+# results page can be replicated without any problem
 def getGameStats(userid, gameidForStats):
-	# Returns stats of a particular game
 	questionsInGame = FC.query.filter(FC.gameId == gameidForStats).all()
 	opponentUserId = ""
 	gameResult = ""
@@ -161,9 +171,10 @@ def getGameStats(userid, gameidForStats):
 
 
 
+# Returns stats of a particular user in a particular flashset
+# Get all multiplayer games played
+# Search amongst these multiplayer games if the user has played using the flashset
 def getUserSetStats(userid, setid):
-	# Returns stats of a particular user in a particular flashset
-	# Get all multiplayer games played
 	allGamesUserPlayed = FG.query.with_entities(FG.gameId).\
 							group_by(FG.gameId).\
 							having(FG.user == userid).\

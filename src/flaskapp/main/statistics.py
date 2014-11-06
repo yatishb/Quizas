@@ -45,9 +45,13 @@ def displayUserSetStats(userid, setid):
 
 @main.route('/user/<userid>/gameresults', methods=['POST'])
 def readStatsOfJustEndedGame(userid):
-	if request.json:
-		receivedData = request.get_json()
-		accessdb.soloGameResultsWriteDb(userid, receivedData)
-		return "Successfully updated"
+	internalUserid = authhelper.lookup(userid)
+	if internalUserid == None:
+		abort(401)
 	else:
-		return "Did not receive json"
+		if request.json:
+			receivedData = request.get_json()
+			accessdb.soloGameResultsWriteDb(userid, receivedData)
+			return "Successfully updated"
+		else:
+			abort(401)
