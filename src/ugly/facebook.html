@@ -1,0 +1,117 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<script>
+// TODO: Move this to quizas_fbappid.js or somewhere
+// We have different App IDs for quizas.me and localhost
+var quizas_fbappid = (window.location.hostname === "quizas.me") ? 
+                     "886033551408121" :
+                     "886034451408031";
+</script>
+
+
+
+<!-- Load the FB JS SDK -->
+<div id="fb-root"></div>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : quizas_fbappid,
+      xfbml      : true,
+      version    : 'v2.1'
+    });
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+
+
+<!-- Login button -->
+<!-- https://developers.facebook.com/docs/plugins/login-button -->
+
+<!-- Not sure if you want auto-logout-link or not. -->
+<div class="fb-login-button"
+     data-max-rows="1"
+     onlogin="afterFacebookLogin"
+     data-size="medium"
+     data-show-faces="false"
+     data-auto-logout-link="true"
+     data-scope="user_friends"></div>
+<br/>
+
+<!--
+  Alternatively, use something like "doFacebookLogin()" with a URL.
+  Could also check FB.getLoginStatus()
+  Advantage of JS is you get authResponse each time, which you don't with
+  login button
+-->
+<script>
+function doFacebookLogin() {
+  // We want the 'user_friends' permission so that we can access /{user}/friends
+  // See: https://developers.facebook.com/docs/graph-api/reference/v2.2/user/friends
+  FB.login(afterFacebookLogin, {scope: 'user_friends'});
+}
+
+facebook.html (line 59)
+
+function afterFacebookLogin(response) {
+    if (response.authResponse) {
+      console.log('Welcome!  Fetching your information.... ');
+      console.log(JSON.stringify(response));
+
+      // e.g. response
+      // {"authResponse":{"accessToken":"...","userID":"10204898258962045","expiresIn":6855,"signedRequest":"...."},"status":"connected"}
+      // So, we're interested in
+      // authResponse.userID, authResponse.accessToken, authResponse.expiresIn
+    } else {
+      console.log('User cancelled login or did not fully authorize.');
+    }
+}
+</script>
+<a onClick="doFacebookLogin();">Facebook Login</a>
+<br/>
+
+
+
+<!-- List Friends demo -->
+<div id="friendlist"></div>
+<br/>
+
+<input value="List Friends" type="button" onclick="listFriends();" />
+
+
+
+<!-- FB SDK, list friends-->
+<script>
+function listFacebookFriends(friendsCallback) {
+  FB.getLoginStatus(function(response) {
+    if (response.status === 'connected') {
+      console.log('Logged in.');
+
+      FB.api(
+          "/me/friends",
+          function (response) {
+            if (response && !response.error) {
+              // Raw Dump of Response.
+              console.log(JSON.stringify(response));
+
+              // Damn, can't see what the data looks like until someone
+              // else is logged in using the app.
+
+              // Call-back with (processed) info.
+            }
+          }
+      );
+    } else {
+      //FB.login();
+    }
+  });
+}
+</script>
+
+
