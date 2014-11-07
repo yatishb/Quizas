@@ -159,7 +159,11 @@ define :quizas_app do
         variables({
             "app_dir" => flaskapp_dir,
             "static_serve_dir" => "#{flaskapp_dir}/current/html",
-            "static_src_dirs" => %w{src/html src/html/js src/html/css}
+            "static_src_dirs" => %w{src/html
+                                    src/html/js
+                                    src/html/css
+                                    src/html/images
+                                    src/html/font}
         })
     end
 

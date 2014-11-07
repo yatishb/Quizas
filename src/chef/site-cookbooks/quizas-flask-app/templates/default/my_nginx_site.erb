@@ -7,7 +7,7 @@ server {
   server_name <%= @server_name %>;
 
 
-  location / {
+  location /api/ {
     proxy_pass <%= @proxy_pass %>;
 
     # For OAuth stuff in reverse proxy
@@ -19,8 +19,9 @@ server {
   # Assumes that WebSocket server is on LocalHost.
   # If load-balancing with external servers,
   # need to add hop-by-hop header Upgrades for WebSockets
-  location /ws/ {
-    proxy_pass <%= @proxy_pass %>;
+  location /socket.io {
+    # e.g. http://localhost:5000/socket.io
+    proxy_pass <%= @proxy_pass %>socket.io;
 
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
@@ -31,8 +32,11 @@ server {
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
   }
 
-  location /static/ {
+  location / {
     root <%= @static_root %>;
-    rewrite "/static/(.*)" /$1 break;
+
+    # Let the user go to /study to access /study.html
+    # (And still let them access other files)
+    try_files $uri $uri.html $uri/index.html;
   }
 }

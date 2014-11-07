@@ -50,7 +50,15 @@ include_recipe "python"
 # pip stuff already installed. Tidier not to.
 
 # Use pip to install Flask.
-%w{flask sqlalchemy flask-sqlalchemy}.each do |pypac|
+%w{flask
+   sqlalchemy
+   flask-sqlalchemy
+   flask-socketio
+   requests
+   gevent
+   gevent-socketio
+   tweepy
+   gunicorn}.each do |pypac|
     python_pip pypac
 end
 
