@@ -5,9 +5,6 @@ from .. import socketio
 from .. import redis
 import accessdb, authhelper
 
-socketRooms = {}
-roomClientAnswers = {}
-roomSendAnswers = {}
 defaultRoom = str(0)
 
 
@@ -40,16 +37,18 @@ def assignRoom(message):
 	user2 = message['user2']
 
 	if authhelper.lookup(user1) != None and authhelper.lookup(user2) != None:
+		# Get the internal user ids of the clients
 		user1 = authhelper.lookup(user1)
 		user2 = authhelper.lookup(user2)
 
 		for sessid, socket in request.namespace.socket.server.sockets.items():
-			if (socket['/test'].session['id'] == user1) | (socket['/test'].session['id'] == user2):
-				print "User: %r room%r" % (socket['/test'].session['id'], socket['/test'].session['room'])
+			if (socket['/test'].session['id'] == user1) or (socket['/test'].session['id'] == user2):
 				if socket['/test'].session['room'] == defaultRoom:
 					socket['/test'].session['room'] = room
 					socket['/test'].join_room(room)
 					
+					# Check redis if room exists
+					# Add client to room and create room if not found
 					if redis.hexists("ROOMS", room) == True :
 						usersInRoom = redis.hget("ROOMS", room)
 						usersInRoom += ", %r" % socket['/test'].session['id']
@@ -62,11 +61,13 @@ def assignRoom(message):
 				
 				else:
 					emit('my response', {'data': 'Already part of a room'})
-				print "After adding User: %r room%r" % (socket['/test'].session['id'], socket['/test'].session['room'])
+
+		# This is to counter the problem being faced
+		if (session['id'] == user1) or (session['id'] == user2):
+			session['room'] = room
 
 	else:
 		emit('my response', {'data': 'One or more user is incorrect'})
-	print "from redis %r" % redis.hget("ROOMS", room)
 
 
 
@@ -78,128 +79,83 @@ def clearRoom():
 	room = session['room']
 	print room
 	if redis.hexists("ROOMS", room) == True:
-		# Write all answers to db first
-		# Get flashsetid here first
-		# Verify if quiz is genuinely completed. If not do not write to db
-		if roomClientAnswers.has_key(room) == True:
-			accessdb.documentGame(room, roomClientAnswers.get(room), 1)
-			del roomClientAnswers[room]
-
 		# Read users from redis
 		# Expect usersInRoom to be a list of comma separated ids
 		usersInRoom = redis.hget("ROOMS", room)
+		usersInRoom = usersInRoom.split(", ")
 		print usersInRoom
 		redis.hdel("ROOMS", room)
 
+		HASH_SEND = "ROOM_" + room + "_SEND"
+		redis.pexpire(HASH_SEND, 1)
+
+
+		# Write all answers to db first
+		# Get flashsetid here first
+		# Verify if quiz is genuinely completed. If not do not write to db
+		HASH_USER1 = "ROOM_" + room + "_" + usersInRoom[0]
+		HASH_USER2 = "ROOM_" + room + "_" + usersInRoom[1]
+		# Check if game exists and number of questions answered are same
+		if (redis.hlen(HASH_USER1) == redis.hlen(HASH_USER2) and redis.exists(HASH_USER1) == True):
+			accessdb.documentGame(room, roomClientAnswers.get(room), 1) #Rewrite this line
+
+		# Clear hash key from redis
+		redis.pexpire(HASH_USER1, 1)
+		redis.pexpire(HASH_USER2, 1)
+		
 		for eachUser in usersInRoom :
+			# Sending expiry information to client
 			for sessid, socket in request.namespace.socket.server.sockets.items():
 				if socket['/test'].session['id'] == eachUser:
 					socket['/test'].session['room'] = defaultRoom
 					socket['/test'].leave_room(room)
 					socket['/test'].base_emit('my response', {'data': "cleared room"})
 		# emit('my response', {'data': "checking for room"}, room=room) # This doesn't send message to any client. Verified
+		redis.save()
 	else:
 		emit('my response', {'data': 'no such room'})
 	# This is to counter some error experienced
 	session['room'] = defaultRoom
 
 
+
 # Each response by the client for each question is handled here
 @socketio.on('readanswer', namespace='/test')
 def readAnswerByClient(message):
 	room = session['room']
+
+	# Decode the message obtained
 	idClient = session['id']
 	idQuestion = message['qid']
 	clientAnswer = message['answer']
-	ansData = {}
-	ansData['client'] = idClient
-	ansData['question'] = idQuestion
-	ansData['answer'] = clientAnswer
-	print (ansData)
-	if roomClientAnswers.has_key(room) == True:
-		# Received replied from this room
-		roomArray = roomClientAnswers.get(room)
-		print ("Got into this1")
-		if roomArray.has_key(idQuestion) == True:
-			print ("Got into this2")
-			# This question has been encountered 
-			# atleast one client has already answered
-			qidArray = roomArray.get(idQuestion)
-			if qidArray.has_key(idClient) == False:
-				qidArray[idClient] = clientAnswer
-				# Also remember this answer to be sent later
-				allAnswers = roomSendAnswers.get(room)
-				allAnswers.append(ansData)
-				roomSendAnswers[room] = allAnswers
-				sendReceivedAnswersToClient(room)
-		else:
-			# This question hasn't been encountered
-			qidArray = {}
-			qidArray[idClient] = clientAnswer
-			roomArray[idQuestion] = qidArray
-			# Also remember this answer to be sent later
-			allAnswers = []
-			allAnswers.append(ansData)
-			roomSendAnswers[room] = allAnswers
-	else:
-		# This room hasn't been encountered
-		# Quiz in this room has just started
-		qidArray = {}
-		qidArray[idClient] = clientAnswer
-		roomArray = {}
-		roomArray[idQuestion] = qidArray
-		roomClientAnswers[room] = roomArray
-		# Also remember this answer to be sent later
-		allAnswers = []
-		allAnswers.append(ansData)
-		roomSendAnswers[room] = allAnswers
-		print ("Got into this")
+
+	HASH_USER = "ROOM_" + room + "_" + str(idClient)
+	HASH_SEND = "ROOM_" + room + "_SEND"
+
+	# Store result in 2 separate tables in redis
+	# One table is for the purpose of answer retention
+	# Other table is for sending information abt other client's answer
+	redis.hset(HASH_USER, idQuestion, clientAnswer)
+	redis.hset(HASH_SEND, idClient, clientAnswer)
+	redis.save()
+
+	if redis.hlen(HASH_SEND) == 2:
+		sendReceivedAnswersToClient(HASH_SEND, room)
+
 
 
 # This function sends responses to both clients to proceed to next question
 # Is called only when the server has received a response 
 # from both clients for the same question
-def sendReceivedAnswersToClient(room):
-	print ("gets in here")
-	dataToSend = roomSendAnswers.get(room)
+def sendReceivedAnswersToClient(hashSend, room):
+	answersForQuestion = redis.hgetall(hashSend)
+	dataToSend = {}
+	clientsList = answersForQuestion.keys()
+	for eachClient in clientsList:
+		# Find user id of the client
+		userId = authhelper.lookupInternal(eachClient)
+		dataToSend[userId] = answersForQuestion.get(eachClient)
+		redis.hdel(hashSend, eachClient)
+
 	emit('my response', {'data': json.dumps(dataToSend)}, room=room)
-	del roomSendAnswers[room]
-
-
-#################################################################
-# These functions might would not need to be called by the client
-
-# room = str(uuid.uuid1())
-# This has to be chosen by a separate function
-# and then passed onto this function
-@socketio.on('joinroom', namespace='/test')
-def joinRoom(room):
-	if session['room'] == defaultRoom:
-		room = room['room']
-		session['room'] = room
-		join_room(room)
-		if socketRooms.has_key(room) == True :
-			usersInRoom = socketRooms.get(room)
-			usersInRoom.append(session['id'])
-			socketRooms[room] = usersInRoom
-		else:
-			usersInRoom = []
-			usersInRoom.append(session['id'])
-			socketRooms[room] = usersInRoom
-		emit('my response', {'data': 'Joined room'})
-	else:
-		emit('my response', {'data': 'Already part of a room'})
-
-@socketio.on('leaveroom', namespace='/test')
-def leaveRoom():
-	if session['room'] != defaultRoom:
-		room = session['room']
-		leave_room(room)
-		if socketRooms.has_key(room) == True:
-			usersInRoom = socketRooms.get(room)
-			usersInRoom.remove(session['id'])
-			socketRooms[room] = usersInRoom
-		session['room'] = defaultRoom
-		emit('my response', {'data': 'left room '+room})
-	else:
-		emit('my response', {'data': 'wasn\'t part of a room'})
+	redis.save()

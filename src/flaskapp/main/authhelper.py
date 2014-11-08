@@ -21,6 +21,17 @@ def lookup(userid):
 		return u.id
 
 
+# From internal id to user_id `site:auth_id
+# or None if the given userid isn't in the table
+def lookupInternal(internalid):
+	u = InternalUserAuth.query.filter_by(id = internalid).first()
+	
+	if u == None:
+		return None
+	else:
+		return u.user_id
+
+
 
 # Returns an array of all the user_ids (`site:auth_id`),
 # which the requests sends as cookies.
