@@ -2,6 +2,7 @@ import uuid, json
 from flask import Flask, render_template, session, request
 from flask.ext.socketio import emit, join_room, leave_room
 from .. import socketio
+from .. import redis
 import accessdb, authhelper
 
 socketRooms = {}
@@ -44,25 +45,28 @@ def assignRoom(message):
 
 		for sessid, socket in request.namespace.socket.server.sockets.items():
 			if (socket['/test'].session['id'] == user1) | (socket['/test'].session['id'] == user2):
+				print "User: %r room%r" % (socket['/test'].session['id'], socket['/test'].session['room'])
 				if socket['/test'].session['room'] == defaultRoom:
 					socket['/test'].session['room'] = room
 					socket['/test'].join_room(room)
 					
-					if socketRooms.has_key(room) == True :
-						usersInRoom = socketRooms.get(room)
-						usersInRoom.append(socket['/test'].session['id'])
-						socketRooms[room] = usersInRoom
+					if redis.hexists("ROOMS", room) == True :
+						usersInRoom = redis.hget("ROOMS", room)
+						usersInRoom += ", %r" % socket['/test'].session['id']
+						redis.hset("ROOMS", room, usersInRoom)
+						redis.save()
 					else:
-						usersInRoom = []
-						usersInRoom.append(socket['/test'].session['id'])
-						socketRooms[room] = usersInRoom
+						redis.hset("ROOMS", room, socket['/test'].session['id'])
+						redis.save()
 					socket['/test'].base_emit('my response', {'data': 'Joined room'})
 				
 				else:
 					emit('my response', {'data': 'Already part of a room'})
+				print "After adding User: %r room%r" % (socket['/test'].session['id'], socket['/test'].session['room'])
 
 	else:
 		emit('my response', {'data': 'One or more user is incorrect'})
+	print "from redis %r" % redis.hget("ROOMS", room)
 
 
 
@@ -72,7 +76,8 @@ def assignRoom(message):
 @socketio.on('clearroom', namespace='/test')
 def clearRoom():
 	room = session['room']
-	if socketRooms.has_key(room) == True:
+	print room
+	if redis.hexists("ROOMS", room) == True:
 		# Write all answers to db first
 		# Get flashsetid here first
 		# Verify if quiz is genuinely completed. If not do not write to db
@@ -80,8 +85,11 @@ def clearRoom():
 			accessdb.documentGame(room, roomClientAnswers.get(room), 1)
 			del roomClientAnswers[room]
 
-		usersInRoom = socketRooms.get(room)
-		del socketRooms[room]
+		# Read users from redis
+		# Expect usersInRoom to be a list of comma separated ids
+		usersInRoom = redis.hget("ROOMS", room)
+		print usersInRoom
+		redis.hdel("ROOMS", room)
 
 		for eachUser in usersInRoom :
 			for sessid, socket in request.namespace.socket.server.sockets.items():
