@@ -1,37 +1,37 @@
 from models import User, FlashGame as FG, FlashCardInGame as FC
 from sqlalchemy import func
 from . import main
-from .. import db
+from .. import db, redis
 import json, uuid
 
 
-def documentGame(room, roomClientAnswers, flashsetId) :
-	allQuestions = roomClientAnswers.items()
-	userNames = allQuestions[0][1].keys()
-	user1 = userNames[0]
-	user2 = userNames[1]
+# Parameters: room, user1, user2, redis.hgetall(HASH_USER1), redis.hgetall(HASH_USER2), flashsetid
+# user1 and user2 are integers
+# redis.hgetall(HASH_USER1) gives dict of FlashcardID and UserAnswer
+def documentGame(room, user1, user2, userAns1, userAns2, flashsetId) :
+	# Store game header in FlashGame db
 	gameUser1 = FG(room, flashsetId, user1)
 	gameUser2 = FG(room, flashsetId, user2)
 	db.session.add(gameUser1)
 	db.session.add(gameUser2)
 
-	for eachQues in allQuestions:
-		questionId = eachQues[0]
-		bothClientResp = eachQues[1]
-		user1Ans = bothClientResp[user1]
-		user2Ans = bothClientResp[user2]
+	allQuestions = userAns1.keys()
+
+	for questionId in allQuestions:
+		user1AnsChosen = userAns1.get(questionId)
+		user2AnsChosen = userAns2.get(questionId)
 		# Algorithm to detect if the answer chosen by the user is correct or not
-		if user1Ans == questionId:
+		if user1AnsChosen == questionId:
 			user1IsCorrect = True
 		else:
 			user1IsCorrect = False
-		if user2Ans == questionId:
+		if user2AnsChosen == questionId:
 			user2IsCorrect = True
 		else:
 			user2IsCorrect = False
 
-		cardUser1 = FC(room, flashsetId, questionId, user1, user1Ans, user1IsCorrect)
-		cardUser2 = FC(room, flashsetId, questionId, user2, user2Ans, user2IsCorrect)
+		cardUser1 = FC(room, flashsetId, questionId, user1, user1AnsChosen, user1IsCorrect)
+		cardUser2 = FC(room, flashsetId, questionId, user2, user2AnsChosen, user2IsCorrect)
 		db.session.add(cardUser1)
 		db.session.add(cardUser2)
 

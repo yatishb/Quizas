@@ -1,8 +1,7 @@
 import uuid, json
 from flask import Flask, render_template, session, request
 from flask.ext.socketio import emit, join_room, leave_room
-from .. import socketio
-from .. import redis
+from .. import socketio, redis
 import accessdb, authhelper
 
 defaultRoom = str(0)
@@ -77,13 +76,11 @@ def assignRoom(message):
 @socketio.on('clearroom', namespace='/test')
 def clearRoom():
 	room = session['room']
-	print room
 	if redis.hexists("ROOMS", room) == True:
 		# Read users from redis
 		# Expect usersInRoom to be a list of comma separated ids
 		usersInRoom = redis.hget("ROOMS", room)
 		usersInRoom = usersInRoom.split(", ")
-		print usersInRoom
 		redis.hdel("ROOMS", room)
 
 		HASH_SEND = "ROOM_" + room + "_SEND"
@@ -97,7 +94,8 @@ def clearRoom():
 		HASH_USER2 = "ROOM_" + room + "_" + usersInRoom[1]
 		# Check if game exists and number of questions answered are same
 		if (redis.hlen(HASH_USER1) == redis.hlen(HASH_USER2) and redis.exists(HASH_USER1) == True):
-			accessdb.documentGame(room, roomClientAnswers.get(room), 1) #Rewrite this line
+			accessdb.documentGame(room, int(usersInRoom[0]), int(usersInRoom[1]), redis.hgetall(HASH_USER1), 
+				redis.hgetall(HASH_USER2), 1)
 
 		# Clear hash key from redis
 		redis.pexpire(HASH_USER1, 1)
