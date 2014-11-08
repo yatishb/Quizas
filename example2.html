@@ -128,6 +128,8 @@
 		var FLASH_SET = TestFlashSet;
 		var DECK_SIZE = getDeckSize(FLASH_SET);
 		var TOTAL_QUESTIONS = TestTotalQuestions;
+		var PLAYER_SPRITE = "";
+		var ENEMY_SPRITE = "";
 	</script>
  </head>
  
@@ -141,21 +143,36 @@
 		maximize: true
 	}).touch();
 	
-	Q.state.set({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
+	Q.state.set({playerScore: 0, enemyScore: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
 	var deck = shuffleDeck(Q.state.get("totalQuestions"), DECK_SIZE);
 	
-	Q.UI.Score = Q.UI.Text.extend("UI.Score", { 
+	Q.UI.PlayerScore = Q.UI.Text.extend("UI.PlayerScore", { 
 		init: function(p) {
 			this._super({
-			  label: "[score: " + Q.state.get('score') + "]",
-			  x: 90,
+			  label: Q.state.get("playerScore") + "",
+			  x: 20,
 			  y: 30
 			});
-			Q.state.on("change.score",this,"score");
+			Q.state.on("change.playerScore",this,"score");
 		},
-
-		score: function(score) {
-			this.p.label = "[score: " + score + "]";
+		
+		score: function() {
+			this.p.label = Q.state.get("playerScore") + "";
+		}
+	});
+	
+	Q.UI.EnemyScore = Q.UI.Text.extend("UI.EnemyScore", { 
+		init: function(p) {
+			this._super({
+			  label: Q.state.get("enemyScore") + "",
+			  x: 300,
+			  y: 30
+			});
+			Q.state.on("change.enemyScore",this,"score");
+		},
+		
+		score: function() {
+			this.p.label = Q.state.get("enemyScore") + "";
 		}
 	});
 	
@@ -163,15 +180,35 @@
 		init: function(p) {
 			this._super({
 			  label: "[Q: 1/" + Q.state.get("totalQuestions") + "]",
-			  x: 240,
+			  x: 160,
 			  y: 30
 			});
 			Q.state.on("change.currentQuestion",this,"qc");
 		},
 
-		qc: function(score) {
+		qc: function() {
 			this.p.label = "[Q: " + Q.state.get("currentQuestion") + "/" + Q.state.get("totalQuestions") + "]";
 		}
+	});
+	
+	Q.PlayerPortrait = Q.Sprite.extend("PlayerPortrait", {
+		init: function(p) {
+			this._super(p, {
+				x: 40,
+				y: 550,
+				asset: PLAYER_SPRITE
+			});
+		},
+	});
+	
+	Q.EnemyPortrait = Q.Sprite.extend("EnemyPortrait", {
+		init: function(p) {
+			this._super(p, {
+				x: 280,
+				y: 550,
+				asset: ENEMY_SPRITE
+			});
+		},
 	});
 
     
@@ -230,9 +267,10 @@
 	// set scene
 	Q.scene("scene1",function(stage) {
 	
-		Q.state.reset({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
+		Q.state.reset({playerScore: 0, enemyScore: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
 	
-		var leScore = stage.insert(new Q.UI.Score());
+		var playerScore = stage.insert(new Q.UI.PlayerScore());
+		var enemyScore = stage.insert(new Q.UI.EnemyScore());
 		var leQC = stage.insert(new Q.UI.QuestionCounter());
 		var ansDeck;
 		
@@ -253,7 +291,7 @@
 						highlight: ansColor,
 						fontColor: "white",
 						x: 90 + (140*j),
-						y: 360 + (130*i),
+						y: 320 + (120*i),
 						border: 2,
 						shadow: 3,
 						shadowColor: "rgba(0,0,0,0.5)",
@@ -265,7 +303,7 @@
 							// do something
 							if (deck[Q.state.get("currentQuestion") - 1] == ansDeck[this.p.name]) {
 								console.log("Placeholder Trigger: Correct");
-								Q.state.inc("score", 1);
+								Q.state.inc("playerScore", 1);
 							} else {
 								console.log("Placeholder Trigger: Wrong");
 							}
@@ -312,12 +350,16 @@
 			aBtns = generateAnswers();
 		});
 		
+		var player1 = stage.insert(new Q.PlayerPortrait());
+		
+		var player2 = stage.insert(new Q.EnemyPortrait());
+		
 	});
 	
 	// set scene
 	Q.scene("scene2",function(stage) {
 	
-		var leScore = stage.insert(new Q.UI.Score());
+		var leScore = stage.insert(new Q.UI.PlayerScore());
 	
 		var ReplayBtn = stage.insert(new Q.UI.Button({
 			fill: "gray",
