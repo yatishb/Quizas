@@ -3,6 +3,7 @@
 import requests
 import ast
 import json
+import random
 
 import secrets
 import authhelper
@@ -59,50 +60,123 @@ def modify_user_sets(user_id, set_id):
 # Quizlet Wrapping API
 #
 
+# Returns as dict, in raw Quizlet format
+def get_raw_quizlet_set_json(qzlt_set_id):
+	tokenUrl = "https://api.quizlet.com/oauth/token"
+	clientID = CONSUMER_TOKEN
+	keySecret = CONSUMER_SECRET
 
-# /sets/#set-id
-# Expects set-id as `quizlet:SET_ID`
-# Quizlet API, see:
-# https://quizlet.com/api/2.0/docs/sets#view
-@main.route('/sets/<set_id>')
-def get_quizlet_set(set_id):
+	qzlt_set_url = "https://api.quizlet.com/2.0/sets/" + qzlt_set_id
+
+	# Get ACCESS TOKEN from Cookies
+	qzlt_access_token = request.cookies.get("quizlet_access_token")
+	if qzlt_access_token == None:
+		# If no user access token, just use CLIENT ID to access public sets
+		req = requests.get(qzlt_set_url, params = {"client_id": clientID})
+	else:
+		# FIXME: Not sure how to pass access token to `requests` properly
+		req = requests.get(qzlt_set_url, headers = {"Authorization": "Bearer " + qzlt_access_token})
+
+	if req.status_code != 200 :
+		return {"error": "Bad Request: " + req.text}
+	else :
+		qzlt_json = json.loads(req.text)
+		return qzlt_json
+
+
+
+# Returns as dict, in Quizas format
+def get_flashset_json(set_id):
 	if set_id[:8] == "quizlet:":
 		qzlt_set_id = set_id[8:]
 
-		tokenUrl = "https://api.quizlet.com/oauth/token"
-		clientID = CONSUMER_TOKEN
-		keySecret = CONSUMER_SECRET
+		qzlt_json = get_raw_quizlet_set_json(qzlt_set_id)
 
-		qzlt_set_url = "https://api.quizlet.com/2.0/sets/" + qzlt_set_id
-
-		# Get ACCESS TOKEN from Cookies
-		qzlt_access_token = request.cookies.get("quizlet_access_token")
-		if qzlt_access_token == None:
-			# If no user access token, just use CLIENT ID to access public sets
-			req = requests.get(qzlt_set_url, params = {"client_id": clientID})
+		if "error" in qzlt_json:
+			return qzlt_json
 		else:
-			# FIXME: Not sure how to pass access token to `requests` properly
-			req = requests.get(qzlt_set_url, headers = {"Authorization": "Bearer " + qzlt_access_token})
-
-		if req.status_code != 200 :
-			return "Bad Request: " + req.text
-		else :
 			# Map from
 			# qzlt.id -> "quizlet:" + id
 			# qzlt.title -> name
 			# ??? -> category
 			# [{id, term, definition}] -> [{id, question, answer}]
 
-			qzlt_json = json.loads(req.text)
 			app_json = {"id": "quizlet:" + str(qzlt_json["id"]),
 					    "name": qzlt_json["title"],
 						"category": "???",
 						"cards": [{"id": "quizlet:" + str(term["id"]),
 						           "question": term["term"],
 								   "answer": term["definition"]} for term in qzlt_json["terms"]]}
-			return json.dumps(app_json)
+			return app_json
 	else:
-		return "Invalid format"
+		return {"error": "Invalid set_id format: " + set_id}
+
+# /sets/#set-id
+# Expects set-id as `quizlet:SET_ID`
+# Quizlet API, see:
+# https://quizlet.com/api/2.0/docs/sets#view
+@main.route('/sets/<set_id>')
+def get_flashset(set_id):
+	set_json = get_flashset_json(set_id)
+
+	if "error" in set_json:
+		# FIXME: Could be more sophisticated about error codes & json, here
+		return set_json["error"]
+	else:
+		return json.dumps(set_json)
+
+
+
+# Shuffled Quizset.
+def shuffled_flashset_json(set_id, n):
+	# Get the Flashset with the given id
+	# in full Quizas set format
+	set_json = get_flashset_json(set_id)
+
+	if "error" in set_json:
+		return set_json
+
+	result = []
+	shuffled_flashcards = []
+
+	# Generate Questions:
+	for i in xrange(0, n):
+		# Draw cards.
+		# If n <= len(set), great. Don't repeat
+		# If n > len(set), need to repeat.
+		if len(shuffled_flashcards) == 0:
+			shuffled_flashcards = set_json["cards"][:] # Copy cards
+			random.shuffle(shuffled_flashcards)
+
+		# Since list is shuffled, just pop off last item,
+		qn_card = shuffled_flashcards.pop()
+
+		# Draw 3x OTHER cards. (4 answers per qn)
+		# If I knew a better way. :/
+		cards_not_qn = [c for c in set_json["cards"] if c != qn_card]
+		random.shuffle(cards_not_qn)
+		other_cards = cards_not_qn[0:3] # again, shuffled, so this is rndm
+
+		answers = [qn_card] + other_cards
+		random.shuffle(answers)
+
+		# Shuffle the order of the cards; call  this a "Question"
+		# {question: FCard, answers: [FCard]}
+		# This is *somewhat* wasteful; quite wasteful if n > len.
+		result.append({"question": qn_card,
+		               "answers": answers})
+
+	return {"questions": result}
+
+@main.route('/sets/<set_id>/shuffle/<int:n>')
+def shuffled_flashset(set_id, n):
+	shuffled_json = shuffled_flashset_json(set_id, n)
+
+	if "error" in shuffled_json:
+		#FIXME: Be more sophisticated about error codes & JSON
+		return shuffled_json["error"]
+
+	return json.dumps(shuffled_json)
 
 
 
