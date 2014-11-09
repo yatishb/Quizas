@@ -22,8 +22,9 @@ def documentGame(room, user1, user2, userAns1, userAns2, flashsetId) :
 		user1AnsChosen = userAns1.get(questionId)
 		user2AnsChosen = userAns2.get(questionId)
 
-		cardUser1 = FC(room, flashsetId, questionId, user1, user1AnsChosen)
-		cardUser2 = FC(room, flashsetId, questionId, user2, user2AnsChosen)
+		# -1 refers to time taken by client for each answer
+		cardUser1 = FC(room, flashsetId, questionId, user1, user1AnsChosen, -1)
+		cardUser2 = FC(room, flashsetId, questionId, user2, user2AnsChosen, -1)
 		db.session.add(cardUser1)
 		db.session.add(cardUser2)
 
