@@ -13,7 +13,8 @@ def socketConnect():
 	# Use this and then find internal user id
     session['id'] = authhelper.get_current_id()
     session['room'] = defaultRoom
-    emit('my response', {'data': 'Connected %r' % session['id']})
+    session['random'] = str(uuid.uuid1())
+    emit('my response', {'data': 'Connected %r- %r' % (session['id'], session['random'])})
 
 @socketio.on('disconnect', namespace='/test')
 def socketDisconnect():
@@ -22,7 +23,7 @@ def socketDisconnect():
 @socketio.on('print connected', namespace='/test')
 def printSocketsConnected():
 	for sessid, socket in request.namespace.socket.server.sockets.items():
-		emit('my response', {'data': 'sessions uuid: %r' % socket['/test'].session['id']})
+		emit('my response', {'data': 'sessions uuid: %r- %r' % (socket['/test'].session['id'], socket['/test'].session['random'])})
 
 
 
@@ -45,6 +46,7 @@ def assignRoom(message):
 				if socket['/test'].session['room'] == defaultRoom:
 					socket['/test'].session['room'] = room
 					socket['/test'].join_room(room)
+					# print "Assigned: user:%r room:%r" % (socket['/test'].session['id'], socket['/test'].session['room'])
 					
 					# Check redis if room exists
 					# Add client to room and create room if not found
@@ -127,6 +129,7 @@ def readAnswerByClient(message):
 	idClient = session['id']
 	idQuestion = message['qid']
 	clientAnswer = message['answer']
+	# print "received: %r" % message
 
 	HASH_USER = "ROOM_" + room + "_" + str(idClient)
 	HASH_SEND = "ROOM_" + room + "_SEND"
