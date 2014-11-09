@@ -8,6 +8,7 @@ import json, uuid
 # Parameters: room, user1, user2, redis.hgetall(HASH_USER1), redis.hgetall(HASH_USER2), flashsetid
 # user1 and user2 are integers
 # redis.hgetall(HASH_USER1) gives dict of FlashcardID and UserAnswer
+# The equivalent parameter for that is userAns1
 def documentGame(room, user1, user2, userAns1, userAns2, flashsetId) :
 	# Store game header in FlashGame db
 	gameUser1 = FG(room, flashsetId, user1)
@@ -20,18 +21,9 @@ def documentGame(room, user1, user2, userAns1, userAns2, flashsetId) :
 	for questionId in allQuestions:
 		user1AnsChosen = userAns1.get(questionId)
 		user2AnsChosen = userAns2.get(questionId)
-		# Algorithm to detect if the answer chosen by the user is correct or not
-		if user1AnsChosen == questionId:
-			user1IsCorrect = True
-		else:
-			user1IsCorrect = False
-		if user2AnsChosen == questionId:
-			user2IsCorrect = True
-		else:
-			user2IsCorrect = False
 
-		cardUser1 = FC(room, flashsetId, questionId, user1, user1AnsChosen, user1IsCorrect)
-		cardUser2 = FC(room, flashsetId, questionId, user2, user2AnsChosen, user2IsCorrect)
+		cardUser1 = FC(room, flashsetId, questionId, user1, user1AnsChosen)
+		cardUser2 = FC(room, flashsetId, questionId, user2, user2AnsChosen)
 		db.session.add(cardUser1)
 		db.session.add(cardUser2)
 

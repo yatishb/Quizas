@@ -1,3 +1,4 @@
+import datetime
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import UniqueConstraint, ColumnDefault, sql
 from .. import db
@@ -21,11 +22,13 @@ class FlashGame(db.Model):
 	gameId = db.Column(db.String(40))
 	flashsetId = db.Column(db.String(40))
 	user = db.Column(db.Integer)
+	datetime = db.Column(db.DateTime, default = datetime.datetime.utcnow())
 
+	__tablename__ = "FlashGame"
 	def __init__(self, gameId, flashsetId, user):
 		self.gameId = gameId
 		self.flashsetId = flashsetId
-		self.user = user
+		self.user = user 
 
 	def __repr__(self):
 		return '<Game ID %r>' % self.gameId	
@@ -38,15 +41,16 @@ class FlashCardInGame(db.Model):
 	flashcardId = db.Column(db.String(40))
 	user = db.Column(db.Integer)
 	userAns = db.Column(db.String(40))
-	isCorrect = db.Column(db.Boolean)
+	time = db.Column(db.Integer) # time is in msec
 
-	def __init__(self, gameId, flashsetId, flashcardId, user, userAns, isCorrect):
+	__tablename__ = "FlashCardInGame"
+	def __init__(self, gameId, flashsetId, flashcardId, user, userAns, time):
 		self.gameId = gameId
 		self.flashsetId = flashsetId
 		self.flashcardId = flashcardId
 		self.user = user
 		self.userAns = userAns
-		self.isCorrect = isCorrect
+		self.time = time
 
 	def __repr__(self):
 		return '<Game ID %r FlashCardId %r User %r>' % (self.gameId, self.flashcardId, self.user)
