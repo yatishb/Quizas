@@ -76,6 +76,7 @@ def assignRoom(message):
 @socketio.on('clearroom', namespace='/test')
 def clearRoom():
 	room = session['room']
+	print room
 	if redis.hexists("ROOMS", room) == True:
 		# Read users from redis
 		# Expect usersInRoom to be a list of comma separated ids
@@ -104,7 +105,7 @@ def clearRoom():
 		for eachUser in usersInRoom :
 			# Sending expiry information to client
 			for sessid, socket in request.namespace.socket.server.sockets.items():
-				if socket['/test'].session['id'] == eachUser:
+				if socket['/test'].session['id'] == int(eachUser):
 					socket['/test'].session['room'] = defaultRoom
 					socket['/test'].leave_room(room)
 					socket['/test'].base_emit('my response', {'data': "cleared room"})
