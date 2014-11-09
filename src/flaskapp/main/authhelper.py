@@ -65,6 +65,17 @@ def get_current_id():
 # Adds the given userid into the database,
 # assigning it a new id.
 def insert_new_id(new_userid):
+	# First check to make sure that the userid doesn't exist
+	# in the DB already.
+	# If it does, they've signed in previously. So, just keep track of
+	# them using the same ID they had before.
+	# (TODO: This *might* get messy if the user fucks around with different
+	#  accounts. >.<).
+
+	if lookup(new_userid) != None:
+		# pk exists in DB already.
+		return
+
 	newUserAuth = InternalUserAuth(new_userid)
 	db.session.add(newUserAuth)
 	db.session.commit()
