@@ -10,7 +10,12 @@
 
             // the socket.io documentation recommends sending an explicit package upon connection
             // this is specially important when using the global namespace
-            var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+            // N.B. WS can fail due to firewall before falling back on XHR,
+            // so *SOME* clients (not all) have 10s delay before connecting.
+            // sol'n is to reduce `connect timeout`.
+            // SEE: https://github.com/Automattic/socket.io/wiki/Configuring-Socket.IO
+            var socket = io.connect('http://' + document.domain + ':' + location.port + namespace,
+                                    {"connect timeout": 300});
             socket.on('connect', function() {
                 socket.emit('my event', {data: 'I\'m connected!'});
             });
