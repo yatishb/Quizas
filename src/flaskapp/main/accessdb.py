@@ -169,26 +169,31 @@ def getGameStats(userid, gameidForStats):
 # Search amongst these multiplayer games if the user has played using the flashset
 def getUserSetStats(userid, setid):
 	allGamesUserPlayed = FG.query.with_entities(FG.gameId).\
-							group_by(FG.gameId).\
-							having(FG.user == userid).\
-							having(FG.flashsetId == setid).\
-							having(func.count() == 2)
+	                              group_by(FG.gameId).\
+	                              having(FG.user == userid).\
+	                              having(FG.flashsetId == setid).\
+	                              having(func.count() == 2)
 	noOfWins = 0
 	noOfLosses = 0
 	noOfDraws = 0
 
+	# Look through these games for # W/L/D
+	# based on the flashset.
 	for eachGamePlayed in allGamesUserPlayed:
 		eachGameId = eachGamePlayed.gameId
-		allQuestionsInGame = FC.query.filter(FC.gameId == eachGameId).all()
-		
+		allQuestionsInGame = FC.query.filter_by(gameId = eachGameId).all()
+
+		# This is written in a very imperative style!
+
 		noOfQuestionsCorrectUser = 0
 		noOfQuestionsCorrectOpponent = 0
 		for row in allQuestionsInGame:
+			rowIsCorrect = row.flashcardId == userAns
 			if row.user == userid:
-				if row.isCorrect == True:
+				if rowIsCorrect:
 					noOfQuestionsCorrectUser += 1
 			else:
-				if row.isCorrect == True:
+				if rowIsCorrect:
 					noOfQuestionsCorrectOpponent += 1
 
 		if noOfQuestionsCorrectUser > noOfQuestionsCorrectOpponent:
@@ -198,8 +203,35 @@ def getUserSetStats(userid, setid):
 		else:
 			noOfDraws += 1
 
+
+	# For this, we want to get all the flashcardIds
+	# where user==user_id and flashsetId==set_id
+	flashCardRows = FC.query.filter_by(user = userid,
+	                                   flashsetId = setid).all()
+	
+	# Gather the flashCardIds which were tested.
+	flashCardIds = set([fc.flashcardId for fc in flashCardRows])
+	# Gather user answers per flashcardId
+	# answerForUser : dict{ fcid -> [user answers for those] }
+	userAnswers = dict([(fcid,
+	                     [row.userAns
+	                      for row in flashCardRows
+	                      if row.flashcardId == fcid])
+	                    for fcid in flashCardIds])
+	# Gather the correct/total stats for each flashcardId
+	# flashCardStats : dict{ fcid -> {"correct": int, "total": int} }
+	# TODO: more stuff later, so there's more information as to
+	# how the user is doing with the flashcard *recently*.
+	flashCardStats = dict([(fcid,
+	                       {"correct": userAnswers[fcid].count(fcid),
+	                        "total": len(userAnswers[fcid])})
+	                       for fcid in flashCardIds])
+
+
 	numPlayed = noOfDraws + noOfWins + noOfLosses
-	return json.dumps({'#Played': numPlayed, 
-				'#Wins': noOfWins, 
-				'#Losses': noOfLosses, 
-				'#Draws': noOfDraws})
+	return json.dumps({'played': numPlayed,
+	                   'wins': noOfWins,
+	                   'losses': noOfLosses,
+	                   'draws': noOfDraws,
+	                   'fcids': list(flashCardIds),
+	                   'flashcards': flashCardStats})
