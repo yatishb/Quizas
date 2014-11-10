@@ -1,5 +1,5 @@
 from . import main
-from flask import request
+from flask import request, abort
 import accessdb, authhelper
 
 @main.route('/user/<userid>/stats', methods=['GET'])
@@ -33,7 +33,7 @@ def displayUserGameStats(userid, gameid):
 	if internalUserid == None:
 		abort(401)
 	else:
-		return accessdb.getGameStats(userid, gameid)
+		return accessdb.getGameStats(internalUserId, gameid)
 
 @main.route('/user/<userid>/stats/sets/<setid>', methods=['GET'])
 def displayUserSetStats(userid, setid):
@@ -41,7 +41,7 @@ def displayUserSetStats(userid, setid):
 	if internalUserid == None:
 		abort(401)
 	else:
-		return accessdb.getUserSetStats(userid, setid)
+		return accessdb.getUserSetStats(internalUserid, setid)
 
 @main.route('/user/<userid>/gameresults', methods=['POST'])
 def readStatsOfJustEndedGame(userid):
@@ -51,7 +51,7 @@ def readStatsOfJustEndedGame(userid):
 	else:
 		if request.json:
 			receivedData = request.get_json()
-			accessdb.soloGameResultsWriteDb(userid, receivedData)
+			accessdb.soloGameResultsWriteDb(internalUserId, receivedData)
 			return "Successfully updated"
 		else:
 			abort(401)
