@@ -58,8 +58,8 @@
                 socket.emit('readanswer', {qid: $('#room_name').val(), answer: $('#room_data').val()});
                 return false;
             });
-            $('form#client_uuid').submit(function(event) {
-                socket.emit('send client', {client: $('#clientuuid').val(), data: $('#client_data').val()});
+            $('form#client_user').submit(function(event) {
+                socket.emit('send notification', {user: $('#clientuser').val() });
                 return false;
             });
         });
@@ -103,10 +103,9 @@
         <input type="text" name="room_data" id="room_data" placeholder="Answer">
         <input type="submit" value="Answer Room">
     </form>
-    <form id="client_uuid" method='POST' action='#'>
-        <input type="text" name="clientuuid" id="clientuuid" placeholder="Client UUID">
-        <input type="text" name="client_data" id="client_data" placeholder="Message">
-        <input type="submit" value="Send To Client">
+    <form id="client_user" method='POST' action='#'>
+        <input type="text" name="clientuser" id="clientuser" placeholder="Client User">
+        <input type="submit" value="Send Notif To Client">
     </form>
     <h2>Receive:</h2>
     <div id="log"></div>

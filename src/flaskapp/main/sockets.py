@@ -23,8 +23,16 @@ def socketDisconnect():
 @socketio.on('print connected', namespace='/test')
 def printSocketsConnected():
 	for sessid, socket in request.namespace.socket.server.sockets.items():
-		emit('my response', {'data': 'sessions uuid: %r- %r' % (socket['/test'].session['id'], socket['/test'].session['random'])})
+		emit('my response', {'data': 'sessions userid: %r- %r' % (socket['/test'].session['id'], socket['/test'].session['random'])})
 
+
+@socketio.on('send notification', namespace='/test')
+def sendNotificationToSocket(message):
+	userSendTo = message['user']
+	internalUser = authhelper.lookup(userSendTo)
+	for sessid, socket in request.namespace.socket.server.sockets.items():
+		if socket['/test'].session['id'] == internalUser:
+			socket['/test'].base_emit('my response', {'data': 'received notif from: %r' % authhelper.lookupInternal(session['id'])})
 
 
 
