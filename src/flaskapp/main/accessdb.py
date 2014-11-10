@@ -1,5 +1,5 @@
 from models import User, FlashGame as FG, FlashCardInGame as FC
-from sqlalchemy import func
+from sqlalchemy import func, and_
 from . import main
 from .. import db, redis
 import json, uuid
@@ -252,10 +252,10 @@ def getGameStats(userid, gameidForStats):
 # Search amongst these multiplayer games if the user has played using the flashset
 def getUserSetStats(userid, setid):
 	allGamesUserPlayed = FG.query.with_entities(FG.gameId).\
+	                              filter_by(user=userid).\
 	                              group_by(FG.gameId).\
-	                              having(FG.user == userid).\
-	                              having(FG.flashsetId == setid).\
-	                              having(func.count() == 2)
+	                              having(FG.flashsetId == setid)
+	gameIds = [g.gameId for g in allGamesUserPlayed]
 	noOfWins = 0
 	noOfLosses = 0
 	noOfDraws = 0
@@ -271,7 +271,7 @@ def getUserSetStats(userid, setid):
 		noOfQuestionsCorrectUser = 0
 		noOfQuestionsCorrectOpponent = 0
 		for row in allQuestionsInGame:
-			rowIsCorrect = row.flashcardId == userAns
+			rowIsCorrect = row.flashcardId == row.userAns
 			if row.user == userid:
 				if rowIsCorrect:
 					noOfQuestionsCorrectUser += 1
@@ -317,4 +317,5 @@ def getUserSetStats(userid, setid):
 	                   'losses': noOfLosses,
 	                   'draws': noOfDraws,
 	                   'fcids': list(flashCardIds),
+	                   'gameids': gameIds,
 	                   'flashcards': flashCardStats})
