@@ -8,7 +8,7 @@ def displayUserStats(userid):
 	if internalUserid == None:
 		abort(401)
 	else:
-		return accessdb.getUserWinLossStats(internalUserid)
+		return accessdb.getIndividualUserGameStats(internalUserid)
 
 @main.route('/user/<userid>/stats/vs/<opponent>', methods=['GET'])
 def displayUserStatsHeadToHead(userid, opponent):
@@ -17,7 +17,10 @@ def displayUserStatsHeadToHead(userid, opponent):
 	if internalUserid == None or opponentUserid == None:
 		abort(401)
 	else:
-		return accessdb.getUserWinLossStats(internalUserid, opponentUserid)
+		if internalUserid == opponentUserid:
+			abort(401)
+		else:
+			return accessdb.getCommonGamesStats(internalUserid, opponentUserid)
 
 @main.route('/user/<userid>/stats/games', methods=['GET'])
 def displayUserGamesPlayed(userid):
@@ -25,7 +28,7 @@ def displayUserGamesPlayed(userid):
 	if internalUserid == None:
 		abort(401)
 	else:
-		return accessdb.getUserGames(internalUserid)
+		return accessdb.getUserGamesJSON(internalUserid)
 
 @main.route('/user/<userid>/stats/game/<gameid>', methods=['GET'])
 def displayUserGameStats(userid, gameid):
@@ -33,7 +36,7 @@ def displayUserGameStats(userid, gameid):
 	if internalUserid == None:
 		abort(401)
 	else:
-		return accessdb.getGameStats(userid, gameid)
+		return accessdb.getGameStats(internalUserid, gameid)
 
 @main.route('/user/<userid>/stats/sets/<setid>', methods=['GET'])
 def displayUserSetStats(userid, setid):

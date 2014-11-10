@@ -42,88 +42,172 @@ def soloGameResultsWriteDb(userid, receivedData) :
 	for eachQues in cards:
 		questionId = eachQues['flashcard']
 		userAns = eachQues['result']
-		userIsCorrect = True # Must check whether ans is correct
-		cardUser = FC(gameId, flashsetId, questionId, userid, userAns, userIsCorrect)
+		cardUser = FC(gameId, flashsetId, questionId, userid, userAns, -1)
 		db.session.add(cardUser)
 
 	db.session.commit()
 
 
-def getUserWinLossStats(userid, opponentUserId = None):
-	# Find all games where one user is userid
-	# Retrieve all cards for each game and individually compute if userid won
-	if opponentUserId == None:
-		gamesRetrieved = getUserGames(userid)
-	else:
-		gamesRetrieved = getCommonGames(userid, opponentUserId)
 
-	allGamesUserPlayed = json.loads(gamesRetrieved)
-	if len(allGamesUserPlayed) == 0:
-		return "Haven't played"
+# def getUserWinLossStats(userid, opponentUserId = None):
+# 	# Find all games where one user is userid
+# 	# Retrieve all cards for each game and individually compute if userid won
+# 	if opponentUserId == None:
+# 		gamesRetrieved = getUserGames(userid)
+# 	else:
+# 		gamesRetrieved = getCommonGames(userid, opponentUserId)
+
+# 	allGamesUserPlayed = json.loads(gamesRetrieved)
+# 	if len(allGamesUserPlayed) == 0:
+# 		return "Haven't played"
 
 
-	noOfWins = 0
-	noOfLosses = 0
-	noOfDraws = 0
-	for eachGameId in allGamesUserPlayed:
-		allQuestionsInGame = FC.query.filter(FC.gameId == eachGameId).all()
+# 	noOfWins = 0
+# 	noOfLosses = 0
+# 	noOfDraws = 0
+# 	for eachGameId in allGamesUserPlayed:
+# 		allQuestionsInGame = FC.query.filter(FC.gameId == eachGameId).all()
 		
-		noOfQuestionsCorrectUser = 0
-		noOfQuestionsCorrectOpponent = 0
-		for row in allQuestionsInGame:
-			if row.user == userid:
-				if row.isCorrect == True:
-					noOfQuestionsCorrectUser += 1
-			else:
-				if row.isCorrect == True:
-					noOfQuestionsCorrectOpponent += 1
+# 		noOfQuestionsCorrectUser = 0
+# 		noOfQuestionsCorrectOpponent = 0
+# 		for row in allQuestionsInGame:
+# 			if row.user == userid:
+# 				if row.flashcardId == row.userAns:
+# 					# Check if ans is correct
+# 					noOfQuestionsCorrectUser += 1
+# 			else:
+# 				if row.flashcardId == row.userAns:
+# 					# Check if ans is correct
+# 					noOfQuestionsCorrectOpponent += 1
 
-		if noOfQuestionsCorrectUser > noOfQuestionsCorrectOpponent:
-			noOfWins += 1
-		elif noOfQuestionsCorrectUser < noOfQuestionsCorrectOpponent:
-			noOfLosses += 1
+# 		if noOfQuestionsCorrectUser > noOfQuestionsCorrectOpponent:
+# 			noOfWins += 1
+# 		elif noOfQuestionsCorrectUser < noOfQuestionsCorrectOpponent:
+# 			noOfLosses += 1
+# 		else:
+# 			noOfDraws += 1
+
+# 	numPlayed = noOfDraws + noOfWins + noOfLosses
+# 	return json.dumps({'#Played': numPlayed, 
+# 				'#Wins': noOfWins, 
+# 				'#Losses': noOfLosses, 
+# 				'#Draws': noOfDraws})
+
+
+
+# Given num of questions got correct by user and opponent, update win/draw/loss
+def updateWinDrawLossStat(noOfQuestionsCorrectUser, noOfQuestionsCorrectOpponent, 
+		noOfWins, noOfDraws, noOfLosses):
+	if noOfQuestionsCorrectUser > noOfQuestionsCorrectOpponent:
+		noOfWins += 1
+	elif noOfQuestionsCorrectUser < noOfQuestionsCorrectOpponent:
+		noOfLosses += 1
+	else:
+		noOfDraws += 1
+
+	return noOfWins, noOfDraws, noOfLosses
+
+
+def findNumOfQuesEachUserInGameGotCorrect(allQuestionsInGame, userid):
+	noOfQuestionsCorrectUser = 0
+	noOfQuestionsCorrectOpponent = 0
+
+	for row in allQuestionsInGame:
+		if row.user == userid:
+			if row.flashcardId == row.userAns:
+				# Check if ans is correct
+				noOfQuestionsCorrectUser += 1
 		else:
-			noOfDraws += 1
+			if row.flashcardId == row.userAns:
+				# Check if ans is correct
+				noOfQuestionsCorrectOpponent += 1
+
+	return noOfQuestionsCorrectUser, noOfQuestionsCorrectOpponent
+
+
+# Return list of games played by the user as a JSON
+def getUserGamesJSON(userid):
+	return json.dumps(getUserGames(userid))
+
+# Return list of games played by the user
+def getUserGames(userid):
+	userGames = FG.query.filter(FG.user == userid).\
+					with_entities(FG.gameId)
+	gameIds = []
+	for eachGamePlayedByUser in userGames:
+		gameIds.append(eachGamePlayedByUser.gameId)
+
+	return gameIds
+
+
+
+
+# Find list of gameids of the games played by the user
+# Supposed to return only multiplayer games played
+def getIndividualUserGameStats(userid):
+	allGamesUserPlayed = getUserGames(userid)
+	
+	noOfWins = noOfLosses = noOfDraws = 0
+	for eachGameId in allGamesUserPlayed:
+		# Retrieve the gameids of each of the rows in the query
+		# eachGameId = eachGamePlayedByUser.gameId
+		
+		# Retrieve complete details about the game
+		allQuestionsInGame = FC.query.filter(FC.gameId == eachGameId).all()
+
+		# Flag variable to detect if single player game
+		singleGame = True
+		for row in allQuestionsInGame:
+			if row.user != userid:
+				singleGame = False
+		# If the game was found to be a single player, ignore game
+		if singleGame == True:
+			continue
+				
+		noOfQuestionsCorrectUser, noOfQuestionsCorrectOpponent = findNumOfQuesEachUserInGameGotCorrect(
+																		allQuestionsInGame, userid)
+		noOfWins, noOfDraws, noOfLosses = updateWinDrawLossStat(noOfQuestionsCorrectUser, 
+									noOfQuestionsCorrectOpponent, noOfWins, noOfDraws, noOfLosses)
 
 	numPlayed = noOfDraws + noOfWins + noOfLosses
 	return json.dumps({'#Played': numPlayed, 
 				'#Wins': noOfWins, 
 				'#Losses': noOfLosses, 
 				'#Draws': noOfDraws})
+	
 
 
-# Return list of gameids of the games played by the user
-def getUserGames(userid):
-	allGamesUserPlayed = FG.query.with_entities(FG.gameId).\
-							group_by(FG.gameId).\
-							having(FG.user == userid).\
-							having(func.count() == 2)
-	gameIds = []
-	for eachGamePlayedByUser in allGamesUserPlayed:
-		gameIds.append(eachGamePlayedByUser.gameId)
-	return json.dumps(gameIds)
-
-
-# Return list of common gameids of the games played by both
-def getCommonGames(userid, opponentUserId):
-	userGames = FG.query.filter(FG.user == userid).\
-					with_entities(FG.gameId)
-	oppoGames = FG.query.filter(FG.user == opponentUserId).\
-					with_entities(FG.gameId)
+# Find list of common gameids of the games played by both
+# Return stats on the multiplayer games played
+def getCommonGamesStats(userid, opponentUserId):
+	userGames = getUserGames(userid)
+	oppoGames = getUserGames(opponentUserId)
 	commonGames = []
-
 	gameIds = []
 	for eachGamePlayedByUser in userGames:
-		gameIds.append(eachGamePlayedByUser.gameId)
+		gameIds.append(eachGamePlayedByUser)
 
 	userGamesSet = set(gameIds)
-
-	for eachGameOppo in oppoGames:
-		gameid = eachGameOppo.gameId
+	# Find common games for the two users
+	for gameid in oppoGames:
 		if gameid in userGamesSet:
 			commonGames.append(gameid)
 
-	return json.dumps(commonGames)
+	noOfWins = noOfLosses = noOfDraws = 0
+	for eachGameId in commonGames:		
+		# Retrieve complete details about the game
+		allQuestionsInGame = FC.query.filter(FC.gameId == eachGameId).all()
+		noOfQuestionsCorrectUser, noOfQuestionsCorrectOpponent = findNumOfQuesEachUserInGameGotCorrect(
+																		allQuestionsInGame, userid)
+		noOfWins, noOfDraws, noOfLosses = updateWinDrawLossStat(noOfQuestionsCorrectUser, 
+									noOfQuestionsCorrectOpponent, noOfWins, noOfDraws, noOfLosses)
+
+	numPlayed = noOfDraws + noOfWins + noOfLosses
+	return json.dumps({'#Played': numPlayed, 
+				'#Wins': noOfWins, 
+				'#Losses': noOfLosses, 
+				'#Draws': noOfDraws,
+				'CommonGames': commonGames})
 
 
 
@@ -136,18 +220,8 @@ def getGameStats(userid, gameidForStats):
 	gameResult = ""
 
 	noOfQuestions = 0
-	noOfQuestionsCorrectUser = 0
-	noOfQuestionsCorrectOpponent = 0
-	
-	for row in questionsInGame:
-		if row.user == userid:
-			noOfQuestions += 1
-			if row.isCorrect == True:
-				noOfQuestionsCorrectUser += 1
-		else:
-			opponentUserId = row.user
-			if row.isCorrect == True:
-				noOfQuestionsCorrectOpponent += 1
+	noOfQuestionsCorrectUser, noOfQuestionsCorrectOpponent = findNumOfQuesEachUserInGameGotCorrect(
+																		allQuestionsInGame, userid)
 
 	if noOfQuestionsCorrectUser > noOfQuestionsCorrectOpponent:
 		gameResult = "Won"
@@ -173,9 +247,8 @@ def getUserSetStats(userid, setid):
 							having(FG.user == userid).\
 							having(FG.flashsetId == setid).\
 							having(func.count() == 2)
-	noOfWins = 0
-	noOfLosses = 0
-	noOfDraws = 0
+	
+	noOfWins = noOfLosses = noOfDraws = 0
 
 	for eachGamePlayed in allGamesUserPlayed:
 		eachGameId = eachGamePlayed.gameId
@@ -185,18 +258,16 @@ def getUserSetStats(userid, setid):
 		noOfQuestionsCorrectOpponent = 0
 		for row in allQuestionsInGame:
 			if row.user == userid:
-				if row.isCorrect == True:
+				if row.flashcardId == row.userAns:
+					# Check if ans is correct
 					noOfQuestionsCorrectUser += 1
 			else:
-				if row.isCorrect == True:
+				if row.flashcardId == row.userAns:
+					# Check if ans is correct
 					noOfQuestionsCorrectOpponent += 1
 
-		if noOfQuestionsCorrectUser > noOfQuestionsCorrectOpponent:
-			noOfWins += 1
-		elif noOfQuestionsCorrectUser < noOfQuestionsCorrectOpponent:
-			noOfLosses += 1
-		else:
-			noOfDraws += 1
+		noOfWins, noOfDraws, noOfLosses = updateWinDrawLossStat(noOfQuestionsCorrectUser, 
+									noOfQuestionsCorrectOpponent, noOfWins, noOfDraws, noOfLosses)
 
 	numPlayed = noOfDraws + noOfWins + noOfLosses
 	return json.dumps({'#Played': numPlayed, 
