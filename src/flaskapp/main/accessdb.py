@@ -3,6 +3,11 @@ from sqlalchemy import func
 from . import main
 from .. import db, redis
 import json, uuid
+import authhelper
+
+# To serialise datetime to JSON
+def date_handler(obj):
+    return obj.isoformat() if hasattr(obj, 'isoformat') else obj
 
 
 # Parameters: room, user1, user2, redis.hgetall(HASH_USER1), redis.hgetall(HASH_USER2), flashsetid
@@ -48,53 +53,6 @@ def soloGameResultsWriteDb(userid, receivedData) :
 	db.session.commit()
 
 
-
-# def getUserWinLossStats(userid, opponentUserId = None):
-# 	# Find all games where one user is userid
-# 	# Retrieve all cards for each game and individually compute if userid won
-# 	if opponentUserId == None:
-# 		gamesRetrieved = getUserGames(userid)
-# 	else:
-# 		gamesRetrieved = getCommonGames(userid, opponentUserId)
-
-# 	allGamesUserPlayed = json.loads(gamesRetrieved)
-# 	if len(allGamesUserPlayed) == 0:
-# 		return "Haven't played"
-
-
-# 	noOfWins = 0
-# 	noOfLosses = 0
-# 	noOfDraws = 0
-# 	for eachGameId in allGamesUserPlayed:
-# 		allQuestionsInGame = FC.query.filter(FC.gameId == eachGameId).all()
-		
-# 		noOfQuestionsCorrectUser = 0
-# 		noOfQuestionsCorrectOpponent = 0
-# 		for row in allQuestionsInGame:
-# 			if row.user == userid:
-# 				if row.flashcardId == row.userAns:
-# 					# Check if ans is correct
-# 					noOfQuestionsCorrectUser += 1
-# 			else:
-# 				if row.flashcardId == row.userAns:
-# 					# Check if ans is correct
-# 					noOfQuestionsCorrectOpponent += 1
-
-# 		if noOfQuestionsCorrectUser > noOfQuestionsCorrectOpponent:
-# 			noOfWins += 1
-# 		elif noOfQuestionsCorrectUser < noOfQuestionsCorrectOpponent:
-# 			noOfLosses += 1
-# 		else:
-# 			noOfDraws += 1
-
-# 	numPlayed = noOfDraws + noOfWins + noOfLosses
-# 	return json.dumps({'#Played': numPlayed, 
-# 				'#Wins': noOfWins, 
-# 				'#Losses': noOfLosses, 
-# 				'#Draws': noOfDraws})
-
-
-
 # Given num of questions got correct by user and opponent, update win/draw/loss
 def updateWinDrawLossStat(noOfQuestionsCorrectUser, noOfQuestionsCorrectOpponent, 
 		noOfWins, noOfDraws, noOfLosses):
@@ -125,9 +83,12 @@ def findNumOfQuesEachUserInGameGotCorrect(allQuestionsInGame, userid):
 	return noOfQuestionsCorrectUser, noOfQuestionsCorrectOpponent
 
 
+
 # Return list of games played by the user as a JSON
 def getUserGamesJSON(userid):
 	return json.dumps(getUserGames(userid))
+
+
 
 # Return list of games played by the user
 def getUserGames(userid):
@@ -170,10 +131,10 @@ def getIndividualUserGameStats(userid):
 									noOfQuestionsCorrectOpponent, noOfWins, noOfDraws, noOfLosses)
 
 	numPlayed = noOfDraws + noOfWins + noOfLosses
-	return json.dumps({'#Played': numPlayed, 
-				'#Wins': noOfWins, 
-				'#Losses': noOfLosses, 
-				'#Draws': noOfDraws})
+	return json.dumps({'played': numPlayed, 
+				'wins': noOfWins, 
+				'losses': noOfLosses, 
+				'draws': noOfDraws})
 	
 
 
@@ -203,11 +164,11 @@ def getCommonGamesStats(userid, opponentUserId):
 									noOfQuestionsCorrectOpponent, noOfWins, noOfDraws, noOfLosses)
 
 	numPlayed = noOfDraws + noOfWins + noOfLosses
-	return json.dumps({'#Played': numPlayed, 
-				'#Wins': noOfWins, 
-				'#Losses': noOfLosses, 
-				'#Draws': noOfDraws,
-				'CommonGames': commonGames})
+	return json.dumps({'played': numPlayed, 
+				'wins': noOfWins, 
+				'losses': noOfLosses, 
+				'draws': noOfDraws,
+				'commongames': commonGames})
 
 
 
@@ -215,13 +176,59 @@ def getCommonGamesStats(userid, opponentUserId):
 # These stats are such provided such that the 
 # results page can be replicated without any problem
 def getGameStats(userid, gameidForStats):
+	game = FG.query.filter(FG.gameId == gameidForStats, FG.user != userid).first()
 	questionsInGame = FC.query.filter(FC.gameId == gameidForStats).all()
-	opponentUserId = ""
 	gameResult = ""
 
 	noOfQuestions = 0
+	flashcards = []
+
+	# Create array flashcards which shows the cards and answers
+	for row in questionsInGame:
+
+		if row.user == userid:
+			noOfQuestions += 1
+			flag = False
+
+			# Check if the flashcard array already contains the question.
+			# If this is so then the enemy's answers has already been recorded in array
+			for i in range(0, len(flashcards)):
+				if flashcards[i].get('question') == row.flashcardId:
+					flag = True
+					eachQues = flashcards[i]
+					eachQues['ans'] = row.userAns
+					flashcards[i] = eachQues
+					
+			# Could not find the question in the array so hence create new dict and add it
+			if flag == False:
+				eachQues = {}
+				eachQues['question'] = row.flashcardId
+				eachQues['ans'] = row.userAns
+				flashcards.append(eachQues)
+		else:
+			flag = False
+			# Check if the flashcard array already contains the question.
+			# If this is so then the user's answers has already been recorded in array
+			for i in range(0, len(flashcards)):
+				if flashcards[i].get('question') == row.flashcardId:
+					flag = True
+					eachQues = flashcards[i]
+					eachQues['enemy'] = row.userAns
+					flashcards[i] = eachQues
+
+			# Could not find the question in the array so hence create new dict and add it
+			if flag == False:
+				eachQues = {}
+				eachQues['question'] = row.flashcardId
+				eachQues['enemy'] = row.userAns
+				flashcards.append(eachQues)
+
+	# To get the other relevant data
+	datetime = game.datetime
+	opponentUserId = authhelper.lookupInternal(game.user)
+
 	noOfQuestionsCorrectUser, noOfQuestionsCorrectOpponent = findNumOfQuesEachUserInGameGotCorrect(
-																		allQuestionsInGame, userid)
+																		questionsInGame, userid)
 
 	if noOfQuestionsCorrectUser > noOfQuestionsCorrectOpponent:
 		gameResult = "Won"
@@ -230,11 +237,13 @@ def getGameStats(userid, gameidForStats):
 	else:
 		gameResult = "Drew"
 
-	return json.dumps({"#Questions":noOfQuestions, 
-				"#Correct":noOfQuestionsCorrectUser, 
-				"AgainstUser":opponentUserId, 
-				"#AgainstCorrect":noOfQuestionsCorrectOpponent, 
-				"Result":gameResult})
+	return json.dumps({"questions":noOfQuestions, 
+				"correct":noOfQuestionsCorrectUser, 
+				"againstUser":opponentUserId, 
+				"againstCorrect":noOfQuestionsCorrectOpponent, 
+				"result":gameResult,
+				"flashcards":flashcards,
+				"datetime":datetime}, default=date_handler)
 
 
 
