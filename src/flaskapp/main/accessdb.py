@@ -225,6 +225,7 @@ def getGameStats(userid, gameidForStats):
 
 	# To get the other relevant data
 	datetime = game.datetime
+	flashset = game.flashsetId
 	opponentUserId = authhelper.lookupInternal(game.user)
 
 	noOfQuestionsCorrectUser, noOfQuestionsCorrectOpponent = findNumOfQuesEachUserInGameGotCorrect(
@@ -242,6 +243,7 @@ def getGameStats(userid, gameidForStats):
 				"againstUser":opponentUserId, 
 				"againstCorrect":noOfQuestionsCorrectOpponent, 
 				"result":gameResult,
+				"flashset":flashset,
 				"flashcards":flashcards,
 				"datetime":datetime}, default=date_handler)
 
