@@ -68,3 +68,8 @@ docs/_build/
 # PyBuilder
 target/
 
+# Redis stuff
+*.rdb
+
+# Ignore this. 'cause it's Secret.
+secrets.json

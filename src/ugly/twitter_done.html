@@ -1,0 +1,37 @@
+Done.<br/>
+
+Cookies:<br/>
+<div id="cookieVal"></div>
+<br/>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+<script>
+var cookVal = $.cookie('twitter_user_id');
+console.log("Cookie[foo] is " + cookVal);
+$("#cookieVal").html(cookVal);
+</script>
+
+<br/>
+<br/>
+
+
+Twitter API Call Response:<br/>
+<div id="apiResponse">TODO, lol</div>
+<br/>
+
+<!-- From: http://www.ajax-cross-origin.com/ -->
+<!-- <script type="text/javascript" src="js/jquery.ajax&#45;cross&#45;origin.min.js"></script> -->
+<script>
+
+var username = $.cookie('quizas_user_id');
+var accessToken = $.cookie('quizas_access_token');
+var reqUrl = "http://dev.localhost/quizlet/2.0/users/" + username;
+
+
+</script>
+
+
+<br/>
+<br/>
+<a href="http://dev.localhost/">START THE FUCK OVER</a>
