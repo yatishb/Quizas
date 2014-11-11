@@ -37,7 +37,7 @@ def lookupInternal(internalid):
 		return u.user_id
 
 
-auth_sites = ["quizlet", "twitter"]
+auth_sites = ["quizlet", "twitter", "facebook"]
 
 
 # Returns an array of all the user_ids (`site:auth_id`),
