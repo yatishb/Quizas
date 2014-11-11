@@ -1,0 +1,147 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>Quizas - Create your own set</title>
+
+    <link rel="stylesheet" href="css/newset.css" />
+
+</head>
+
+<body class="page_container v_original">
+    <div class="page_main">
+        <div class="background"></div>
+
+        <div class="button_container v_original">
+            <div class="logo_text">Quizas</div>
+            <div class="subtitle">Generate your own study sets</div>
+            <div class="button upload">Upload</div>
+            <div class="button create">Type</div>
+            <input type="file" id="upload">
+        </div>
+    </div>
+
+    <div class="page_upload">
+        <form action="" method="post" class="form_upload">
+            <h1>Study Set Details
+                <span>Please check all the texts in the fields.</span>
+            </h1>
+            <label>
+                <span>Name of Study Set :</span>
+                <input id="name" type="text" name="name" placeholder="The Full Name" />
+            </label>
+
+            <label>
+                <span>Category :</span>
+                <select name="selection">
+                    <option value="Job Inquiry">Job Inquiry</option>
+                    <option value="General Question">General Question</option>
+                </select>
+            </label>
+            
+            <label>
+                <span>Question :</span>
+                <input id="q1" type="text" name="question" placeholder="Type Your Question" />
+            </label>
+
+            <label>
+                <span>Answer :</span>
+                <input id="a1" type="text" name="answer" placeholder="Type Your Answer" />
+            </label>
+            
+            <label>
+                <span>Question :</span>
+                <input id="q2" type="text" name="question" placeholder="Type Your Question" />
+            </label> 
+
+            <label>
+                <span>Answer :</span>
+                <input id="a2" type="text" name="answer" placeholder="Type Your Answer" />
+            </label>
+             
+             <label>
+                <span>&nbsp;</span> 
+                <input type="button" class="button" id="finish"/> 
+            </label>    
+        </form>
+
+        <div class="button_container v_upload">
+            <div class="button cancel">Cancel</div>
+            <div class="button finish">Finish</div>
+        </div>
+    </div>
+
+    <div class="page_create">
+        <form action="" method="post" class="form_upload">
+            <h1>Study Set Details
+                <span>Please enter texts in the fields.</span>
+            </h1>
+            <label>
+                <span>Name of Study Set :</span>
+                <input id="name" type="text" name="name" placeholder="The Full Name" />
+            </label>
+
+            <label>
+                <span>Category :</span>
+                <select name="selection">
+                    <option value="Job Inquiry">Job Inquiry</option>
+                    <option value="General Question">General Question</option>
+                </select>
+            </label>
+            
+            <label>
+                <span>Question :</span>
+                <input id="q1" type="text" name="question" placeholder="Type Your Question" />
+            </label>
+
+            <label>
+                <span>Answer :</span>
+                <input id="a1" type="text" name="answer" placeholder="Type Your Answer" />
+            </label>
+            
+            <label>
+                <span>Question :</span>
+                <input id="q2" type="text" name="question" placeholder="Type Your Question" />
+            </label> 
+
+            <label>
+                <span>Answer :</span>
+                <input id="a2" type="text" name="answer" placeholder="Type Your Answer" />
+            </label>
+             
+             <label>
+                <span>&nbsp;</span> 
+                <input type="button" class="button" id="finish"/> 
+            </label>    
+        </form>
+
+        <div class="button_container v_upload">
+            <div class="button cancel">Cancel</div>
+            <div class="button finish">Finish</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <span class="copyright">© Quizas</span>
+    </div>
+
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="js/createNewSet.js"></script>
+    <script src="js/jquery.mobile.js"></script>
+
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-46324526-3', 'auto');
+        ga('send', 'pageview');
+    </script>
+</body>
+</html>
