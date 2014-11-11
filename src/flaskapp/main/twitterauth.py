@@ -79,21 +79,41 @@ def get_verification():
 	# Now Go to a page where we make use of the Twitter API.
 	resp = redirect("http://dev.localhost:8080/twitter_done.html")
 
+	new_userid = "twitter:" + auth.access_token.key
+	if authhelper.userids_clash_userid(new_userid):
+		# A different user was previously logged in on this
+		# browser (i.e. different w/ different twitter acct).
+		# Delete their cookies.
+		for site in authhelper.auth_sites:
+			if request.cookies.get(site + "_user_id") != None:
+				resp.set_cookie(site + "_user_id", '', expires = 0)
+
 	# See http://tweepy.readthedocs.org/en/v2.3.0/auth_tutorial.html#oauth-authentication
 	resp.set_cookie("twitter_user_id", auth.access_token.key);
 	resp.set_cookie("twitter_access_token", auth.access_token.secret);
 	# resp.set_cookie("twitter_expires_in", "???"); # Twitter tokens don't expire
 
 	# Ensure user table has an internal id.
-	authhelper.register("twitter:" + auth.access_token.key)
+	authhelper.register(new_userid)
 
 	return resp
 
-# @app.route("/start")
-# def start():
-# 	#auth done, app logic can begin
-# 	api = db['api']
-#
-# 	#example, print your latest status posts
-# 	return flask.render_template('tweets.html', tweets = api.user_timeline())
+
+# Get Twitter username + profile picture url.
+# See: https://dev.twitter.com/rest/reference/get/users/show
+# probably only want to be application-only request.
+# See https://dev.twitter.com/oauth/application-only
+@main.route("/profile/twitter/<twitter_id>")
+def get_twitter_profile(twitter_id):
+	auth = tweepy.OAuthHandler(CONSUMER_TOKEN,
+	                           CONSUMER_SECRET,
+	                           CALLBACK_URL)
+	
+	# What about client requests
+	api = tweepy.API(auth)
+	user = api.get_user(twitter_id)
+
+	return json.dumps({"name": user.name,
+	                   "picture": user.profile_image_url})
+
 
