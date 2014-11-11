@@ -681,6 +681,7 @@
 		socket.on('nextQuestion', function(msg) {
             //$('#log').append('<br>Received #' + msg.count + ': ' + msg.data);
 			//Q.state.set("received", true);
+			console.log("socket: nextQuestion start");
 			serverJSON = JSON.parse(msg.data);
 			fcQuestion = serverJSON.question,
 			  fcAnswers = serverJSON.answers,
@@ -689,6 +690,7 @@
 			  prevPlayerAns = serverJSON.player,
 			  prevEnemyAns = serverJSON.enemy;
 			 Q.state.inc("nextQuestion", 1);
+			 console.log("socket: nextQuestion end");
         });
 		
 		socket.on('gameOver', function(msg) {
