@@ -681,6 +681,7 @@
 		socket.on('nextQuestion', function(msg) {
             //$('#log').append('<br>Received #' + msg.count + ': ' + msg.data);
 			//Q.state.set("received", true);
+			if (Q.state.get("currentIndex") > 0) {prevFcQuestion = fcQuestion};
 			serverJSON = JSON.parse(msg.data);
 			fcQuestion = serverJSON.question,
 			  fcAnswers = serverJSON.answers,
@@ -700,6 +701,7 @@
 		Q.state.on("change.currentIndex", function() {
 			
 			console.log(serverJSON);
+			console.log(prevFcQuestion);
 		
 			if (Q.state.get("currentIndex") == questionNumber) {
 			// this part should be in above handler:
@@ -721,7 +723,7 @@
 				}
 				*/  
 				  
-console.log("DB 1");
+
 
 			// express enemy previous answer
 			if (Q.state.get("currentIndex") > 1) {
@@ -733,7 +735,7 @@ console.log("DB 1");
 				}
 			}
 
-			console.log("DB 2");
+			
 				
 			// result in bomb movement
 				var remainingQ = totalQuestions - Q.state.get("currentIndex") + 1;
@@ -753,7 +755,7 @@ console.log("DB 1");
 					alert("game over");
 				}
 				
-				console.log("DB 3");
+				
 				
 				// game over
 				//if (Q.state.get("currentIndex") > totalQuestions) {
@@ -767,12 +769,12 @@ console.log("DB 1");
 			}
 				qCard.generate(fcQuestion);
 				
-			console.log("DB 4");
+			
 
 			if (Q.state.get("currentIndex") > 1) destroyAnswers(aBtns);
 				aBtns = generateAnswers();
 
-				console.log("DB 5");				
+								
 			}
 			if (Q.state.get("currentIndex") > 1) {TIMER.stop();}
 			if (Q.state.get("currentIndex") > 0 && Q.state.get("currentIndex") <= totalQuestions) {
@@ -785,7 +787,7 @@ console.log("DB 1");
 				TIMER.start();
 			}
 
-			console.log("DB 6");
+			
 			
 		});
 
