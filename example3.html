@@ -727,7 +727,8 @@
 
 			// express enemy previous answer
 			if (Q.state.get("currentIndex") > 1) {
-				if (prevFcQuestion.id == prevEnemyAns.id) {
+			console.log("TIME OF RECKONING: " + (prevFcQuestion.id == prevEnemyAns));
+				if (prevFcQuestion.id == prevEnemyAns) {
 					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "green";
 					Q.state.inc("enemyScore", 1);
 				} else {
