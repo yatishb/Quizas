@@ -43,7 +43,7 @@
                 return false;
             });
             $('form#assign').submit(function(event) {
-                socket.emit('assignroom', {room: $('#assign_room').val(), user1: $('#assign_user_1').val(), user2: $('#assign_user_2').val()});
+                socket.emit('assignroom', {flashset: $('#flashset').val(), user1: $('#assign_user_1').val(), user2: $('#assign_user_2').val()});
                 return false;
             });
             $('form#leave').submit(function(event) {
@@ -55,7 +55,7 @@
                 return false;
             });
             $('form#send_room').submit(function(event) {
-                socket.emit('readanswer', {id: $('#room_name').val(), answer: $('#room_data').val()});
+                socket.emit('readanswer', {id: $('#room_name').val(), answer: $('#room_data').val(), done: $('#num_done').val()});
                 return false;
             });
             $('form#client_user').submit(function(event) {
@@ -85,7 +85,7 @@
         <input type="submit" value="Join Room">
     </form>
     <form id="assign" method='POST' action='#'>
-        <input type="text" name="assign_room" id="assign_room" placeholder="Room Name">
+        <input type="text" name="flashset" id="flashset" placeholder="Flash Set">
         <input type="text" name="assign_user_1" id="assign_user_1" placeholder="User 1">
         <input type="text" name="assign_user_2" id="assign_user_2" placeholder="User 2">
         <input type="submit" value="Assign Room">
@@ -101,6 +101,7 @@
     <form id="send_room" method='POST' action='#'>
         <input type="text" name="room_name" id="room_name" placeholder="Question id">
         <input type="text" name="room_data" id="room_data" placeholder="Answer">
+        <input type="text" name="num_done" id="num_done" placeholder="Done">
         <input type="submit" value="Answer Room">
     </form>
     <form id="client_user" method='POST' action='#'>

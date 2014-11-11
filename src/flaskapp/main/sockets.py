@@ -2,7 +2,7 @@ import uuid, json
 from flask import Flask, render_template, session, request
 from flask.ext.socketio import emit, join_room, leave_room
 from .. import socketio, redis
-import internalstats, authhelper
+import internalstats, authhelper, quizletsets
 
 defaultRoom = str(0)
 
@@ -40,14 +40,27 @@ def sendNotificationToSocket(message):
 # Socket reads the two usernames and creates a room for both
 @socketio.on('assignroom', namespace='/test')
 def assignRoom(message):
+	NUMQUES = 10
 	room = str(uuid.uuid1())
 	user1 = message['user1']
 	user2 = message['user2']
+	flashset = message['flashset']
+	shuffledFlashcards = quizletsets.shuffled_flashset_json(flashset, NUMQUES)
 
-	if authhelper.lookup(user1) != None and authhelper.lookup(user2) != None:
+	if authhelper.lookup(user1) != None and authhelper.lookup(user2) != None and shuffledFlashcards.has_key('error') == False:
 		# Get the internal user ids of the clients
 		user1 = authhelper.lookup(user1)
 		user2 = authhelper.lookup(user2)
+
+		# Store the flashsetid for room information in redis
+		# This key should never exist in db. If it does something is wrong
+		if redis.hexists("ROOMS_SETS", room) == False:
+			redis.hset("ROOMS_SETS", room, flashset)
+		# Deal with shuffled flashcards
+		# Store all the flashcards json in redis as a string
+		flashcardsJson = shuffledFlashcards['questions']
+		redis.hset("ROOMS_CARDS", room, json.dumps(flashcardsJson))
+		redis.save()
 
 		for sessid, socket in request.namespace.socket.server.sockets.items():
 			if (socket['/test'].session['id'] == user1) or (socket['/test'].session['id'] == user2):
@@ -75,8 +88,11 @@ def assignRoom(message):
 		if (session['id'] == user1) or (session['id'] == user2):
 			session['room'] = room
 
+		# Send very first question to the room to kick-start the entire game
+		sendFirstQuestionInfoToClient(room)
+
 	else:
-		emit('my response', {'data': 'One or more user is incorrect'})
+		emit('my response', {'data': 'Either user(s) or flashset is incorrect'})
 
 
 
@@ -106,11 +122,15 @@ def clearRoom():
 		# Check if game exists and number of questions answered are same
 		if (redis.hlen(HASH_USER1) == redis.hlen(HASH_USER2) and redis.exists(HASH_USER1) == True):
 			internalstats.documentGame(room, int(usersInRoom[0]), int(usersInRoom[1]), redis.hgetall(HASH_USER1), 
-				redis.hgetall(HASH_USER2), 1)
+				redis.hgetall(HASH_USER2), redis.hget("ROOMS_SETS", room))
 
 		# Clear hash key from redis
+		# Second parameter here refers to time in msec when key should expire
+		# Setting expiry time as 1msec to delete the key
 		redis.pexpire(HASH_USER1, 1)
 		redis.pexpire(HASH_USER2, 1)
+		redis.hdel("ROOMS_SETS", room)
+		redis.hdel("ROOMS_CARDS", room)
 		
 		for eachUser in usersInRoom :
 			# Sending expiry information to client
@@ -137,7 +157,7 @@ def readAnswerByClient(message):
 	# Decode the message obtained
 	idQuestion = message['id']
 	clientAnswer = message['answer']
-	# print "received: %r" % message
+	done = int(message['done']) # num questions including current done
 
 	HASH_USER = "ROOM_" + room + "_" + str(idClient)
 	HASH_SEND = "ROOM_" + room + "_SEND"
@@ -150,19 +170,24 @@ def readAnswerByClient(message):
 	redis.save()
 
 	if redis.hlen(HASH_SEND) == 2:
-		sendReceivedAnswersToClient(HASH_SEND, room)
+		sendNextQuesInfoToClient(HASH_SEND, room, done)
 
 
 
 # This function sends responses to both clients to proceed to next question
 # Is called only when the server has received a response 
 # from both clients for the same question
-def sendReceivedAnswersToClient(hashSend, room):
+# This function also sends the clients the details of the next question
+def sendNextQuesInfoToClient(hashSend, room, done):
 	answersForQuestion = redis.hgetall(hashSend)
 	clientsList = answersForQuestion.keys()
 
+	commonDataToSend = getNextQuestionForRoom(room, done)
+
 	dataToSend1 = {"player":answersForQuestion.get(clientsList[0]), "enemy":answersForQuestion.get(clientsList[1])}
 	dataToSend2 = {"player":answersForQuestion.get(clientsList[1]), "enemy":answersForQuestion.get(clientsList[0])}
+	dataToSend1.update(commonDataToSend)
+	dataToSend2.update(commonDataToSend)
 	dataToSend = {clientsList[0]:dataToSend1, clientsList[1]:dataToSend2}
 
 	for eachClient in clientsList:
@@ -176,3 +201,30 @@ def sendReceivedAnswersToClient(hashSend, room):
 		redis.hdel(hashSend, eachClient)
 
 	redis.save()
+
+
+
+# This function send the clients the details of the first question
+# Called only one "immediately" after the creation of the game
+# This function is important to kick start the game
+def sendFirstQuestionInfoToClient(room):
+	done = 0
+
+	# Retrieve the details of the very first ques for the given room
+	commonDataToSend = getNextQuestionForRoom(room, done)
+
+	# There is no customized message for the first question
+	# Hence broadcast across room can be used to send the details of the next question
+	emit('my response', {'data': json.dumps(commonDataToSend)}, room= room)
+
+
+
+# For a given room, retrieve and return the next question to be asked
+# Also return array of answers, time and index along with the question in the dict
+def getNextQuestionForRoom(room, done):
+	flashcardsJson = json.loads(redis.hget("ROOMS_CARDS", room))
+	nextQues = flashcardsJson[done]['question']
+	nextAns = flashcardsJson[done]['answers']
+	commonDataToSend = {"question":nextQues, "answers":nextAns, "time": 10, "index": str(done+1)}
+
+	return commonDataToSend
