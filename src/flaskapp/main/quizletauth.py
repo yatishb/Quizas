@@ -53,10 +53,19 @@ def authparam():
 		# Stretching the definition of "auth" a bit here, but..
 		resp = redirect(secrets.auth["login_success_url"]); # make_response(json.dumps(jsonData))
 
+		new_userid = "quizlet:" + userId
+		if authhelper.userids_clash_userid(new_userid):
+			# A different user was previously logged in on this
+			# browser (i.e. different w/ different quizlet acct).
+			# Delete their cookies.
+			for site in authhelper.auth_sites:
+				if request.cookies.get(site + "_user_id") != None:
+					resp.set_cookie(site + "_user_id", '', expires = 0)
+
 		resp.set_cookie("quizlet_user_id", userId, max_age = 3600*24*30)
 		resp.set_cookie("quizlet_access_token", accessToken, max_age = 3600*24*30)
 
 		# Ensure user has an internal user id we can use.
-		authhelper.register("quizlet:" + userId)
+		authhelper.register(new_userid)
 
 		return resp
