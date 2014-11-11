@@ -17,12 +17,6 @@ CONSUMER_TOKEN  = secrets.auth["quizlet"]["client_id"]
 CONSUMER_SECRET = secrets.auth["quizlet"]["key_secret"]
 CALLBACK_URL    = secrets.auth["quizlet"]["redirect_url"]
 
-@main.route('/user/currentid')
-def get_internal_id():
-	cookie_ids = authhelper.get_cookie_user_ids()
-	return json.dumps({"internal_id": authhelper.get_current_id(),
-	                   "cookie_user_ids": cookie_ids})
-
 # /user/#user-id/sets
 @main.route('/user/<user_id>/sets')
 def get_user_sets(user_id):
