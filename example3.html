@@ -701,7 +701,7 @@
 			
 			console.log(serverJSON);
 		
-			if (Q.state.get("currentIndex") > questionNumber) {
+			if (Q.state.get("currentIndex") == questionNumber) {
 			// this part should be in above handler:
 				if (Q.state.get("currentIndex") > 1) {prevFcQuestion = fcQuestion};
 				
