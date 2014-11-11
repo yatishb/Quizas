@@ -688,9 +688,8 @@
 			  maxTimeAllowed = serverJSON.time,
 			  prevPlayerAns = serverJSON.player,
 			  prevEnemyAns = serverJSON.enemy;
-			 Q.state.inc("nextQuestion", 1);
+			 Q.state.inc("currentIndex", 1);
 			 console.log("yatish socket received: " + msg.data);
-			 console.log("tk socket var: " + serverJSON);
         });
 		
 		socket.on('gameOver', function(msg) {
@@ -699,6 +698,8 @@
 			
 	
 		Q.state.on("change.currentIndex", function() {
+			
+			console.log(serverJSON);
 		
 			if (Q.state.get("currentIndex") > questionNumber) {
 			// this part should be in above handler:
