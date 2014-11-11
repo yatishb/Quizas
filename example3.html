@@ -701,7 +701,7 @@
 			
 			console.log(serverJSON);
 		
-			if (Q.state.get("currentIndex") > questionNumber) {
+			if (Q.state.get("currentIndex") == questionNumber) {
 			// this part should be in above handler:
 				if (Q.state.get("currentIndex") > 1) {prevFcQuestion = fcQuestion};
 				
@@ -721,6 +721,8 @@
 				}
 				*/  
 				  
+console.log("DB 1");
+
 			// express enemy previous answer
 			if (Q.state.get("currentIndex") > 1) {
 				if (prevFcQuestion.id == prevEnemyAns.id) {
@@ -730,6 +732,8 @@
 					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "red";
 				}
 			}
+
+			console.log("DB 2");
 				
 			// result in bomb movement
 				var remainingQ = totalQuestions - Q.state.get("currentIndex") + 1;
@@ -749,7 +753,7 @@
 					alert("game over");
 				}
 				
-				
+				console.log("DB 3");
 				
 				// game over
 				//if (Q.state.get("currentIndex") > totalQuestions) {
@@ -763,10 +767,12 @@
 			}
 				qCard.generate(fcQuestion);
 				
+			console.log("DB 4");
+
 			if (Q.state.get("currentIndex") > 1) destroyAnswers(aBtns);
 				aBtns = generateAnswers();
 
-				
+				console.log("DB 5");				
 			}
 			if (Q.state.get("currentIndex") > 1) {TIMER.stop();}
 			if (Q.state.get("currentIndex") > 0 && Q.state.get("currentIndex") <= totalQuestions) {
@@ -778,6 +784,8 @@
 				});
 				TIMER.start();
 			}
+
+			console.log("DB 6");
 			
 		});
 

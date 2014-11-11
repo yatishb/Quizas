@@ -170,7 +170,9 @@ def clearRoom():
 # Each response by the client for each question is handled here
 @socketio.on('readanswer', namespace='/test')
 def readAnswerByClient(message):
-	print "received ans: %r" % message
+	message = json.loads(message)
+	print "json load: %r" % message
+	print "room %r " % session['room']
 	room = session['room']
 	idClient = session['id']
 
@@ -247,6 +249,7 @@ def sendFirstQuestionInfoToClient(room):
 def getNextQuestionForRoom(room, done):
 	# Handle situation when we have reached the last question
 	# If this happens then we have to clear the room and record the game into the db
+	print "get next question"
 	if done == NUMQUES:
 		clearRoom()
 		return {}
@@ -256,6 +259,6 @@ def getNextQuestionForRoom(room, done):
 	nextQues = flashcardsJson[done]['question']
 	nextAns = flashcardsJson[done]['answers']
 	commonDataToSend = {"question":nextQues, "answers":nextAns, "time": 10, "index": str(done+1)}
-	print commonDataToSend
+	print "Send : %r" % commonDataToSend
 
 	return commonDataToSend
