@@ -20,6 +20,26 @@
     
     <link rel="stylesheet" href="css/main.css"></link>
 
+    <!-- Load the FB JS SDK -->
+    <div id="fb-root"></div>
+    <script>
+    window.fbAsyncInit = function() {
+        FB.init({
+            appId      : quizas_fbappid,
+            xfbml      : true,
+            version    : 'v2.1'
+        });
+    };
+
+    (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+    </script>
+
 </head>
 <body>
     <div class="logo">
@@ -32,7 +52,7 @@
             <div class="let-icon-bg"></div>
             <div class="let-bg"></div>
         </div>
-        <div class="login_button">
+        <div class="login_button" onclick="doFacebookLogin()">
             <div class="fb-icon-bg"></div>
             <div class="fb-bg"></div>
         </div>
@@ -45,12 +65,50 @@
             <div class="g-bg"></div>
         </div>
     </div>
-    <!-- <div class="btn_fb btn_social" onclick="location.href='/api/quizletauth'">Sign in with Facebook</div> -->
+
+    <div class="footer_copyright">
+        <span class="copyright">© Quizas</span>
+    </div>
+
+    <!--
+      Alternatively, use something like "doFacebookLogin()" with a URL.
+      Could also check FB.getLoginStatus()
+      Advantage of JS is you get authResponse each time, which you don't with
+      login button
+    -->
+    <script>
+    function doFacebookLogin() {
+      // We want the 'user_friends' permission so that we can access /{user}/friends
+      // See: https://developers.facebook.com/docs/graph-api/reference/v2.2/user/friends
+      FB.login(afterFacebookLogin, {scope: 'public_profile,user_friends'});
+    }
+
+    function afterFacebookLogin(response) {
+        if (response.authResponse) {
+            console.log('Welcome!  Fetching your information.... ');
+            console.log(JSON.stringify(response));
+
+            // e.g. response
+            // {"authResponse":{"accessToken":"...","userID":"10204898258962045","expiresIn":6855,"signedRequest":"...."},"status":"connected"}
+            // So, we're interested in
+            // authResponse.userID, authResponse.accessToken, authResponse.expiresIn
+            quizas_update_auth_cookies("facebook",
+                                       response.authResponse.userID,
+                                       response.authResponse.accessToken);
+        } else {
+            console.log('User cancelled login or did not fully authorize.');
+        }
+    }
+    </script>
 
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
     <script src="js/jquery.mobile.js"></script>
+
+    <script src="js/quizas_auth_helper.js"></script>
+    <script src="js/quizas_facebook.js"></script>
 
     <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

@@ -51,7 +51,7 @@ body,html{
 }
 
 .footer {
-    margin: 10px auto;
+    margin-bottom: 20px;
     text-align: center;
     top: 70%;
 }
@@ -72,7 +72,7 @@ body,html{
     position: relative;
     margin: 5px auto;
     text-align: center;
-    display: inline-block;
+    display: block;
 }
 
 .button_container.v_original {

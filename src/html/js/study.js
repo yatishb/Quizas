@@ -11,6 +11,7 @@ $(document).ready(function() {
 
     $('body,html').css('overflow','visible');
     $('body,html').css('overflow-x','hidden');
+
     getSetContent();
 
     $('.list_search input').on('input', function() {
@@ -28,6 +29,8 @@ $(document).ready(function() {
             }
         });
     });
+
+    listFacebookFriends(outputFriends);
 });
 
 //$('.list_option ul li').on("click", function() {
@@ -117,5 +120,19 @@ function getSetContent() {
     })
      .fail(function() {
         alert("error in getSetContent call back function");
+    });
+}
+
+function outputFriends(friends) {
+    friends.forEach(function (f) {
+        $('.friend_list').append(
+            "<div class='simple_friend' id='" +
+            f.userid +
+            "'><div class='friend_profile'><img src='" +
+
+            "'></div><span>" +
+            f.name +
+            "</span></div>"
+        );
     });
 }
