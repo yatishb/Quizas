@@ -1,6 +1,6 @@
 from . import main
 from flask import request, abort
-import accessdb, authhelper
+import internalstats, authhelper
 
 @main.route('/user/<userid>/stats', methods=['GET'])
 def displayUserStats(userid):
@@ -8,7 +8,7 @@ def displayUserStats(userid):
 	if internalUserid == None:
 		abort(401)
 	else:
-		return accessdb.getIndividualUserGameStats(internalUserid)
+		return internalstats.getIndividualUserGameStats(internalUserid)
 
 @main.route('/user/<userid>/stats/vs/<opponent>', methods=['GET'])
 def displayUserStatsHeadToHead(userid, opponent):
@@ -20,7 +20,7 @@ def displayUserStatsHeadToHead(userid, opponent):
 		if internalUserid == opponentUserid:
 			abort(401)
 		else:
-			return accessdb.getCommonGamesStats(internalUserid, opponentUserid)
+			return internalstats.getCommonGamesStats(internalUserid, opponentUserid)
 
 @main.route('/user/<userid>/stats/games', methods=['GET'])
 def displayUserGamesPlayed(userid):
@@ -28,7 +28,7 @@ def displayUserGamesPlayed(userid):
 	if internalUserid == None:
 		abort(401)
 	else:
-		return accessdb.getUserGamesJSON(internalUserid)
+		return internalstats.getUserGamesJSON(internalUserid)
 
 @main.route('/user/<userid>/stats/game/<gameid>', methods=['GET'])
 def displayUserGameStats(userid, gameid):
@@ -36,7 +36,7 @@ def displayUserGameStats(userid, gameid):
 	if internalUserid == None:
 		abort(401)
 	else:
-		return accessdb.getGameStats(internalUserid, gameid)
+		return internalstats.getGameStats(internalUserid, gameid)
 
 @main.route('/user/<userid>/stats/sets/<setid>', methods=['GET'])
 def displayUserSetStats(userid, setid):
@@ -44,7 +44,7 @@ def displayUserSetStats(userid, setid):
 	if internalUserid == None:
 		abort(401)
 	else:
-		return accessdb.getUserSetStats(internalUserid, setid)
+		return internalstats.getUserSetStats(internalUserid, setid)
 
 @main.route('/user/<userid>/gameresults', methods=['POST'])
 def readStatsOfJustEndedGame(userid):
@@ -54,7 +54,7 @@ def readStatsOfJustEndedGame(userid):
 	else:
 		if request.json:
 			receivedData = request.get_json()
-			accessdb.soloGameResultsWriteDb(internalUserId, receivedData)
+			internalstats.soloGameResultsWriteDb(internalUserId, receivedData)
 			return "Successfully updated"
 		else:
 			abort(401)

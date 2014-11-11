@@ -55,7 +55,7 @@
                 return false;
             });
             $('form#send_room').submit(function(event) {
-                socket.emit('readanswer', {qid: $('#room_name').val(), answer: $('#room_data').val()});
+                socket.emit('readanswer', {id: $('#room_name').val(), answer: $('#room_data').val()});
                 return false;
             });
             $('form#client_user').submit(function(event) {

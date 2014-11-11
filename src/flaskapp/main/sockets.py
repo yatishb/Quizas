@@ -2,7 +2,7 @@ import uuid, json
 from flask import Flask, render_template, session, request
 from flask.ext.socketio import emit, join_room, leave_room
 from .. import socketio, redis
-import accessdb, authhelper
+import internalstats, authhelper
 
 defaultRoom = str(0)
 
@@ -105,7 +105,7 @@ def clearRoom():
 		HASH_USER2 = "ROOM_" + room + "_" + usersInRoom[1]
 		# Check if game exists and number of questions answered are same
 		if (redis.hlen(HASH_USER1) == redis.hlen(HASH_USER2) and redis.exists(HASH_USER1) == True):
-			accessdb.documentGame(room, int(usersInRoom[0]), int(usersInRoom[1]), redis.hgetall(HASH_USER1), 
+			internalstats.documentGame(room, int(usersInRoom[0]), int(usersInRoom[1]), redis.hgetall(HASH_USER1), 
 				redis.hgetall(HASH_USER2), 1)
 
 		# Clear hash key from redis
@@ -132,10 +132,10 @@ def clearRoom():
 @socketio.on('readanswer', namespace='/test')
 def readAnswerByClient(message):
 	room = session['room']
+	idClient = session['id']
 
 	# Decode the message obtained
-	idClient = session['id']
-	idQuestion = message['qid']
+	idQuestion = message['id']
 	clientAnswer = message['answer']
 	# print "received: %r" % message
 
@@ -159,13 +159,20 @@ def readAnswerByClient(message):
 # from both clients for the same question
 def sendReceivedAnswersToClient(hashSend, room):
 	answersForQuestion = redis.hgetall(hashSend)
-	dataToSend = {}
 	clientsList = answersForQuestion.keys()
+
+	dataToSend1 = {"player":answersForQuestion.get(clientsList[0]), "enemy":answersForQuestion.get(clientsList[1])}
+	dataToSend2 = {"player":answersForQuestion.get(clientsList[1]), "enemy":answersForQuestion.get(clientsList[0])}
+	dataToSend = {clientsList[0]:dataToSend1, clientsList[1]:dataToSend2}
+
 	for eachClient in clientsList:
-		# Find user id of the client
-		userId = authhelper.lookupInternal(eachClient)
-		dataToSend[userId] = answersForQuestion.get(eachClient)
+		# For each client in game, send customized message
+		for sessid, socket in request.namespace.socket.server.sockets.items():
+			if socket['/test'].session['id'] == int(eachClient):
+				socket['/test'].base_emit('my response', {'data': json.dumps(dataToSend[eachClient])})
+
+		# If messages have been sent to the client in the room
+		# Remove the redis key-value pair for message to be sent to a client
 		redis.hdel(hashSend, eachClient)
 
-	emit('my response', {'data': json.dumps(dataToSend)}, room=room)
 	redis.save()
