@@ -10,6 +10,11 @@ from . import main
 from .. import db
 
 
+# Returns "SITE" from "SITE:AUTHID"
+def site_of(userid):
+	return userid[:userid.find(":")]
+
+
 # From user_id `site:auth_id` to internal id
 # or None if the given userid isn't in the table
 def lookup(userid):
@@ -32,20 +37,25 @@ def lookupInternal(internalid):
 		return u.user_id
 
 
+auth_sites = ["quizlet", "twitter"]
+
 
 # Returns an array of all the user_ids (`site:auth_id`),
 # which the requests sends as cookies.
 def get_cookie_user_ids():
 	# We only have support for quizlet, twitter at this stage.
 	# This is an unfortunately magic way of checking this. :/
-	auth_sites = ["quizlet", "twitter"]
-
 	cookie_names = [site + "_user_id" for site in auth_sites]
 	user_ids = [site + ":" + request.cookies.get(site + "_user_id")
 	            for site in auth_sites
 	            if request.cookies.get(site + "_user_id") != None]
 
 	return user_ids
+
+
+def get_cookie_userid_sites():
+	cookie_userids = get_cookie_user_ids()
+	return map(site_of, cookie_userids)
 
 
 # Returns internal id if they're in the database;
@@ -82,10 +92,26 @@ def insert_new_id(new_userid):
 
 
 def link_with_current_accounts(uid, new_userid):
-	newUserAuth = InternalUserAuth(new_userid)
-	newUserAuth.id = uid
-	db.session.add(newUserAuth)
-	db.session.commit()
+	# Pre-Condition: Must have some cookie.
+
+	if not userids_clash_userid(new_userid):
+		newUserAuth = InternalUserAuth(new_userid)
+		newUserAuth.id = uid
+		db.session.add(newUserAuth)
+		db.session.commit()
+	# TODO? else, ensure that new_userid points to current id.
+
+
+def userids_clash_userid(userid):
+	# Assumes there are some cookies already.
+	# No assumption about userid in DB.
+	
+	cookie_userids = get_cookie_user_ids()
+	userid_sites = map(site_of, cookie_userids)
+
+	# cannot have different userids from the same site.
+	return userid not in cookie_userids and \
+           site_of(userid) in userid_sites
 
 
 # Put the given userid in the database if
@@ -95,8 +121,15 @@ def register(userid):
 	uid = get_current_id()
 
 	if uid == None:
+		# No cookies in browser;
+		# either userid is in DB (insert_new_id takes care of this)
+		#     or it needs to be put there.
 		insert_new_id(userid)
 	else:
+		# Cookies in browser;
+		# if userid is one of them (good),
+		# otherwise, better not clash with the same site.
+		# (callback takes care of cookies in resp.)
 		link_with_current_accounts(uid, userid)
 
 
