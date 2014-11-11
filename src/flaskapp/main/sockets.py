@@ -148,7 +148,7 @@ def clearRoom():
 				if socket['/test'].session['id'] == int(eachUser):
 					socket['/test'].session['room'] = defaultRoom
 					socket['/test'].leave_room(room)
-					socket['/test'].base_emit('my response', {'data': "GAME OVER!!"})
+					socket['/test'].base_emit('gameOver', {'data': "GAME OVER!!"})
 		# emit('my response', {'data': "checking for room"}, room=room) # This doesn't send message to any client. Verified
 		redis.save()
 	else:
