@@ -93,13 +93,16 @@ def insert_new_id(new_userid):
 
 def link_with_current_accounts(uid, new_userid):
 	# Pre-Condition: Must have some cookie.
+	# No clash exists
 
-	if not userids_clash_userid(new_userid):
-		newUserAuth = InternalUserAuth(new_userid)
-		newUserAuth.id = uid
-		db.session.add(newUserAuth)
-		db.session.commit()
-	# TODO? else, ensure that new_userid points to current id.
+	if lookup(new_userid) != None:
+		# pk exists in DB already.
+		return
+
+	newUserAuth = InternalUserAuth(new_userid)
+	newUserAuth.id = uid
+	db.session.add(newUserAuth)
+	db.session.commit()
 
 
 def userids_clash_userid(userid):
@@ -120,16 +123,18 @@ def userids_clash_userid(userid):
 def register(userid):
 	uid = get_current_id()
 
-	if uid == None:
+	if uid == None or userids_clash_userid(userid):
 		# No cookies in browser;
 		# either userid is in DB (insert_new_id takes care of this)
 		#     or it needs to be put there.
+		# (Has no effect if userid in DB previously).
 		insert_new_id(userid)
 	else:
 		# Cookies in browser;
-		# if userid is one of them (good),
-		# otherwise, better not clash with the same site.
-		# (callback takes care of cookies in resp.)
+		# userid is one of them (good), or needs to be added.
+		# otherwise, it's a clash.
+		# (callback takes care of deleting cookies in resp.)
+
 		link_with_current_accounts(uid, userid)
 
 
