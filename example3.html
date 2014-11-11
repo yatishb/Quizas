@@ -21,13 +21,15 @@
                                      "hearbeat timeout": 30});
             socket.on('connect', function() {
             });
+			
+			 
 		
 		// socket handler
 		socket.on('initiating', function(msg) {
                 //$('#log').append('<br>Received #' + msg.count + ': ' + msg.data);
             });
 	
-	
+		
 	
 		// helper functions
 		
@@ -279,6 +281,8 @@
  <body>
 	<script>
 	window.addEventListener("load",function() {
+	
+	socket.emit('assignroom', {flashset: "flashSetTestID", user1: "quizlet:yatish", user2: "quizlet:byatishyuvaraj"});
  
 	var Q = window.Q = Quintus()
     .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
@@ -293,7 +297,7 @@
 	  enemyEncounter = initiatingJSON.encounter,
 	  totalQuestions = initiatingJSON.total;	
 	
-	Q.state.set({playerScore: 0, enemyScore: 0, currentIndex: 1, currentQuestion: "", waiting: true});
+	Q.state.set({playerScore: 0, enemyScore: 0, currentIndex: 0, currentQuestion: "", waiting: true});
 	var deck = shuffleDeck(totalQuestions, DECK_SIZE);
 	
 	
@@ -448,7 +452,7 @@
 	// set scene
 	Q.scene("scene1",function(stage) {
 	
-		Q.state.reset({playerScore: 0, enemyScore: 0, currentIndex: 1, currentQuestion: "", waiting: true});
+		Q.state.reset({playerScore: 0, enemyScore: 0, currentIndex: 0, currentQuestion: "", waiting: true});
 	
 		var playerScore = stage.insert(new Q.UI.PlayerScore());
 		var enemyScore = stage.insert(new Q.UI.EnemyScore());
@@ -459,24 +463,17 @@
 		var timeTakenCurrent = 0;
 		
 		// start receive serverForm
-		var serverJSON = JSON.parse(TestServerForm[0]);
+		var serverJSON, fcQuestion, fcAnswers, questionNumber = "0", maxTimeAllowed, prevPlayerAns, prevEnemyAns;
+		/*var serverJSON = JSON.parse(TestServerForm[0]);
 		var fcQuestion = serverJSON.question,
 		  fcAnswers = serverJSON.answers,
 		  questionNumber = serverJSON.index,
 		  maxTimeAllowed = serverJSON.time,
 		  prevPlayerAns = serverJSON.player,
-		  prevEnemyAns = serverJSON.enemy;
+		  prevEnemyAns = serverJSON.enemy;*/
 		var currentFcAnswer, prevFcQuestion;
-		Q.state.set("currentQuestion", fcQuestion.id);
+		//Q.state.set("currentQuestion", fcQuestion.id);
 		// end receive serverForm
-		
-		TIMER = new Countdown({
-			seconds: maxTimeAllowed,
-			onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
-			onCounterEnd: function() {outOfTime();}
-		});
-		
-		
 		
 		function generateAnswers() {
 			Q.state.set("waiting", false);
@@ -529,8 +526,7 @@
 								// send form to server and wait for next
 								clientJSON = createClientToServerJSON(fcQuestion.id, currentFcAnswer, timeTakenCurrent, Q.state.get("currentIndex") + "");
 								console.log("Post to Server: " + clientJSON);
-								
-								
+								socket.emit("readanswer", clientJSON});
 								
 							}
 					}));
@@ -543,11 +539,14 @@
 		}
 		
 		function outOfTime() {
+			if (!Q.state.get("waiting")) {
 			Q.state.set("waiting", true);
 			timeTakenCurrent = maxTimeAllowed;
 			currentFcAnswer = "nothing";
 			clientJSON = createClientToServerJSON(fcQuestion.id, currentFcAnswer, timeTakenCurrent, Q.state.get("currentIndex") + "");
 			console.log("Post to Server: " + clientJSON);
+			socket.emit("readanswer", clientJSON});
+			}
 		}
 		
 		/*
@@ -640,10 +639,13 @@
 			h: 180
 		}));
 		
+		if (Q.state.get("currentIndex") > 0) {
 		var aBtns = generateAnswers();
-		
 		var qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
 		qCard.generate(fcQuestion);
+		}
+		var qCard;
+		//var qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
 		
 		var playerPortrait = stage.insert(new Q.PlayerPortrait());
 		var enemyPortrait = stage.insert(new Q.EnemyPortrait());
@@ -660,7 +662,7 @@
 			h: 3
 		}));
 		
-		Q.state.on("change.currentIndex", function() {
+		/*Q.state.on("change.currentIndex", function() {
 			if (Q.state.get("currentIndex") > TOTAL_QUESTIONS) {
 				//Q.stageScene("scene2");
 			}
@@ -672,15 +674,13 @@
 			//aBtns = generateAnswers();
 			
 			
-		});
+		});*/
 		
 	// include an event handler, when receive from server, set variables, then set "received" to true.
 	
 		socket.on('nextQuestion', function(msg) {
             //$('#log').append('<br>Received #' + msg.count + ': ' + msg.data);
 			//Q.state.set("received", true);
-			prevFcQuestion = fcQuestion;
-			
 			serverJSON = JSON.parse(msg.data);
 			fcQuestion = serverJSON.question,
 			  fcAnswers = serverJSON.answers,
@@ -688,22 +688,27 @@
 			  maxTimeAllowed = serverJSON.time,
 			  prevPlayerAns = serverJSON.player,
 			  prevEnemyAns = serverJSON.enemy;
-			 Q.state.inc("currentIndex", 1);
-			 
-            });
+			 Q.state.inc("nextQuestion", 1);
+        });
+		
+		socket.on('gameOver', function(msg) {
+			console.log(msg.data);
+		}
+			
 	
 		Q.state.on("change.currentIndex", function() {
 		
 			if (Q.state.get("currentIndex") > questionNumber) {
 			// this part should be in above handler:
-			/*	prevFcQuestion = fcQuestion;
+				if (Q.state.get("currentIndex") > 1) {prevFcQuestion = fcQuestion};
 				
+				/*
 				if (Q.state.get("currentIndex") <= totalQuestions) {
 				serverJSON = JSON.parse(TestServerForm[parseInt(questionNumber)]);
 				fcQuestion = serverJSON.question,
 				  fcAnswers = serverJSON.answers,
-				  questionNumber = serverJSON.index,
-			  	  maxTimeAllowed = serverJSON.time,
+				  questionNumber = parseInt(serverJSON.index),
+			  	  maxTimeAllowed = parseInt(serverJSON.time),
 				  prevPlayerAns = serverJSON.player,
 				  prevEnemyAns = serverJSON.enemy;
 				} else {
@@ -711,15 +716,17 @@
 				prevEnemyAns = JSON.parse(createFlashCard('test:'+m, m + ' x 1 = ??', m.toString()));
 				
 				}
-			*/	  
+				*/  
 				  
 			// express enemy previous answer
+			if (Q.state.get("currentIndex") > 1) {
 				if (prevFcQuestion.id == prevEnemyAns.id) {
 					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "green";
 					Q.state.inc("enemyScore", 1);
 				} else {
 					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "red";
 				}
+			}
 				
 			// result in bomb movement
 				var remainingQ = totalQuestions - Q.state.get("currentIndex") + 1;
@@ -748,16 +755,28 @@
 				//}
 			
 			// start next question
+			if (Q.state.get("currentIndex") == 1) {
+				qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
+			}
 				qCard.generate(fcQuestion);
-				destroyAnswers(aBtns);
+				
+			if (Q.state.get("currentIndex") > 1) destroyAnswers(aBtns);
 				aBtns = generateAnswers();
 
+				
+			}
+			if (Q.state.get("currentIndex") > 1) {TIMER.stop();}
+			if (Q.state.get("currentIndex") > 0 && Q.state.get("currentIndex") <= totalQuestions) {
+				
+				TIMER = new Countdown({
+					seconds: maxTimeAllowed,
+					onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
+					onCounterEnd: function() {outOfTime();}
+				});
 				TIMER.start();
 			}
 			
 		});
-		
-		TIMER.start();
 
 	});
 	
