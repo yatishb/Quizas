@@ -73,7 +73,8 @@ function quizas_update_auth_cookies(site, authId, authToken) {
              authToken,
              { expires: 365, path: '/' });
 
-    // TODO: Notify Quizas app about the new auth.
+    // Notify Quizas app about the new auth.
+    $.post("/api/facebookauthnotify");
 }
 </script>
 
