@@ -5,6 +5,7 @@ from .. import socketio, redis
 import internalstats, authhelper, quizletsets
 
 defaultRoom = str(0)
+NUMQUES = 10
 
 
 @socketio.on('connect', namespace='/test')
@@ -40,7 +41,6 @@ def sendNotificationToSocket(message):
 # Socket reads the two usernames and creates a room for both
 @socketio.on('assignroom', namespace='/test')
 def assignRoom(message):
-	NUMQUES = 10
 	room = str(uuid.uuid1())
 	user1 = message['user1']
 	user2 = message['user2']
@@ -103,6 +103,11 @@ def assignRoom(message):
 def clearRoom():
 	room = session['room']
 	print room
+
+	# Handle for when/if the second client
+	if room == defaultRoom:
+		return
+
 	if redis.hexists("ROOMS", room) == True:
 		# Read users from redis
 		# Expect usersInRoom to be a list of comma separated ids
@@ -194,7 +199,7 @@ def sendNextQuesInfoToClient(hashSend, room, done):
 		# For each client in game, send customized message
 		for sessid, socket in request.namespace.socket.server.sockets.items():
 			if socket['/test'].session['id'] == int(eachClient):
-				socket['/test'].base_emit('my response', {'data': json.dumps(dataToSend[eachClient])})
+				socket['/test'].base_emit('nextQuestion', {'data': json.dumps(dataToSend[eachClient])})
 
 		# If messages have been sent to the client in the room
 		# Remove the redis key-value pair for message to be sent to a client
@@ -215,13 +220,20 @@ def sendFirstQuestionInfoToClient(room):
 
 	# There is no customized message for the first question
 	# Hence broadcast across room can be used to send the details of the next question
-	emit('my response', {'data': json.dumps(commonDataToSend)}, room= room)
+	emit('nextQuestion', {'data': json.dumps(commonDataToSend)}, room= room)
 
 
 
 # For a given room, retrieve and return the next question to be asked
 # Also return array of answers, time and index along with the question in the dict
 def getNextQuestionForRoom(room, done):
+	# Handle situation when we have reached the last question
+	# If this happens then we have to clear the room and record the game into the db
+	if done == NUMQUES:
+		clearRoom()
+		return {}
+
+	# When there are questions left in the game, retrieve the next game and send
 	flashcardsJson = json.loads(redis.hget("ROOMS_CARDS", room))
 	nextQues = flashcardsJson[done]['question']
 	nextAns = flashcardsJson[done]['answers']

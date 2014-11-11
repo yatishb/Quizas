@@ -27,6 +27,9 @@
             socket.on('my response', function(msg) {
                 $('#log').append('<br>Received #' + msg.count + ': ' + msg.data);
             });
+            socket.on('nextQuestion', function(msg) {
+                $('#log').append('<br>Received : ' + msg.data);
+            });
 
             // handlers for the different forms in the page
             // these send data to the server in a variety of ways
