@@ -684,8 +684,8 @@
 			serverJSON = JSON.parse(msg.data);
 			fcQuestion = serverJSON.question,
 			  fcAnswers = serverJSON.answers,
-			  questionNumber = serverJSON.index,
-			  maxTimeAllowed = serverJSON.time,
+			  questionNumber = parseInt(serverJSON.index),
+			  maxTimeAllowed = parseInt(serverJSON.time),
 			  prevPlayerAns = serverJSON.player,
 			  prevEnemyAns = serverJSON.enemy;
 			 Q.state.inc("currentIndex", 1);
