@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html>
+ <head>
+	<meta name="viewport" content="width=device-width, user-scalable=no" />
+	<title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src='http://cdn.html5quintus.com/v0.2.0/quintus-all.js'></script>
+	<script src='http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js'></script>
+    <!-- <script src='example1.js'></script> -->
+	<link rel="stylesheet" type="text/css" href="example1.css">
+	<script>
+		// socket stuff
+	
+			namespace = '/test'; // change to an empty string to use the global namespace
+
+            // the socket.io documentation recommends sending an explicit package upon connection
+            // this is specially important when using the global namespace
+            var socket = io.connect('http://' + document.domain + ':' + location.port + namespace,
+                                    {"connect timeout": 300,
+                                     "close timeout": 30,
+                                     "hearbeat timeout": 30});
+            socket.on('connect', function() {
+            });
+		
+		// socket handler
+		socket.on('initiating', function(msg) {
+                //$('#log').append('<br>Received #' + msg.count + ': ' + msg.data);
+            });
+	
+	
+	
+		// helper functions
+		
+		function Countdown(options) {
+			var timer,
+			  instance = this,
+			  seconds = options.seconds || 10,
+			  updateStatus = options.onUpdateStatus || function () {},
+			  counterEnd = options.onCounterEnd || function () {},
+			  offset, max;
+			  
+			function decrementCounter() {
+				d = delta();
+				seconds = (seconds >= d) ? seconds -= d : 0;
+				updateStatus((seconds/1000).toFixed(2));
+				if (seconds <= 0) {
+					counterEnd();
+					instance.stop();
+				}
+			}
+			
+			function delta() {
+				var now = Date.now(),
+				  d = now - offset;
+				offset = now;
+				return d;
+			}
+			
+			this.getTime = function() {
+				return (max - seconds)/1000;
+			};
+
+			this.start = function () {
+				clearInterval(timer);
+				timer = 0;
+				offset = Date.now();
+				max = options.seconds * 1000;
+				seconds = options.seconds * 1000;
+				timer = setInterval(decrementCounter, 10);
+			};
+
+			 this.stop = function () {
+				clearInterval(timer);
+			};
+		}
+	
+		function parseBool(param) {
+			return (param === 'true');
+		}
+		
+		function createFlashCard(pId, pQn, pAns) {
+			var fc = JSON.stringify({
+				id: pId, 
+				question: pQn, 
+				answer: pAns, 
+			});
+			return fc;
+		}
+		
+		function createFlashSet(pId, pN, pC, pFc) {
+			var fs = JSON.stringify({
+				id: pId,
+				name: pN,
+				category: pC,
+				cards: pFc
+			});
+			return fs;
+		}
+		
+		function getFlashCard(flashSet, n) { // input fs and output fc all in JSON
+			var fs = JSON.parse(flashSet);
+			var fc = fs.cards[n];
+			return fc;
+		}
+		
+		function getDeckSize(flashSet) { // input in JSON, output in integer
+			var parsedDeck = JSON.parse(flashSet);
+			var n = parsedDeck.cards.length;
+			return n;
+		}
+		
+		function shuffle(array) { // http://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+			var currentIndex = array.length, temporaryValue, randomIndex ;
+
+			// While there remain elements to shuffle...
+			while (0 !== currentIndex) {
+
+				// Pick a remaining element...
+				randomIndex = Math.floor(Math.random() * currentIndex);
+				currentIndex -= 1;
+
+				// And swap it with the current element.
+				temporaryValue = array[currentIndex];
+				array[currentIndex] = array[randomIndex];
+				array[randomIndex] = temporaryValue;
+			}
+
+		return array;
+		}
+		
+		/**
+		 * Returns a random integer between min (inclusive) and max (inclusive)
+		 * Using Math.round() will give you a non-uniform distribution!
+		 */
+		function getRandomInt(min, max) {
+			return Math.floor(Math.random() * (max - min + 1)) + min;
+		}
+		
+		function shuffleDeck(x, n) { // x = decksize, n = totalsize
+			var deck = [];
+			for (i=0;i<n;i++) {
+				deck[i] = i;
+			}
+			var newDeck = shuffle(deck);
+			var chosenDeck = newDeck.slice(0, x);
+			return chosenDeck;
+		}
+		
+		function dealAnswers(a, n) { // a = order # of answer, n = decksize
+			var deck = [];
+			var iniCounter = 0;
+			for (i=0;i<n;i++) {
+				if (i != a) {
+					deck[iniCounter] = i;
+					iniCounter = iniCounter + 1;
+				}
+			}
+			var newDeck = shuffle(deck);
+			var chosenDeck = newDeck.slice(0, 3);
+			var finalDeck = [];
+			var hasInserted = false;
+			var deckCounter = 0;
+			for (i=0;i<4;i++) {
+				var decision = Math.random() < 0.5;
+				if (!hasInserted && (decision || i == 3)) {
+					finalDeck[i] = a;
+					hasInserted = true;
+				} else {
+					finalDeck[i] = chosenDeck[deckCounter];
+					deckCounter = deckCounter + 1;
+				}
+			}
+			return finalDeck;
+		}
+		
+		function createClientToServerJSON(questionId, answerId, timeTaken, questionsCompleted) {
+			var clientJSON = JSON.stringify({
+				id: questionId,
+				answer: answerId,
+				time: timeTaken,
+				done: questionsCompleted,
+			});
+			return clientJSON;
+		}
+		
+		// some global variables
+		var playerCounters = [];
+		var enemyCounters = [];
+
+		// declare JSON vars for testing purposes
+		var TestFlashCard = createFlashCard('22', 'F=??', 'M x A');
+		
+		var TestFCArray = [];
+		for (i=0;i<30;i++) {
+			var stringId = i.toString();
+			var stringQn = i.toString() + ' + ' + i.toString() + ' = ??';
+			var stringAns = (i + i).toString();
+			var fc = createFlashCard(stringId, stringQn, stringAns);
+			TestFCArray[i] = fc;
+		}
+		var TestFlashSet = createFlashSet('101', 'Simple Additions', 'Mathematics', TestFCArray);
+		var TestTotalQuestions = 10;
+		
+		var TestInitiatingForm = JSON.stringify({
+			name: "John Smith",
+			sprite: "smiley.png",
+			win: "75%",
+			encounter: "6",
+			total: "3",
+		});
+		
+		var TestServerForm = [];
+		for (i=0;i<3;i++) {
+		m = getRandomInt(0, 2);
+			j = i + 1, k = j + 1, l = k + 1;
+			TestServerForm[i] = JSON.stringify({
+				question: JSON.parse(createFlashCard('test:'+i, i + ' x 1 = ??', i.toString())),
+				answers: [JSON.parse(createFlashCard('test:'+i, i + ' x 1 = ??', i.toString())), 
+				  JSON.parse(createFlashCard('test:'+j, i + ' x 1 = ??', j.toString())), 
+				  JSON.parse(createFlashCard('test:'+k, i + ' x 1 = ??', k.toString())), 
+				  JSON.parse(createFlashCard('test:'+l, i + ' x 1 = ??', l.toString()))],
+				index: "" + (i + 1),
+				time: "" + 5,
+				player: null,
+				enemy: JSON.parse(createFlashCard('test:'+m, m + ' x 1 = ??', m.toString())),
+			});
+		}
+		
+		// fetching info from server
+		var INITIATING_FORM, SERVER_FORM;
+		
+		// Start load test
+			INITIATING_FORM = TestInitiatingForm;
+		// End load test
+
+		var FLASH_SET = TestFlashSet;
+		var DECK_SIZE = getDeckSize(FLASH_SET);
+		var TOTAL_QUESTIONS = TestTotalQuestions;
+		var PLAYER_SPRITE = "smiley.png";
+		var ENEMY_SPRITE = "smiley.png";
+		var BOMB_SPRITE = "bomb.png";
+		var QUESTION_TIME = 10;
+		var CURRENT_TIME = QUESTION_TIME;
+		var TIMER;
+		
+		// interpreting info from server
+		var initiatingJSON = JSON.parse(INITIATING_FORM);
+		var enemyName, enemySprite, enemyWinRate, enemyEncounter, totalQuestions;
+		/*
+		var enemyName = initiatingJSON.name,
+		  enemySprite = initiatingJSON.sprite,
+		  enemyWinRate = initiatingJSON.win,
+		  enemyEncounter = initiatingJSON.encounter,
+		  totalQuestions = initiatingJSON.total;
+		*/
+		//var serverJSON = JSON.parse(SERVER_FORM);
+		/*
+		var fcQuestion = serverJSON.question,
+		  fcAnswers = serverJSON.answers,
+		  questionNumber = serverJSON.index,
+		  maxTimeAllowed = serverJSON.time,
+		  prevPlayerAns = serverJSON.player,
+		  prevEnemyAns = serverJSON.enemy;
+		*/
+		
+		var battleLibrary = []
+		function addBattle(fcQ, playerA, enemyA, playerTime) { // all are flashcard objects
+			battleLibrary[battleLibrary.length] = {
+				question: fcQ,
+				player: playerA,
+				enemy: enemyA,
+				time: playerTime,
+			};
+		}
+		
+	</script>
+ </head>
+ 
+ <body>
+	<script>
+	window.addEventListener("load",function() {
+ 
+	var Q = window.Q = Quintus()
+    .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
+    .setup({
+		maximize: true
+	}).touch();
+	
+	// load initiating form here
+	enemyName = initiatingJSON.name,
+	  enemySprite = initiatingJSON.sprite,
+	  enemyWinRate = initiatingJSON.win,
+	  enemyEncounter = initiatingJSON.encounter,
+	  totalQuestions = initiatingJSON.total;	
+	
+	Q.state.set({playerScore: 0, enemyScore: 0, currentIndex: 1, currentQuestion: "", waiting: true});
+	var deck = shuffleDeck(totalQuestions, DECK_SIZE);
+	
+	
+	Q.UI.PlayerScore = Q.UI.Text.extend("UI.PlayerScore", { 
+		init: function(p) {
+			this._super(p, {
+			  label: Q.state.get("playerScore") + "",
+			  x: 20,
+			  y: 30
+			});
+			Q.state.on("change.playerScore",this,"score");
+		},
+		
+		score: function() {
+			this.p.label = Q.state.get("playerScore") + "";
+		}
+	});
+	
+	Q.UI.EnemyScore = Q.UI.Text.extend("UI.EnemyScore", { 
+		init: function(p) {
+			this._super({
+			  label: Q.state.get("enemyScore") + "",
+			  x: 300,
+			  y: 30
+			});
+			Q.state.on("change.enemyScore",this,"score");
+		},
+		
+		score: function() {
+			this.p.label = Q.state.get("enemyScore") + "";
+		}
+	});
+
+	/*
+	Q.UI.QuestionCounter = Q.UI.Text.extend("UI.QuestionCounter", { 
+		init: function(p) {
+			this._super({
+			  label: "[Q: 1/" + TOTAL_QUESTIONS + "]",
+			  x: 160,
+			  y: 30
+			});
+			Q.state.on("change.currentIndex",this,"qc");
+		},
+
+		qc: function() {
+			this.p.label = "[Q: " + Q.state.get("currentIndex") + "/" + TOTAL_QUESTIONS + "]";
+		}
+	});
+	*/
+	
+	Q.UI.TimeCounter = Q.UI.Text.extend("UI.TimeCounter", { 
+		init: function(p) {
+			this._super({
+			  label: "n/a",
+			  x: 160,
+			  y: 30,
+			});
+		},
+	});
+	
+	Q.PlayerPortrait = Q.Sprite.extend("PlayerPortrait", {
+		init: function(p) {
+			this._super(p, {
+				x: 30,
+				y: 530,
+				scale: 0.03,
+				//asset: PLAYER_SPRITE
+			});
+		},
+	});
+	
+	Q.EnemyPortrait = Q.Sprite.extend("EnemyPortrait", {
+		init: function(p) {
+			this._super(p, {
+				x: 290,
+				y: 530,
+				scale: 0.03,
+				asset: enemySprite
+			});
+		},
+	});
+	
+	Q.Bomb = Q.Sprite.extend("Bomb", {
+		init: function(p) {
+			this._super(p, {
+				x: 160,
+				y: 530,
+				scale: 0.03,
+				asset: BOMB_SPRITE
+			});
+		},
+	});
+
+    
+	// Flash Card
+	Q.UI.FlashCard = Q.UI.Text.extend('UI.FlashCard', {
+		// default position is question
+		init: function(p) {
+			this._super(p, {
+				color: "white",
+				x: 	0,
+				y: 	0,
+				id: 'fc-null',
+				question: 'q-null',
+				answer: 'a-null',
+				isQuestion: true
+			});
+		},
+	
+	// load flashcard properties
+		generate: function(param) {
+			parsedArgument = param;			
+			this.p.id = parsedArgument.id;
+			this.p.question = parsedArgument.question;
+			this.p.answer = parsedArgument.answer;
+			if (this.p.isQuestion) {
+				this.p.label = this.p.question;
+			} else {
+				this.p.label = this.p.answer;
+			}
+		},
+	});
+	
+	//answer button
+		Q.UI.AnswButton = Q.UI.Button.extend('UI.AnswButton', {
+		init: function(p) {
+			this._super(Q._defaults(p, {
+				fill: "#FFFFFF",
+				//highlight: "#FFFFFF",
+				fontColor: "white",
+				border: 2,
+				shadow: 3,
+				shadowColor: "rgba(0,0,0,0.5)",
+				w: 40,
+				h: 40
+			}),                     
+			function() {
+					
+			});
+		},
+		});
+		
+	// versus screen with countdown
+	Q.scene("scene0", function(stage) {
+		var cdTimer = new Countdown({
+			seconds: 5,
+			onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
+			onCounterEnd: function() {/*alert("Out of time");*/}
+		});
+	});
+	
+	// set scene
+	Q.scene("scene1",function(stage) {
+	
+		Q.state.reset({playerScore: 0, enemyScore: 0, currentIndex: 1, currentQuestion: "", waiting: true});
+	
+		var playerScore = stage.insert(new Q.UI.PlayerScore());
+		var enemyScore = stage.insert(new Q.UI.EnemyScore());
+		//var leQC = stage.insert(new Q.UI.QuestionCounter());
+		var leTC = stage.insert(new Q.UI.TimeCounter());
+		var ansDeck;
+		var isPhaseOne = true;
+		var timeTakenCurrent = 0;
+		
+		// start receive serverForm
+		var serverJSON = JSON.parse(TestServerForm[0]);
+		var fcQuestion = serverJSON.question,
+		  fcAnswers = serverJSON.answers,
+		  questionNumber = serverJSON.index,
+		  maxTimeAllowed = serverJSON.time,
+		  prevPlayerAns = serverJSON.player,
+		  prevEnemyAns = serverJSON.enemy;
+		var currentFcAnswer, prevFcQuestion;
+		Q.state.set("currentQuestion", fcQuestion.id);
+		// end receive serverForm
+		
+		TIMER = new Countdown({
+			seconds: maxTimeAllowed,
+			onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
+			onCounterEnd: function() {outOfTime();}
+		});
+		
+		
+		
+		function generateAnswers() {
+			Q.state.set("waiting", false);
+			var aBtns = [];
+			var k = 0;
+			for (i=0;i<2;i++) {
+				for (j=0;j<2;j++) {
+					var fcAns = fcAnswers[k].answer;
+					var ansColor = "red";
+					if (fcQuestion.id == fcAnswers[k].id) {
+						ansColor = "green";
+					}
+					aBtns[k] = stage.insert(new Q.UI.Button({
+						fill: "gray",
+						highlight: ansColor,
+						fontColor: "white",
+						x: 90 + (140*j),
+						y: 320 + (120*i),
+						border: 2,
+						shadow: 3,
+						shadowColor: "rgba(0,0,0,0.5)",
+						w: 110,
+						h: 100,
+						label: fcAns,
+						counter: k,
+						customId: fcAnswers[k].id,
+						}, function() {
+							// do something
+							if (!Q.state.get("waiting")) {
+								timeTakenCurrent = TIMER.getTime() + "";
+								Q.state.set("waiting", true);
+							
+								var k = this.p.counter;
+								if (fcQuestion.id == fcAnswers[k].id) {
+									console.log("Placeholder Trigger: Correct");
+									playerCounters[Q.state.get("currentIndex") - 1].p.fill = "green";
+									this.p.fill = "green";
+									Q.state.inc("playerScore", 1);
+								} else {
+									console.log("Placeholder Trigger: Wrong");
+									playerCounters[Q.state.get("currentIndex") - 1].p.fill = "red";
+									this.p.fill = "red";
+								}
+								
+								currentFcAnswer = this.p.customId;
+								//Q.state.inc("currentIndex", 1);
+								
+								
+								
+								// send form to server and wait for next
+								clientJSON = createClientToServerJSON(fcQuestion.id, currentFcAnswer, timeTakenCurrent, Q.state.get("currentIndex") + "");
+								console.log("Post to Server: " + clientJSON);
+								
+								
+								
+							}
+					}));
+					
+					k++;
+				}
+			}
+			
+			return aBtns;
+		}
+		
+		function outOfTime() {
+			Q.state.set("waiting", true);
+			timeTakenCurrent = maxTimeAllowed;
+			currentFcAnswer = "nothing";
+			clientJSON = createClientToServerJSON(fcQuestion.id, currentFcAnswer, timeTakenCurrent, Q.state.get("currentIndex") + "");
+			console.log("Post to Server: " + clientJSON);
+		}
+		
+		/*
+		function generateAnswers() {
+			ansDeck = dealAnswers(deck[Q.state.get("currentIndex") - 1], DECK_SIZE);
+		
+			var aBtns = [];
+			var k = 0;
+			for (i=0;i<2;i++) {
+				for (j=0;j<2;j++) {
+					var fcAns = JSON.parse(getFlashCard(FLASH_SET, ansDeck[k])).answer;
+					var ansColor = "red";
+					if (deck[Q.state.get("currentIndex") - 1] == ansDeck[k]) {
+						ansColor = "green";
+					}
+					aBtns[k] = stage.insert(new Q.UI.Button({
+						fill: "gray",
+						highlight: ansColor,
+						fontColor: "white",
+						x: 90 + (140*j),
+						y: 320 + (120*i),
+						border: 2,
+						shadow: 3,
+						shadowColor: "rgba(0,0,0,0.5)",
+						w: 110,
+						h: 100,
+						label: fcAns,
+						name: k
+						}, function() {
+							// do something
+							if (deck[Q.state.get("currentIndex") - 1] == ansDeck[this.p.name]) {
+								console.log("Placeholder Trigger: Correct");
+								playerCounters[Q.state.get("currentIndex") - 1].p.fill = "green";
+								Q.state.inc("playerScore", 1);
+							} else {
+								console.log("Placeholder Trigger: Wrong");
+								playerCounters[Q.state.get("currentIndex") - 1].p.fill = "red";
+							}
+							
+							Q.state.inc("currentIndex", 1);
+							TIMER.start();
+					}));
+					k = k + 1;
+				}
+			}
+			return aBtns;
+		}
+		*/
+		
+		function destroyAnswers(aBtns) {
+			for (i=0;i<aBtns.length;i++) {
+				aBtns[i].destroy();
+			}
+		}
+		
+		// player/enemy's counters
+		// x = 15/305; y = 280; w = 15; h = 420; border: 2
+		// boundary for y: from 70 to 490; origin is centre
+		
+		for (i=0;i<totalQuestions;i++) {
+			playerCounters[i] = stage.insert(new Q.UI.Container({
+				fill: "white",
+				x: 15,
+				w: 15,
+				border: 2,
+				y: 490 - (210/totalQuestions) - (i*(420/totalQuestions)),
+				h: 420/totalQuestions
+			}));
+			
+			enemyCounters[i] = stage.insert(new Q.UI.Container({
+				fill: "white",
+				x: 305,
+				w: 15,
+				border: 2,
+				y: 490 - (210/totalQuestions) - (i*(420/totalQuestions)),
+				h: 420/totalQuestions
+			}));
+		}
+
+	
+		//current question
+		var qContainer = stage.insert(new Q.UI.Container({
+			fill: "gray",
+			x: 160,
+			y: 160,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			w: 250,
+			h: 180
+		}));
+		
+		var aBtns = generateAnswers();
+		
+		var qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
+		qCard.generate(fcQuestion);
+		
+		var playerPortrait = stage.insert(new Q.PlayerPortrait());
+		var enemyPortrait = stage.insert(new Q.EnemyPortrait());
+		//var player1 = stage.insert(new Q.PlayerPiece());
+		//var player2 = stage.insert(new Q.EnemyPiece());
+		var bomb = stage.insert(new Q.Bomb());
+		
+		var raceLine = stage.insert(new Q.UI.Container({
+			fill: "black",
+			// from 60 to 260
+			x: 160,
+			y: 550,
+			w: 200,
+			h: 3
+		}));
+		
+		Q.state.on("change.currentIndex", function() {
+			if (Q.state.get("currentIndex") > TOTAL_QUESTIONS) {
+				//Q.stageScene("scene2");
+			}
+			
+			
+			
+			//qCard.generate(getFlashCard(FLASH_SET, deck[Q.state.get("currentIndex") - 1]));
+			//destroyAnswers(aBtns);
+			//aBtns = generateAnswers();
+			
+			
+		});
+		
+	// include an event handler, when receive from server, set variables, then set "received" to true.
+	
+		socket.on('nextQuestion', function(msg) {
+            //$('#log').append('<br>Received #' + msg.count + ': ' + msg.data);
+			//Q.state.set("received", true);
+			prevFcQuestion = fcQuestion;
+			
+			serverJSON = JSON.parse(msg.data);
+			fcQuestion = serverJSON.question,
+			  fcAnswers = serverJSON.answers,
+			  questionNumber = serverJSON.index,
+			  maxTimeAllowed = serverJSON.time,
+			  prevPlayerAns = serverJSON.player,
+			  prevEnemyAns = serverJSON.enemy;
+			 Q.state.inc("currentIndex", 1);
+			 
+            });
+	
+		Q.state.on("change.currentIndex", function() {
+		
+			if (Q.state.get("currentIndex") > questionNumber) {
+			// this part should be in above handler:
+			/*	prevFcQuestion = fcQuestion;
+				
+				if (Q.state.get("currentIndex") <= totalQuestions) {
+				serverJSON = JSON.parse(TestServerForm[parseInt(questionNumber)]);
+				fcQuestion = serverJSON.question,
+				  fcAnswers = serverJSON.answers,
+				  questionNumber = serverJSON.index,
+			  	  maxTimeAllowed = serverJSON.time,
+				  prevPlayerAns = serverJSON.player,
+				  prevEnemyAns = serverJSON.enemy;
+				} else {
+				prevPlayerAns = null;
+				prevEnemyAns = JSON.parse(createFlashCard('test:'+m, m + ' x 1 = ??', m.toString()));
+				
+			*/	}
+				  
+				  
+			// express enemy previous answer
+				if (prevFcQuestion.id == prevEnemyAns.id) {
+					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "green";
+					Q.state.inc("enemyScore", 1);
+				} else {
+					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "red";
+				}
+				
+			// result in bomb movement
+				var remainingQ = totalQuestions - Q.state.get("currentIndex") + 1;
+				var scoreDiff = Q.state.get("playerScore") - Q.state.get("enemyScore");
+				if (remainingQ > 0) {
+					if (scoreDiff <= remainingQ) {
+						bomb.p.x = 160 + ((scoreDiff/remainingQ)*100);
+					} else if (scoreDiff > remainingQ) {
+						if (isPhaseOne) {
+							// initiate Phase 2
+							bomb.destroy();
+							alert("Phase Two");
+						}
+					}
+				} else {
+					// game over
+					alert("game over");
+				}
+				
+				
+				
+				// game over
+				//if (Q.state.get("currentIndex") > totalQuestions) {
+				//	alert("GAME OVER");
+				//	//Q.stageScene("scene2");
+				//}
+			
+			// start next question
+				qCard.generate(fcQuestion);
+				destroyAnswers(aBtns);
+				aBtns = generateAnswers();
+
+				TIMER.start();
+			}
+			
+		});
+		
+		TIMER.start();
+
+	});
+	
+	// set scene
+	Q.scene("scene2",function(stage) {
+	
+		var leScore = stage.insert(new Q.UI.PlayerScore());
+	
+		var ReplayBtn = stage.insert(new Q.UI.Button({
+			fill: "gray",
+			fontColor: "white",
+			x: 160,
+			y: 160,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			w: 110,
+			h: 100,
+			label: 'Replay',
+		}, function() {
+			Q.stageScene("scene1");
+		}));
+		
+		var BackBtn = stage.insert(new Q.UI.Button({
+			fill: "gray",
+			fontColor: "white",
+			x: 160,
+			y: 320,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			w: 110,
+			h: 100,
+			label: 'Back',
+		}, function() {
+			// return to interface
+			window.location.href="study.html";
+		}));
+		
+		
+	});
+	
+	// stage scene
+	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE], function() {
+		Q.stageScene("scene1");
+	});
+     
+});
+	</script>
+ </body>
+</html>
