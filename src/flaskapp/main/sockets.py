@@ -15,6 +15,7 @@ def socketConnect():
     session['id'] = authhelper.get_current_id()
     session['room'] = defaultRoom
     session['random'] = str(uuid.uuid1())
+    print "Connected : %r %r" % (session['id'], session['random'])
     emit('my response', {'data': 'Connected %r- %r' % (session['id'], session['random'])})
 
 @socketio.on('disconnect', namespace='/test')
@@ -41,6 +42,7 @@ def sendNotificationToSocket(message):
 # Socket reads the two usernames and creates a room for both
 @socketio.on('assignroom', namespace='/test')
 def assignRoom(message):
+	print "assign room func called"
 	room = str(uuid.uuid1())
 	user1 = message['user1']
 	user2 = message['user2']
@@ -48,6 +50,7 @@ def assignRoom(message):
 	shuffledFlashcards = quizletsets.shuffled_flashset_json(flashset, NUMQUES)
 
 	if authhelper.lookup(user1) != None and authhelper.lookup(user2) != None and shuffledFlashcards.has_key('error') == False:
+		print "creating room"
 		# Get the internal user ids of the clients
 		user1 = authhelper.lookup(user1)
 		user2 = authhelper.lookup(user2)
@@ -161,6 +164,7 @@ def clearRoom():
 # Each response by the client for each question is handled here
 @socketio.on('readanswer', namespace='/test')
 def readAnswerByClient(message):
+	print "received ans: %r" % message
 	room = session['room']
 	idClient = session['id']
 
@@ -246,5 +250,6 @@ def getNextQuestionForRoom(room, done):
 	nextQues = flashcardsJson[done]['question']
 	nextAns = flashcardsJson[done]['answers']
 	commonDataToSend = {"question":nextQues, "answers":nextAns, "time": 10, "index": str(done+1)}
+	print commonDataToSend
 
 	return commonDataToSend
