@@ -1,4 +1,7 @@
+<html>
+<body>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
 <script>
 // TODO: Move this to quizas_fbappid.js or somewhere
@@ -44,6 +47,36 @@ var quizas_fbappid = (window.location.hostname === "quizas.me") ?
      data-scope="user_friends"></div>
 <br/>
 
+<!-- This should be in authhelper.js or so -->
+<script>
+function quizas_update_auth_cookies(site, authId, authToken) {
+    // site e.g. "quizlet", "twitter", "facebook"
+
+    // Check what other cookies Quizas has,
+    // if they clash (has this site, but different authId), remove the others.
+    if ($.cookie(site + "_user_id") != authId) {
+        var auth_sites = ["quizlet", "twitter", "facebook"]; // BAD MAGIC
+        for (var i in auth_sites) {
+            var s = auth_sites[i];
+
+            // No great harm in removing a cookie which isn't there.
+            $.removeCookie(s + "_user_id", { path: "/" });
+            $.removeCookie(s + "_access_token", { path: "/" });
+        }
+    }
+
+    // Set the cookie
+    $.cookie(site + "_user_id",
+             authId,
+             { expires: 365, path: '/' });
+    $.cookie(site + "_access_token",
+             authToken,
+             { expires: 365, path: '/' });
+
+    // TODO: Notify Quizas app about the new auth.
+}
+</script>
+
 <!--
   Alternatively, use something like "doFacebookLogin()" with a URL.
   Could also check FB.getLoginStatus()
@@ -57,56 +90,70 @@ function doFacebookLogin() {
   FB.login(afterFacebookLogin, {scope: 'user_friends'});
 }
 
-facebook.html (line 59)
-
 function afterFacebookLogin(response) {
     if (response.authResponse) {
-      console.log('Welcome!  Fetching your information.... ');
-      console.log(JSON.stringify(response));
+        console.log('Welcome!  Fetching your information.... ');
+        console.log(JSON.stringify(response));
 
-      // e.g. response
-      // {"authResponse":{"accessToken":"...","userID":"10204898258962045","expiresIn":6855,"signedRequest":"...."},"status":"connected"}
-      // So, we're interested in
-      // authResponse.userID, authResponse.accessToken, authResponse.expiresIn
+        // e.g. response
+        // {"authResponse":{"accessToken":"...","userID":"10204898258962045","expiresIn":6855,"signedRequest":"...."},"status":"connected"}
+        // So, we're interested in
+        // authResponse.userID, authResponse.accessToken, authResponse.expiresIn
+        quizas_update_auth_cookies("facebook",
+                                   response.authResponse.userID,
+                                   response.authResponse.accessToken);
     } else {
-      console.log('User cancelled login or did not fully authorize.');
+        console.log('User cancelled login or did not fully authorize.');
     }
 }
 </script>
 <a onClick="doFacebookLogin();">Facebook Login</a>
 <br/>
+<br/>
 
 
 
 <!-- List Friends demo -->
+<b>Friends:</b><br/>
 <div id="friendlist"></div>
 <br/>
 
-<input value="List Friends" type="button" onclick="listFriends();" />
+<input value="List Friends" type="button" onclick="listFacebookFriends(outputFriends);" />
 
 
 
 <!-- FB SDK, list friends-->
 <script>
+// Example of listing friends.
+function outputFriends(friends) {
+    friends.forEach(function (f) {
+        $("#friendlist").append(f.name + ", " + f.userid + "<br/>");
+    });
+}
+
+// Function to perform Graph API call to list FB friends.
 function listFacebookFriends(friendsCallback) {
+  // Make sure user is logged in.
   FB.getLoginStatus(function(response) {
     if (response.status === 'connected') {
-      console.log('Logged in.');
+        FB.api(
+            "/me/friends",
+            function (response) {
+                if (response && !response.error) {
+                    // Raw Dump of Response.
+                    console.log(JSON.stringify(response));
 
-      FB.api(
-          "/me/friends",
-          function (response) {
-            if (response && !response.error) {
-              // Raw Dump of Response.
-              console.log(JSON.stringify(response));
+                    // Call-back with (processed) info.
+                    // response.data = [{name, id}]
+                    function toQuizazRep(f){
+                        return {"name": f.name,
+                                "userid": "facebook:" + f.id}
+                    }
 
-              // Damn, can't see what the data looks like until someone
-              // else is logged in using the app.
-
-              // Call-back with (processed) info.
+                    friendsCallback(response.data.map(toQuizazRep));
+                }
             }
-          }
-      );
+        );
     } else {
       //FB.login();
     }
@@ -115,3 +162,5 @@ function listFacebookFriends(friendsCallback) {
 </script>
 
 
+</body>
+</html>

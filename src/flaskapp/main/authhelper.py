@@ -10,6 +10,13 @@ from . import main
 from .. import db
 
 
+@main.route('/user/currentid')
+def get_internal_id():
+	cookie_ids = authhelper.get_cookie_user_ids()
+	return json.dumps({"internal_id": authhelper.get_current_id(),
+	                   "cookie_user_ids": cookie_ids})
+
+
 # Returns "SITE" from "SITE:AUTHID"
 def site_of(userid):
 	return userid[:userid.find(":")]
@@ -37,7 +44,7 @@ def lookupInternal(internalid):
 		return u.user_id
 
 
-auth_sites = ["quizlet", "twitter"]
+auth_sites = ["quizlet", "twitter", "facebook"]
 
 
 # Returns an array of all the user_ids (`site:auth_id`),
