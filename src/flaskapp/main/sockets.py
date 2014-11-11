@@ -55,6 +55,12 @@ def assignRoom(message):
 		user1 = authhelper.lookup(user1)
 		user2 = authhelper.lookup(user2)
 
+		for sessid, socket in request.namespace.socket.server.sockets.items():
+			if (socket['/test'].session['id'] == user1) or (socket['/test'].session['id'] == user2):
+				if socket['/test'].session['room'] != defaultRoom:
+					return
+
+
 		# Store the flashsetid for room information in redis
 		# This key should never exist in db. If it does something is wrong
 		if redis.hexists("ROOMS_SETS", room) == False:
