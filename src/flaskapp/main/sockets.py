@@ -132,10 +132,10 @@ def clearRoom():
 @socketio.on('readanswer', namespace='/test')
 def readAnswerByClient(message):
 	room = session['room']
+	idClient = session['id']
 
 	# Decode the message obtained
-	idClient = session['id']
-	idQuestion = message['qid']
+	idQuestion = message['id']
 	clientAnswer = message['answer']
 	# print "received: %r" % message
 
@@ -159,13 +159,20 @@ def readAnswerByClient(message):
 # from both clients for the same question
 def sendReceivedAnswersToClient(hashSend, room):
 	answersForQuestion = redis.hgetall(hashSend)
-	dataToSend = {}
 	clientsList = answersForQuestion.keys()
+
+	dataToSend1 = {"player":answersForQuestion.get(clientsList[0]), "enemy":answersForQuestion.get(clientsList[1])}
+	dataToSend2 = {"player":answersForQuestion.get(clientsList[1]), "enemy":answersForQuestion.get(clientsList[0])}
+	dataToSend = {clientsList[0]:dataToSend1, clientsList[1]:dataToSend2}
+
 	for eachClient in clientsList:
-		# Find user id of the client
-		userId = authhelper.lookupInternal(eachClient)
-		dataToSend[userId] = answersForQuestion.get(eachClient)
+		# For each client in game, send customized message
+		for sessid, socket in request.namespace.socket.server.sockets.items():
+			if socket['/test'].session['id'] == int(eachClient):
+				socket['/test'].base_emit('my response', {'data': json.dumps(dataToSend[eachClient])})
+
+		# If messages have been sent to the client in the room
+		# Remove the redis key-value pair for message to be sent to a client
 		redis.hdel(hashSend, eachClient)
 
-	emit('my response', {'data': json.dumps(dataToSend)}, room=room)
 	redis.save()
