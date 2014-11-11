@@ -79,7 +79,7 @@ def assignRoom(message):
 					else:
 						redis.hset("ROOMS", room, socket['/test'].session['id'])
 						redis.save()
-					socket['/test'].base_emit('my response', {'data': 'Joined room'})
+					socket['/test'].base_emit('my response', {'data': 'GAME BEGINS...'})
 				
 				else:
 					emit('my response', {'data': 'Already part of a room'})
@@ -124,16 +124,21 @@ def clearRoom():
 		# Verify if quiz is genuinely completed. If not do not write to db
 		HASH_USER1 = "ROOM_" + room + "_" + usersInRoom[0]
 		HASH_USER2 = "ROOM_" + room + "_" + usersInRoom[1]
+		HASH_TIME1 = HASH_USER1 + "_TIME"
+		HASH_TIME2 = HASH_USER2 + "_TIME"
 		# Check if game exists and number of questions answered are same
 		if (redis.hlen(HASH_USER1) == redis.hlen(HASH_USER2) and redis.exists(HASH_USER1) == True):
 			internalstats.documentGame(room, int(usersInRoom[0]), int(usersInRoom[1]), redis.hgetall(HASH_USER1), 
-				redis.hgetall(HASH_USER2), redis.hget("ROOMS_SETS", room))
+				redis.hgetall(HASH_USER2), redis.hget("ROOMS_SETS", room), redis.hgetall(HASH_TIME1),
+				redis.hgetall(HASH_TIME2))
 
 		# Clear hash key from redis
 		# Second parameter here refers to time in msec when key should expire
 		# Setting expiry time as 1msec to delete the key
 		redis.pexpire(HASH_USER1, 1)
 		redis.pexpire(HASH_USER2, 1)
+		redis.pexpire(HASH_TIME1, 1)
+		redis.pexpire(HASH_TIME2, 1)
 		redis.hdel("ROOMS_SETS", room)
 		redis.hdel("ROOMS_CARDS", room)
 		
@@ -143,7 +148,7 @@ def clearRoom():
 				if socket['/test'].session['id'] == int(eachUser):
 					socket['/test'].session['room'] = defaultRoom
 					socket['/test'].leave_room(room)
-					socket['/test'].base_emit('my response', {'data': "cleared room"})
+					socket['/test'].base_emit('my response', {'data': "GAME OVER!!"})
 		# emit('my response', {'data': "checking for room"}, room=room) # This doesn't send message to any client. Verified
 		redis.save()
 	else:
@@ -163,15 +168,18 @@ def readAnswerByClient(message):
 	idQuestion = message['id']
 	clientAnswer = message['answer']
 	done = int(message['done']) # num questions including current done
+	time = message['time']
 
 	HASH_USER = "ROOM_" + room + "_" + str(idClient)
 	HASH_SEND = "ROOM_" + room + "_SEND"
+	HASH_TIME = "ROOM_" + room + "_" + str(idClient) + "_TIME"
 
 	# Store result in 2 separate tables in redis
 	# One table is for the purpose of answer retention
 	# Other table is for sending information abt other client's answer
 	redis.hset(HASH_USER, idQuestion, clientAnswer)
 	redis.hset(HASH_SEND, idClient, clientAnswer)
+	redis.hset(HASH_TIME, idQuestion, time)
 	redis.save()
 
 	if redis.hlen(HASH_SEND) == 2:

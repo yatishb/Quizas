@@ -58,7 +58,7 @@
                 return false;
             });
             $('form#send_room').submit(function(event) {
-                socket.emit('readanswer', {id: $('#room_name').val(), answer: $('#room_data').val(), done: $('#num_done').val()});
+                socket.emit('readanswer', {id: $('#room_name').val(), answer: $('#room_data').val(), done: $('#num_done').val(), time: $('#time').val()});
                 return false;
             });
             $('form#client_user').submit(function(event) {
@@ -105,6 +105,7 @@
         <input type="text" name="room_name" id="room_name" placeholder="Question id">
         <input type="text" name="room_data" id="room_data" placeholder="Answer">
         <input type="text" name="num_done" id="num_done" placeholder="Done">
+        <input type="text" name="time" id="time" placeholder="Time(ms)">
         <input type="submit" value="Answer Room">
     </form>
     <form id="client_user" method='POST' action='#'>
