@@ -1,12 +1,17 @@
 body {
-  background: #99cfb7;
-  background-color: #99cfb7;
-  font-family: 'Open Sans', sans-serif;
+    background: #99cfb7;
+    background-color: #99cfb7;
+    font-family: 'Open Sans', sans-serif;
+}
+
+body, html {
+    overflow: hidden;
+    overflow-x: hidden;
 }
 
 img {
-  max-width: 100%;
-  max-height: 100%;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 @font-face {
@@ -164,7 +169,7 @@ img {
 /*** Start of index.html ***/
 
 .logo {
-    width: 70%;
+    width: 60%;
     max-width: 300px;
     margin: auto;
 }
@@ -180,7 +185,7 @@ img {
     color: white;
     opacity: 0.8;
     text-align: center;
-    font-size: 400%;
+    font-size: 420%;
     margin-left: auto;
     margin-right: auto;
 }
@@ -439,6 +444,10 @@ img {
         font-size: 40pt;
         border-bottom-left-radius: 10px;
     }
+
+    .round_button {
+        font-size: 5vw;
+    }
 }
 
 @media screen and (min-width: 501px) {
@@ -455,6 +464,16 @@ img {
         text-align: center;
         font-size: 80pt;
         border-bottom-left-radius: 25px;
+    }
+
+    .round_button {
+        font-size: 5vw;
+    }
+}
+
+@media screen and (min-width: 1000px) {
+    .round_button {
+        font-size: 30pt;
     }
 }
 
@@ -497,6 +516,7 @@ img {
     border-bottom-style: solid;
     border-bottom-width: 1px;
     border-bottom-color: #47A347;
+    cursor: pointer;
     /*border-top-style: solid;
     border-top-width: 1px;
     border-top-color: #0099FF;*/
@@ -553,6 +573,7 @@ img {
 }
 
 .round_button {
+    font-family: 'Open Sans', sans-serif;
     width: 25vw;
     height: 25vw;
     max-width: 200px;
@@ -565,6 +586,7 @@ img {
     margin-top: 10px;
     text-align: center;
     z-index: 500;
+    cursor: pointer;
 }
 
 .round_button span {
@@ -592,6 +614,148 @@ img {
     margin-right: 5%;
 }
 
+/*** The Friend List ***/
+@media screen and (max-width: 500px) {
+    .friend_window {
+        width: 80vw;
+        height: 50vh;
+        top: 27%;
+        left: 10%;
+    }
+
+    .list_search {
+        width: 80vw;
+    }
+
+    .friend_list {
+        width: 80vw;
+        height: 90%;
+    }
+
+    .list_bottom {
+        width: 80vw;
+        height: 5%;
+        line-height: 28px;
+    }
+}
+
+@media screen and (min-width: 501px) {
+    .friend_window {
+        width: 80vw;
+        height: 50vh;
+        max-width: 1000px;
+        max-height: 600px;
+        top: 27%;
+        left: 10%;
+    }
+
+    .list_search {
+        width: 80vw;
+    }
+
+    .friend_list {
+        width: 80vw;
+        height: 90%;
+        max-width: 1000px;
+        max-height: 570px;
+    }
+
+    .list_bottom {
+        width: 80vw;
+        height: 6%;
+        max-width: 1000px;
+        max-height: 40px;
+        line-height: 36px;
+    }
+}
+
+@media screen and (min-width: 1126px) {
+    .friend_window {
+        width: 80vw;
+        height: 50vh;
+        max-width: 1000px;
+        max-height: 600px;
+        top: 27%;
+        left: 50%;
+        margin-left: -500px;
+    }
+}
+
+.friend_window {
+    z-index: 500;
+    background-color: red;
+    background: red;
+    position: fixed;
+    display: none;
+}
+
+.list_search {
+    background-color: white;
+    background: white;
+    margin: -10px 0;
+    max-width: 1000px;
+}
+
+.list_search input[type="text"] {
+    font-family: 'Open Sans', sans-serif;
+    padding: 10px;
+    border: none;
+    border-bottom: solid 2px #c9c9c9;
+    border-radius: 0;
+    -o-border-radius: 0;
+    -ms-border-radius: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
+    transition: border 0.3s;
+}
+
+.list_search input[type="text"]:focus,
+.list_search input[type="text"].focus {
+}
+
+.friend_list {
+    background-color: white;
+    background: whte;
+    margin-right: auto;
+    margin-left: auto;
+    overflow-y: auto;
+}
+
+.list_bottom {
+    font-family: 'Open Sans', sans-serif;
+    background-color: #1E8BC3;
+    background: #1E8BC3;
+    position: fixed;
+    text-align: center;
+    color: white;
+}
+
+.list_bottom:active {
+    background-color: #2574a9;
+}
+
+.simple_friend {
+    margin: 5px 10px;
+    height: 70px;
+    width: 70px;
+    display: inline-block;
+    text-align: center;
+}
+
+.friend_profile.selected{
+    background-color: yellow;
+}
+
+.friend_profile img{
+    margin: 3px;
+    width: 90%;
+    height: auto;
+}
+
+.simple_friend span{
+    font-family: 'Open Sans', sans-serif;
+}
+
 /*** Start of flashcard.html ***/
 .top_bar {
     width: 100%;
@@ -617,6 +781,7 @@ img {
     font-size: 30pt;
     margin-left: 10px;
     font-family: 'font_back_button', Fallback, sans-serif;
+    cursor: pointer;
 }
 
 .flashcards {

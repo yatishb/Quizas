@@ -41,80 +41,59 @@
 
     <div class="add_set">+</div>
 
+    <div class="friend_window">
+        <div class="list_search"><input type="text" placeholder="Search here..."></div>
+        <div class="friend_list">
+            <div class="simple_friend" id="111">
+                <div class="friend_profile"><img src="https://scontent-b-sin.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/1013371_10204609329898999_4183351813545862553_n.jpg?oh=08107a7fa8af7ff5b595006f341bd506&oe=54E48B71"></div>
+                <span>Richard</span>
+            </div>
+            <div class="simple_friend" id="222">
+                <div class="friend_profile"><img src="https://fbcdn-sphotos-c-a.akamaihd.net/hphotos-ak-xfa1/v/t1.0-9/10624735_10154690559390417_2870427952069110535_n.jpg?oh=49008ba4046ef7d7f51eecabb9d4110e&oe=54EBAC06&__gda__=1425070315_fbffdcc7ec8c261219b6986fda631ab6"></div>
+                <span>TK</span>
+            </div>
+            <div class="simple_friend" id="333">
+                <div class="friend_profile"><img src="https://scontent-b-sin.xx.fbcdn.net/hphotos-xpa1/t31.0-8/p960x960/1492336_10151832484735382_1651513007_o.jpg"></div>
+                <span>Yatish</span>
+            </div>
+        </div>
+        <div class="list_bottom">Submit</div>
+    </div>
+
     <div class="set_info">
-        <div class="simple_set">
+        <div class="simple_set" id="1">
             <div class="set_content title"><p>CS3216</div>
             <div class="set_content description"><p>This module is awesome.</div>
         </div>
-        <div class="simple_set">
+        <div class="simple_set" id="2">
             <div class="set_content title"><p>CS3216</div>
             <div class="set_content description"><p>This module is awesome.</div>
         </div>
-        <div class="simple_set">
+        <div class="simple_set" id="3">
             <div class="set_content title"><p>CS3216</div>
             <div class="set_content description"><p>This module is awesome.</div>
         </div>
-        <div class="simple_set">
+        <div class="simple_set" id="4">
             <div class="set_content title"><p>CS3216</div>
             <div class="set_content description"><p>This module is awesome.</div>
         </div>
-        <div class="simple_set">
+        <div class="simple_set" id="5">
             <div class="set_content title"><p>CS3216</div>
             <div class="set_content description"><p>This module is awesome.</div>
         </div>
-        <div class="simple_set">
+        <div class="simple_set" id="6">
             <div class="set_content title"><p>CS3216</div>
             <div class="set_content description"><p>This module is awesome.</div>
         </div>
-        <div class="simple_set">
+        <div class="simple_set" id="7">
             <div class="set_content title"><p>CS3216</div>
             <div class="set_content description"><p>This module is awesome.</div>
         </div>
-        <div class="simple_set">
+        <div class="simple_set" id="8">
             <div class="set_content title"><p>CS3216</div>
             <div class="set_content description"><p>This module is awesome.</div>
         </div>
     </div>
-
-<!--     <div data-role="content">
-        <div class="content-primary list_option">   
-        <ul data-role="listview" data-filter="true" data-filter-placeholder="Search study set...">
-            <li>
-                <h3>CS3216: Software Development on Evolving Platforms</h3>
-            </li>
-            <li>
-                <h3>CS2106: Computer Organizations</h3>
-            </li>
-            <li>
-                <h3>Interview Behaviors</h3>
-            </li>
-            <li>
-                <h3>GRE Vocabulary</h3>
-            </li>
-            <li>
-                <h3>Spanish</h3>
-            </li>
-            <li>
-                <h3>Hebrew</h3>
-            </li>
-            <li>
-                <h3>Ruby on Rails</h3>
-            </li>
-            <li>
-                <h3>Chinese</h3>
-            </li>
-        </ul>
-        </div>
-
-        <div class="content-secondary" hidden>
-            <div data-role="collapsible" data-collapsed="true" data-theme="b" data-content-theme="d">
-                <h3>More in this section</h3>
-                <ul data-role="listview" data-theme="c" data-dividertheme="d">
-
-                </ul>
-            </div>
-        </div>
-    </div>-->
 
     <div data-role="footer" data-id="foo1" data-position="fixed" class="footer">
         <div data-role="navbar" data-iconpos="top">
@@ -128,9 +107,14 @@
 
     </div>
 
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="js/jquery.mobile.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
     <script src="js/study.js"></script>
+    <script src="js/quizas_auth_helper.js"></script>
 
     <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

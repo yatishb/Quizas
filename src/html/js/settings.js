@@ -5,7 +5,3 @@ $(document).ready(function() {
 
     $('body,html').css('overflow','visible');
 });
-
-$('.list_option ul li').click(function() {
-    
-}
