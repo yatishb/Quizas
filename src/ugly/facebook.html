@@ -44,7 +44,7 @@ var quizas_fbappid = (window.location.hostname === "quizas.me") ?
      data-size="medium"
      data-show-faces="false"
      data-auto-logout-link="true"
-     data-scope="user_friends"></div>
+     data-scope="public_profile,user_friends"></div>
 <br/>
 
 <!-- This should be in authhelper.js or so -->
@@ -73,7 +73,8 @@ function quizas_update_auth_cookies(site, authId, authToken) {
              authToken,
              { expires: 365, path: '/' });
 
-    // TODO: Notify Quizas app about the new auth.
+    // Notify Quizas app about the new auth.
+    $.post("/api/facebookauthnotify");
 }
 </script>
 
@@ -87,7 +88,7 @@ function quizas_update_auth_cookies(site, authId, authToken) {
 function doFacebookLogin() {
   // We want the 'user_friends' permission so that we can access /{user}/friends
   // See: https://developers.facebook.com/docs/graph-api/reference/v2.2/user/friends
-  FB.login(afterFacebookLogin, {scope: 'user_friends'});
+  FB.login(afterFacebookLogin, {scope: 'public_profile,user_friends'});
 }
 
 function afterFacebookLogin(response) {
@@ -119,7 +120,9 @@ function afterFacebookLogin(response) {
 <br/>
 
 <input value="List Friends" type="button" onclick="listFacebookFriends(outputFriends);" />
-
+<br/>
+<br/>
+<br/>
 
 
 <!-- FB SDK, list friends-->
@@ -129,6 +132,10 @@ function outputFriends(friends) {
     friends.forEach(function (f) {
         $("#friendlist").append(f.name + ", " + f.userid + "<br/>");
     });
+}
+
+function outputProfile(profile) {
+   $("#profile").html("<b>" + profile.name + "</b><br/><img src='" + profile.picture + "' />");
 }
 
 // Function to perform Graph API call to list FB friends.
@@ -141,9 +148,7 @@ function listFacebookFriends(friendsCallback) {
             function (response) {
                 if (response && !response.error) {
                     // Raw Dump of Response.
-                    console.log(JSON.stringify(response));
-
-                    // Call-back with (processed) info.
+                    console.log(JSON.stringify(response)); // Call-back with (processed) info.
                     // response.data = [{name, id}]
                     function toQuizazRep(f){
                         return {"name": f.name,
@@ -159,7 +164,48 @@ function listFacebookFriends(friendsCallback) {
     }
   });
 }
+
+// n.b. fbid != Quizas' userid.
+// We want {name, picture}
+function getFacebookProfile(fbid, profileCallback) {
+  // Make sure user is logged in.
+  FB.getLoginStatus(function(response) {
+    if (response.status === 'connected') {
+      // https://developers.facebook.com/docs/graph-api/reference/v2.2/user
+      FB.api(
+        "/" + fbid,
+        function (response) {
+          if (response && !response.error) {
+            // Strictly, profile pic can be public.
+            // https://developers.facebook.com/docs/graph-api/reference/v2.2/user/picture/
+            FB.api(
+              "/" + fbid + "/picture",
+              {
+                "redirect": false,
+                "type": "normal"
+              },
+              function (picResponse) {
+                if (picResponse && !picResponse.error) {
+                  profileCallback({"name": response.name,
+                                   "picture": picResponse.data.url});
+                }
+              }
+            );
+          }
+        }
+      );
+    } else {
+      //FB.login();
+    }
+  });
+}
 </script>
+
+<b>Profile:</b><br/>
+<div id="profile"></div>
+<br/>
+<input value="Get Profile" type="button" onclick="getFacebookProfile('10204898258962045', outputProfile);" />
+<br/>
 
 
 </body>
