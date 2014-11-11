@@ -701,7 +701,6 @@
 		Q.state.on("change.currentIndex", function() {
 			
 			console.log(serverJSON);
-			console.log(prevFcQuestion);
 		
 			if (Q.state.get("currentIndex") == questionNumber) {
 			// this part should be in above handler:
@@ -728,6 +727,8 @@
 			// express enemy previous answer
 			if (Q.state.get("currentIndex") > 1) {
 			console.log("TIME OF RECKONING: " + (prevFcQuestion.id == prevEnemyAns));
+			console.log("prevQnId " + prevFcQuestion.id + " vs enemy " + prevEnemyAns)
+			console.log("END");
 				if (prevFcQuestion.id == prevEnemyAns) {
 					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "green";
 					Q.state.inc("enemyScore", 1);
