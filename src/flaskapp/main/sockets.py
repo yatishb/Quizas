@@ -15,7 +15,6 @@ def socketConnect():
     session['id'] = authhelper.get_current_id()
     session['room'] = defaultRoom
     session['random'] = str(uuid.uuid1())
-    print "Connected : %r %r" % (session['id'], session['random'])
     emit('my response', {'data': 'Connected %r- %r' % (session['id'], session['random'])})
 
 @socketio.on('disconnect', namespace='/test')
@@ -42,7 +41,6 @@ def sendNotificationToSocket(message):
 # Socket reads the two usernames and creates a room for both
 @socketio.on('assignroom', namespace='/test')
 def assignRoom(message):
-	print "assign room func called"
 	room = str(uuid.uuid1())
 	user1 = message['user1']
 	user2 = message['user2']
@@ -50,11 +48,11 @@ def assignRoom(message):
 	shuffledFlashcards = quizletsets.shuffled_flashset_json(flashset, NUMQUES)
 
 	if authhelper.lookup(user1) != None and authhelper.lookup(user2) != None and shuffledFlashcards.has_key('error') == False:
-		print "creating room"
 		# Get the internal user ids of the clients
 		user1 = authhelper.lookup(user1)
 		user2 = authhelper.lookup(user2)
 
+		#######################Only for integration test
 		for sessid, socket in request.namespace.socket.server.sockets.items():
 			if (socket['/test'].session['id'] == user1) or (socket['/test'].session['id'] == user2):
 				if socket['/test'].session['room'] != defaultRoom:
@@ -171,7 +169,6 @@ def clearRoom():
 @socketio.on('readanswer', namespace='/test')
 def readAnswerByClient(message):
 	message = json.loads(message)
-	print "json load: %r" % message
 	print "room %r " % session['room']
 	room = session['room']
 	idClient = session['id']
@@ -249,7 +246,6 @@ def sendFirstQuestionInfoToClient(room):
 def getNextQuestionForRoom(room, done):
 	# Handle situation when we have reached the last question
 	# If this happens then we have to clear the room and record the game into the db
-	print "get next question"
 	if done == NUMQUES:
 		clearRoom()
 		return {}
@@ -259,6 +255,5 @@ def getNextQuestionForRoom(room, done):
 	nextQues = flashcardsJson[done]['question']
 	nextAns = flashcardsJson[done]['answers']
 	commonDataToSend = {"question":nextQues, "answers":nextAns, "time": 10, "index": str(done+1)}
-	print "Send : %r" % commonDataToSend
 
 	return commonDataToSend
