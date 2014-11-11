@@ -1,5 +1,6 @@
+import datetime
 from flask.ext.sqlalchemy import SQLAlchemy
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import UniqueConstraint, ColumnDefault, sql
 from .. import db
 
 class User(db.Model):
@@ -20,12 +21,14 @@ class FlashGame(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	gameId = db.Column(db.String(40))
 	flashsetId = db.Column(db.String(40))
-	user = db.Column(db.String(80))
+	user = db.Column(db.Integer)
+	datetime = db.Column(db.DateTime, default = datetime.datetime.utcnow())
 
+	__tablename__ = "FlashGame"
 	def __init__(self, gameId, flashsetId, user):
 		self.gameId = gameId
 		self.flashsetId = flashsetId
-		self.user = user
+		self.user = user 
 
 	def __repr__(self):
 		return '<Game ID %r>' % self.gameId	
@@ -36,17 +39,18 @@ class FlashCardInGame(db.Model):
 	gameId = db.Column(db.String(40))
 	flashsetId = db.Column(db.String(40))
 	flashcardId = db.Column(db.String(40))
-	user = db.Column(db.String(80))
+	user = db.Column(db.Integer)
 	userAns = db.Column(db.String(40))
-	isCorrect = db.Column(db.Boolean)
+	time = db.Column(db.Integer) # time is in msec
 
-	def __init__(self, gameId, flashsetId, flashcardId, user, userAns, isCorrect):
+	__tablename__ = "FlashCardInGame"
+	def __init__(self, gameId, flashsetId, flashcardId, user, userAns, time):
 		self.gameId = gameId
 		self.flashsetId = flashsetId
 		self.flashcardId = flashcardId
 		self.user = user
 		self.userAns = userAns
-		self.isCorrect = isCorrect
+		self.time = time
 
 	def __repr__(self):
 		return '<Game ID %r FlashCardId %r User %r>' % (self.gameId, self.flashcardId, self.user)
@@ -57,7 +61,7 @@ class FlashCardInGame(db.Model):
 class UserFlashSet(db.Model):
 	# Because we need ID.
 	id = db.Column(db.Integer, primary_key=True)
-	user = db.Column(db.String(80))
+	user = db.Column(db.Integer)
 	flashsetId = db.Column(db.String(40))
 
 	# Constraint so each row is unique
@@ -73,3 +77,19 @@ class UserFlashSet(db.Model):
 
 	def __repr__(self):
 		return '<UserFlashSet %r %r>' % (self.gameId, self.flashsetId)
+
+
+class InternalUserAuth(db.Model):
+	# Because we need ID.
+	id = db.Column(db.Integer)
+	user_id = db.Column(db.String(80), primary_key=True)
+
+	__tablename__ = "InternalUserAuth"
+	def __init__(self, user):
+		self.user_id = user
+
+	def __repr__(self):
+		return '<InternalUser %r %r>' % (self.id, self.user_id)
+
+InternalUserAuth.__table__.c.id.default = ColumnDefault(sql.select([sql.func.coalesce(sql.func.max(InternalUserAuth.id) + 1, 1)]).as_scalar())
+

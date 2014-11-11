@@ -3,8 +3,10 @@
 import requests
 import ast
 import json
+import random
 
 import secrets
+import authhelper
 
 from models import UserFlashSet
 from flask import request, redirect, abort
@@ -18,7 +20,9 @@ CALLBACK_URL    = secrets.auth["quizlet"]["redirect_url"]
 # /user/#user-id/sets
 @main.route('/user/<user_id>/sets')
 def get_user_sets(user_id):
-	result = UserFlashSet.query.filter_by(user = user_id).all()
+	# NOTE: ignores user_id for now
+	internal_id = authhelper.get_current_id()
+	result = UserFlashSet.query.filter_by(user = internal_id).all()
 	set_ids = [user_flashset.flashsetId for user_flashset in result]
 	return json.dumps(set_ids)
 
@@ -27,12 +31,15 @@ def get_user_sets(user_id):
 def modify_user_sets(user_id, set_id):
 	# ACTION = PUT, DELETE
 
+	# NOTE: ignores user_id for now
+	internal_id = authhelper.get_current_id()
+
 	current = UserFlashSet.query \
-	                      .filter_by(user = user_id, flashsetId = set_id) \
+	                      .filter_by(user = internal_id, flashsetId = set_id) \
 	                      .all()
 	if request.method == 'PUT':
 		if len(current) == 0:
-			user_flashset = UserFlashSet(user_id, set_id)
+			user_flashset = UserFlashSet(internal_id, set_id)
 			db.session.add(user_flashset)
 	if request.method == 'DELETE':
 		db.session.delete(current[0])
@@ -47,50 +54,123 @@ def modify_user_sets(user_id, set_id):
 # Quizlet Wrapping API
 #
 
+# Returns as dict, in raw Quizlet format
+def get_raw_quizlet_set_json(qzlt_set_id):
+	tokenUrl = "https://api.quizlet.com/oauth/token"
+	clientID = CONSUMER_TOKEN
+	keySecret = CONSUMER_SECRET
 
-# /sets/#set-id
-# Expects set-id as `quizlet:SET_ID`
-# Quizlet API, see:
-# https://quizlet.com/api/2.0/docs/sets#view
-@main.route('/sets/<set_id>')
-def get_quizlet_set(set_id):
+	qzlt_set_url = "https://api.quizlet.com/2.0/sets/" + qzlt_set_id
+
+	# Get ACCESS TOKEN from Cookies
+	qzlt_access_token = request.cookies.get("quizlet_access_token")
+	if qzlt_access_token == None:
+		# If no user access token, just use CLIENT ID to access public sets
+		req = requests.get(qzlt_set_url, params = {"client_id": clientID})
+	else:
+		# FIXME: Not sure how to pass access token to `requests` properly
+		req = requests.get(qzlt_set_url, headers = {"Authorization": "Bearer " + qzlt_access_token})
+
+	if req.status_code != 200 :
+		return {"error": "Bad Request: " + req.text}
+	else :
+		qzlt_json = json.loads(req.text)
+		return qzlt_json
+
+
+
+# Returns as dict, in Quizas format
+def get_flashset_json(set_id):
 	if set_id[:8] == "quizlet:":
 		qzlt_set_id = set_id[8:]
 
-		tokenUrl = "https://api.quizlet.com/oauth/token"
-		clientID = CONSUMER_TOKEN
-		keySecret = CONSUMER_SECRET
+		qzlt_json = get_raw_quizlet_set_json(qzlt_set_id)
 
-		qzlt_set_url = "https://api.quizlet.com/2.0/sets/" + qzlt_set_id
-
-		# Get ACCESS TOKEN from Cookies
-		qzlt_access_token = request.cookies.get("quizlet_access_token")
-		if qzlt_access_token == None:
-			# If no user access token, just use CLIENT ID to access public sets
-			req = requests.get(qzlt_set_url, params = {"client_id": clientID})
+		if "error" in qzlt_json:
+			return qzlt_json
 		else:
-			# FIXME: Not sure how to pass access token to `requests` properly
-			req = requests.get(qzlt_set_url, headers = {"Authorization": "Bearer " + qzlt_access_token})
-
-		if req.status_code != 200 :
-			return "Bad Request: " + req.text
-		else :
 			# Map from
 			# qzlt.id -> "quizlet:" + id
 			# qzlt.title -> name
 			# ??? -> category
 			# [{id, term, definition}] -> [{id, question, answer}]
 
-			qzlt_json = json.loads(req.text)
 			app_json = {"id": "quizlet:" + str(qzlt_json["id"]),
 					    "name": qzlt_json["title"],
 						"category": "???",
 						"cards": [{"id": "quizlet:" + str(term["id"]),
 						           "question": term["term"],
 								   "answer": term["definition"]} for term in qzlt_json["terms"]]}
-			return json.dumps(app_json)
+			return app_json
 	else:
-		return "Invalid format"
+		return {"error": "Invalid set_id format: " + set_id}
+
+# /sets/#set-id
+# Expects set-id as `quizlet:SET_ID`
+# Quizlet API, see:
+# https://quizlet.com/api/2.0/docs/sets#view
+@main.route('/sets/<set_id>')
+def get_flashset(set_id):
+	set_json = get_flashset_json(set_id)
+
+	if "error" in set_json:
+		# FIXME: Could be more sophisticated about error codes & json, here
+		return set_json["error"]
+	else:
+		return json.dumps(set_json)
+
+
+
+# Shuffled Quizset.
+def shuffled_flashset_json(set_id, n):
+	# Get the Flashset with the given id
+	# in full Quizas set format
+	set_json = get_flashset_json(set_id)
+
+	if "error" in set_json:
+		return set_json
+
+	result = []
+	shuffled_flashcards = []
+
+	# Generate Questions:
+	for i in xrange(0, n):
+		# Draw cards.
+		# If n <= len(set), great. Don't repeat
+		# If n > len(set), need to repeat.
+		if len(shuffled_flashcards) == 0:
+			shuffled_flashcards = set_json["cards"][:] # Copy cards
+			random.shuffle(shuffled_flashcards)
+
+		# Since list is shuffled, just pop off last item,
+		qn_card = shuffled_flashcards.pop()
+
+		# Draw 3x OTHER cards. (4 answers per qn)
+		# If I knew a better way. :/
+		cards_not_qn = [c for c in set_json["cards"] if c != qn_card]
+		random.shuffle(cards_not_qn)
+		other_cards = cards_not_qn[0:3] # again, shuffled, so this is rndm
+
+		answers = [qn_card] + other_cards
+		random.shuffle(answers)
+
+		# Shuffle the order of the cards; call  this a "Question"
+		# {question: FCard, answers: [FCard]}
+		# This is *somewhat* wasteful; quite wasteful if n > len.
+		result.append({"question": qn_card,
+		               "answers": answers})
+
+	return {"questions": result}
+
+@main.route('/sets/<set_id>/shuffle/<int:n>')
+def shuffled_flashset(set_id, n):
+	shuffled_json = shuffled_flashset_json(set_id, n)
+
+	if "error" in shuffled_json:
+		#FIXME: Be more sophisticated about error codes & JSON
+		return shuffled_json["error"]
+
+	return json.dumps(shuffled_json)
 
 
 
@@ -122,13 +202,19 @@ def quizlet_search(query):
 		abort(401)
 
 	# Params for the search
-	payload = {'q': query}
-
-	# FIXME: Not sure how to pass access token to `requests` properly
 	qzlt_search_url = "https://api.quizlet.com/2.0/search/sets"
-	req = requests.get(qzlt_search_url,
-	                   params = payload,
-	                   headers = {"Authorization": "Bearer " + qzlt_access_token})
+
+	# Get ACCESS TOKEN from Cookies
+	qzlt_access_token = request.cookies.get("quizlet_access_token")
+	if qzlt_access_token == None:
+		# If no user access token, just use CLIENT ID to access public sets
+		req = requests.get(qzlt_search_url,
+		                   params = {"q": query, "client_id": clientID})
+	else:
+		# FIXME: Not sure how to pass access token to `requests` properly
+		req = requests.get(qzlt_search_url,
+		                   params = {"q": query},
+		                   headers = {"Authorization": "Bearer " + qzlt_access_token})
 
 	if req.status_code != 200 :
 		return "Bad Request: " + req.text
@@ -157,6 +243,7 @@ def quizlet_user(user_id):
 
 	# Get ACCESS TOKEN from Cookies
 	# Needs to have user id also.
+	# NOTE: ignores user_id
 	qzlt_user_id = request.cookies.get("quizlet_user_id")
 	qzlt_access_token = request.cookies.get("quizlet_access_token")
 	if qzlt_access_token == None or qzlt_user_id == None:
@@ -178,6 +265,7 @@ def quizlet_user(user_id):
 # https://quizlet.com/api/2.0/docs/users
 @main.route('/user/<user_id>/sets/quizlet/created')
 def quizlet_user_created(user_id):
+	# NOTE: ignores user_id (in quizlet_user)
 	res = quizlet_user(user_id)
 	sets = res["sets"]
 	
@@ -192,6 +280,7 @@ def quizlet_user_created(user_id):
 # https://quizlet.com/api/2.0/docs/users
 @main.route('/user/<user_id>/sets/quizlet/favorites')
 def quizlet_user_favourites(user_id):
+	# NOTE: ignores user_id (in quizlet_user)
 	res = quizlet_user(user_id)
 	sets = res["favorite_sets"]
 	

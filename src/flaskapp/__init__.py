@@ -1,9 +1,11 @@
+from redis import Redis
 from flask import Flask
 from flask.ext.socketio import SocketIO
 from flask.ext.sqlalchemy import SQLAlchemy
 
 socketio = SocketIO()
 db = SQLAlchemy()
+redis = Redis()
 
 
 def create_app(debug=False):

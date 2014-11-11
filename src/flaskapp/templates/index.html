@@ -10,7 +10,10 @@
 
             // the socket.io documentation recommends sending an explicit package upon connection
             // this is specially important when using the global namespace
-            var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+            var socket = io.connect('http://' + document.domain + ':' + location.port + namespace,
+                                    {"connect timeout": 300,
+                                     "close timeout": 30,
+                                     "hearbeat timeout": 30});
             socket.on('connect', function() {
                 socket.emit('my event', {data: 'I\'m connected!'});
             });
@@ -23,6 +26,9 @@
             // the data is displayed in the "Received" section of the page
             socket.on('my response', function(msg) {
                 $('#log').append('<br>Received #' + msg.count + ': ' + msg.data);
+            });
+            socket.on('nextQuestion', function(msg) {
+                $('#log').append('<br>Received : ' + msg.data);
             });
 
             // handlers for the different forms in the page
@@ -40,7 +46,7 @@
                 return false;
             });
             $('form#assign').submit(function(event) {
-                socket.emit('assignroom', {room: $('#assign_room').val(), user1: $('#assign_user_1').val(), user2: $('#assign_user_2').val()});
+                socket.emit('assignroom', {flashset: $('#flashset').val(), user1: $('#assign_user_1').val(), user2: $('#assign_user_2').val()});
                 return false;
             });
             $('form#leave').submit(function(event) {
@@ -52,11 +58,11 @@
                 return false;
             });
             $('form#send_room').submit(function(event) {
-                socket.emit('readanswer', {qid: $('#room_name').val(), answer: $('#room_data').val()});
+                socket.emit('readanswer', {id: $('#room_name').val(), answer: $('#room_data').val(), done: $('#num_done').val()});
                 return false;
             });
-            $('form#client_uuid').submit(function(event) {
-                socket.emit('send client', {client: $('#clientuuid').val(), data: $('#client_data').val()});
+            $('form#client_user').submit(function(event) {
+                socket.emit('send notification', {user: $('#clientuser').val() });
                 return false;
             });
         });
@@ -82,7 +88,7 @@
         <input type="submit" value="Join Room">
     </form>
     <form id="assign" method='POST' action='#'>
-        <input type="text" name="assign_room" id="assign_room" placeholder="Room Name">
+        <input type="text" name="flashset" id="flashset" placeholder="Flash Set">
         <input type="text" name="assign_user_1" id="assign_user_1" placeholder="User 1">
         <input type="text" name="assign_user_2" id="assign_user_2" placeholder="User 2">
         <input type="submit" value="Assign Room">
@@ -98,12 +104,12 @@
     <form id="send_room" method='POST' action='#'>
         <input type="text" name="room_name" id="room_name" placeholder="Question id">
         <input type="text" name="room_data" id="room_data" placeholder="Answer">
+        <input type="text" name="num_done" id="num_done" placeholder="Done">
         <input type="submit" value="Answer Room">
     </form>
-    <form id="client_uuid" method='POST' action='#'>
-        <input type="text" name="clientuuid" id="clientuuid" placeholder="Client UUID">
-        <input type="text" name="client_data" id="client_data" placeholder="Message">
-        <input type="submit" value="Send To Client">
+    <form id="client_user" method='POST' action='#'>
+        <input type="text" name="clientuser" id="clientuser" placeholder="Client User">
+        <input type="submit" value="Send Notif To Client">
     </form>
     <h2>Receive:</h2>
     <div id="log"></div>
