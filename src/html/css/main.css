@@ -164,7 +164,7 @@ img {
 /*** Start of index.html ***/
 
 .logo {
-    width: 75%;
+    width: 70%;
     max-width: 300px;
     margin: auto;
 }
@@ -180,9 +180,219 @@ img {
     color: white;
     opacity: 0.8;
     text-align: center;
-    font-size: 500%;
+    font-size: 400%;
     margin-left: auto;
     margin-right: auto;
+}
+
+/* Styles for log-in buttons container */
+@media screen and (max-width: 500px) {
+    .login_container {
+        width: 100%;
+    }
+
+    .login_button {
+        width: 100%;
+        max-width: 320px;
+        padding-left: 20px;
+    }
+}
+
+@media screen and (min-width: 501px) {
+    .login_container {
+        width: 40%;
+    }
+
+    .login_button {
+        width: 60%;
+        min-width: 320px;
+        padding-left: 40px;
+    }
+}
+
+.login_container {
+    margin: 5px auto;
+}
+
+.login_button {
+    margin: 15px auto;
+}
+
+.let-icon-bg, .let-bg,
+.fb-icon-bg, .fb-bg,
+.twi-icon-bg, .twi-bg,
+.g-icon-bg, .g-bg {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.let-bg:after,
+.fb-bg:after,
+.twi-bg:after,
+.g-bg:after {
+    font-family: 'Open Sans', sans-serif;
+}
+
+/* Quizlet */
+.let-icon-bg {
+    background: #165dd1;
+    height: 37px;
+    width: 41px;
+    float: left;
+}
+
+.let-icon-bg:after {
+    content: url(images/let-icon.png);
+    display: inline-block;
+    padding: 7px 10px 5px 11px;
+}
+
+.let-bg {
+    background: #367eea;
+    display: inline-block;
+    height: 37px;
+    width: 75%;
+    float: left;
+}
+
+.let-bg:after {
+    color: #fff;
+    content: "sign in with quizlet";
+    height: 37px;
+    left: 12%;
+    position: relative;
+    text-transform: uppercase;
+    top: 22%;
+    width: 41px; 
+}
+
+.let-bg:hover{
+    cursor: pointer;
+}
+
+.let-bg:active{
+    background: #165dd1;
+}
+
+/* Facebook */
+.fb-icon-bg {
+    background: #354f88;
+    height: 37px;
+    width: 41px;
+    float: left;
+}
+
+.fb-icon-bg:after {
+    content: url(images/fb-icon.png);
+    display: inline-block;
+    padding: 9px 10px 5px 15px;
+}
+
+.fb-bg {
+    background: #3b5998;
+    display: inline-block;
+    height: 37px;
+    width: 75%;
+    float: left;
+}
+
+.fb-bg:after {
+    color: #fff;
+    content: "sign in with facebook";
+    height: 37px;
+    left: 8%;
+    position: relative;
+    text-transform: uppercase;
+    top: 22%;
+    width: 41px; 
+}
+
+.fb-bg:hover{
+    cursor: pointer;
+}
+
+.fb-bg:active{
+    background: #354f88;
+}
+
+/* Twitter */
+.twi-icon-bg:after {
+    content: url(images/twi-icon.png);
+    display: inline-block;
+    padding: 11px 10px 6px 11px;
+}
+
+.twi-icon-bg {
+    background: #40a2d1;
+    height: 37px;
+    width: 41px; 
+    float: left;
+}
+
+.twi-bg {
+    background: #45b0e3;
+    height: 37px;
+    width: 75%;; 
+    float: left;
+}
+ 
+.twi-bg:after {
+    color: #fff;
+    content: "sign in with twitter";
+    height: 37px;
+    left: 11%;
+    position: relative;
+    text-transform: uppercase;
+    top: 22%;
+    width: 41px; 
+}
+
+.twi-bg:hover {
+  cursor: pointer;
+}
+
+.twi-bg:active {
+  background: #40a2d1;
+}
+
+/* Google+ */
+.g-icon-bg:after {
+  content: url(images/g-icon.png);
+  display: block;
+  padding: 11px 10px 6px 13px;
+}
+
+.g-icon-bg {
+    background: #ce3e26;
+    height: 37px;
+    float: left;
+    width: 41px; 
+}
+ 
+.g-bg {
+    background: #de4c34;
+    height: 37px;
+    float: left;
+    width: 75%;; 
+}
+ 
+.g-bg:after {
+    color: #fff;
+    content: "sign in with google+";
+    height: 37px;
+    left: 10%;
+    position: relative;
+    text-transform: uppercase;
+    top: 22%;
+    width: 41px; 
+}
+
+.g-bg:hover {
+  cursor: pointer;
+}
+
+.g-bg:active {
+  background: #ce3e26;
 }
 
 .btn_social {
@@ -218,6 +428,7 @@ img {
     .simple_set {
         left: 0;
         right: 0;
+        height: 90px;
     }
 
     .add_set {
@@ -234,6 +445,7 @@ img {
     .simple_set {
         margin-left: auto;
         margin-right: auto;
+        height: 100px;
     }
 
     .add_set {
@@ -276,7 +488,6 @@ img {
 }
 
 .simple_set {
-    height: 100px;
     max-width: 500px;
     margin-top: 10px;
     margin-bottom: 10px;
