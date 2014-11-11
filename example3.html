@@ -526,7 +526,7 @@
 								// send form to server and wait for next
 								clientJSON = createClientToServerJSON(fcQuestion.id, currentFcAnswer, timeTakenCurrent, Q.state.get("currentIndex") + "");
 								console.log("Post to Server: " + clientJSON);
-								socket.emit("readanswer", clientJSON});
+								socket.emit("readanswer", clientJSON);
 								
 							}
 					}));
@@ -545,7 +545,7 @@
 			currentFcAnswer = "nothing";
 			clientJSON = createClientToServerJSON(fcQuestion.id, currentFcAnswer, timeTakenCurrent, Q.state.get("currentIndex") + "");
 			console.log("Post to Server: " + clientJSON);
-			socket.emit("readanswer", clientJSON});
+			socket.emit("readanswer", clientJSON);
 			}
 		}
 		
