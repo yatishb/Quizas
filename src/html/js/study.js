@@ -36,11 +36,13 @@ $(document).ready(function() {
 
     // the socket.io documentation recommends sending an explicit package upon connection
     // this is specially important when using the global namespace
-    var socket = io.connect('http://' + document.domain + ':' + location.port + namespace, {
+    socket = io.connect('http://' + document.domain + ':' + location.port + namespace, {
                                 "connect timeout": 300,
                                 "close timeout": 30,
                                 "hearbeat timeout": 30
                             });
+
+    console.log("socket: "+socket);
 
     // event handler for server sent data
     // the data is displayed in the "Received" section of the page
@@ -71,6 +73,24 @@ $(document).ready(function() {
         console.log(content);
 
         alert("Your request was rejected by " + content.rejectedby);
+    });
+
+    // event handler for when user not online
+    socket.on('user not online', function(msg) {
+        content = JSON.parse(msg.data);
+        console.log("Reject by ")
+        console.log(content);
+
+        alert("The user " + content.rejectedby + " is not online");
+    });
+
+    // event handler for when user does not exist
+    socket.on('user non-existent', function(msg) {
+        content = JSON.parse(msg.data);
+        console.log("Reject by ")
+        console.log(content);
+
+        alert("The user " + content.rejectedby + " does not exist");
     });
 
     // event handler for accepted request
@@ -138,6 +158,8 @@ $('.list_bottom').on("click", function () {
     console.log("The next page is " + next_page);
 
     if (next_page=="q") {
+        console.log("namespace: "+namespace);
+        console.log("socket: "+socket);
         socket.emit('send notification', {
             'opponent': selected_friend_id,
             'set': selected_set_id,
@@ -178,7 +200,7 @@ function initializeGame(content) {
 }
 
 function getSetContent() {
-    $.get("/api/user/quizlet:li_yuanda/sets", function(data) {
+    $.get("/api/user/" + quizas_user_id() + "/sets", function(data) {
            set_ids = JSON.parse(data);
            console.log(set_ids);
            if(set_ids != null)
