@@ -9,7 +9,6 @@ $(document).ready(function() {
     if(result.length == 0)
         this.location.href='/index.html';
 
-    $('body,html').css('overflow','visible');
     $('body,html').css('overflow-x','hidden');
 
     getSetContent();
@@ -29,8 +28,6 @@ $(document).ready(function() {
             }
         });
     });
-
-    
 
     namespace = '/test'; // change to an empty string to use the global namespace
 
@@ -55,7 +52,7 @@ $(document).ready(function() {
         if (confirm("User " + content.requestfrom + " is inviting you to compete set " + content.set) == true) {
             socket.emit('assignroom', {
                 'user1': content.requestfrom,
-                'flashset': "quizlet:39748410",
+                'flashset': content.set,
                 'user2': quizas_user_id()
             });
         } else {

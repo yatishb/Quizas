@@ -7,6 +7,15 @@ function quizas_authorized_sites() {
     });
 }
 
+function quizas_logout() {
+    var authSites = quizas_authorized_sites();
+
+    authSites.forEach(function (s) {
+        $.removeCookie(s + "_user_id", { path: "/" });
+        $.removeCookie(s + "_access_token", { path: "/" });
+    });
+}
+
 function quizas_is_authorized_for(site) {
     var sites = quizas_authorized_sites();
     return sites.indexOf(site) >= 0;
