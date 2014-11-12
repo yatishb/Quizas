@@ -6,11 +6,12 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <script src='http://cdn.html5quintus.com/v0.2.0/quintus-all.js'></script>
 	<script src='http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js'></script>
+	<script src='js/quizas_auth_helper.js'></script>
     <!-- <script src='example1.js'></script> -->
 	<link rel="stylesheet" type="text/css" href="example1.css">
 	<script>
 		// socket stuff
-	
+	/*
 			namespace = '/test'; // change to an empty string to use the global namespace
 
             // the socket.io documentation recommends sending an explicit package upon connection
@@ -28,7 +29,7 @@
 		socket.on('initiating', function(msg) {
                 //$('#log').append('<br>Received #' + msg.count + ': ' + msg.data);
             });
-	
+	*/
 		
 	
 		// helper functions
@@ -232,7 +233,8 @@
 		var INITIATING_FORM, SERVER_FORM;
 		
 		// Start load test
-			INITIATING_FORM = TestInitiatingForm;
+			INITIATING_FORM = sessionStorage.getItem("initialization");
+			socket = sessionStorage.getItem("socket");
 		// End load test
 
 		var FLASH_SET = TestFlashSet;
@@ -246,7 +248,8 @@
 		var TIMER;
 		
 		// interpreting info from server
-		var initiatingJSON = JSON.parse(INITIATING_FORM);
+		var initiatingJSON = INITIATING_FORM;
+		var playerName;
 		var enemyName, enemySprite, enemyWinRate, enemyEncounter, totalQuestions;
 		/*
 		var enemyName = initiatingJSON.name,
@@ -281,9 +284,7 @@
  <body>
 	<script>
 	window.addEventListener("load",function() {
-		setTimeout(function() {
-			socket.emit('assignroom', {flashset: "quizlet:39748410", user1: "quizlet:yatish", user2: "quizlet:byatishyuvaraj"});
-		}, 10000);
+	
 	var Q = window.Q = Quintus()
     .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
     .setup({
@@ -295,11 +296,15 @@
 	var qy = Q.height/568;
 	
 	// load initiating form here
-	enemyName = initiatingJSON.name,
-	  enemySprite = initiatingJSON.sprite,
+	//enemyName = initiatingJSON.name,
+	  //enemySprite = initiatingJSON.sprite,
+	  playerName = quizas_user_id();
 	  enemyWinRate = initiatingJSON.win,
 	  enemyEncounter = initiatingJSON.encounter,
-	  totalQuestions = initiatingJSON.total;	
+	  totalQuestions = initiatingJSON.total;
+	  // encounterwin
+	  
+	  
 	
 	Q.state.set({playerScore: 0, enemyScore: 0, currentIndex: 0, currentQuestion: "", waiting: true});
 	var deck = shuffleDeck(totalQuestions, DECK_SIZE);
@@ -846,4 +851,10 @@
 });
 	</script>
  </body>
+ 
+ <footer>
+	<script>
+		socket.emit('gameinitialised');
+	</script>
+ </footer>
 </html>
