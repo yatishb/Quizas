@@ -94,7 +94,8 @@
             // authResponse.userID, authResponse.accessToken, authResponse.expiresIn
             quizas_update_auth_cookies("facebook",
                                        response.authResponse.userID,
-                                       response.authResponse.accessToken);
+                                       response.authResponse.accessToken,
+                                       "study.html");
         } else {
             console.log('User cancelled login or did not fully authorize.');
         }
