@@ -152,7 +152,7 @@
       this._super({
         label: "[score: " + Q.state.get('score') + "]",
         x: 90,
-        y: 30
+        y: 20
       });
       Q.state.on("change.score",this,"score");
     },
@@ -167,7 +167,7 @@
       this._super({
         label: "[Q: 1/" + Q.state.get("totalQuestions") + "]",
         x: 240,
-        y: 30
+        y: 20
       });
       Q.state.on("change.currentQuestion",this,"qc");
     },
