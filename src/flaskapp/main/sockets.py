@@ -120,6 +120,12 @@ def assignRoom(message):
 
 		# Send game initilization json to the clients
 		# Contains information about the enemy name, pic, total num questions
+		gameInitData = {"total":10, 
+						"name": "dummy",
+						"sprite": "dummy",
+						"win": "dummy",
+						"encounter": "dummy"}
+		emit('game accepted', {'data': json.dumps(gameInitData)}, room=room)
 
 
 	else:
