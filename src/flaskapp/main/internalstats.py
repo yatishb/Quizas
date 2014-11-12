@@ -10,11 +10,13 @@ def date_handler(obj):
     return obj.isoformat() if hasattr(obj, 'isoformat') else obj
 
 
-# Parameters: room, user1, user2, redis.hgetall(HASH_USER1), redis.hgetall(HASH_USER2), flashsetid
+# Parameters: room, user1, user2, redis.hgetall(HASH_USER1), redis.hgetall(HASH_USER2), 
+#             flashsetid, redis.hgetall(HASH_TIME1),redis.hgetall(HASH_TIME2)
 # user1 and user2 are integers
 # redis.hgetall(HASH_USER1) gives dict of FlashcardID and UserAnswer
+# redis.hgetall(HASH_TIME1) gives dict of FlashcardID and Time taken by user as a string
 # The equivalent parameter for that is userAns1
-def documentGame(room, user1, user2, userAns1, userAns2, flashsetId) :
+def documentGame(room, user1, user2, userAns1, userAns2, flashsetId, timeTaken1, timeTaken2) :
 	# Store game header in FlashGame db
 	gameUser1 = FG(room, flashsetId, user1)
 	gameUser2 = FG(room, flashsetId, user2)
@@ -26,10 +28,12 @@ def documentGame(room, user1, user2, userAns1, userAns2, flashsetId) :
 	for questionId in allQuestions:
 		user1AnsChosen = userAns1.get(questionId)
 		user2AnsChosen = userAns2.get(questionId)
+		time1 = int(timeTaken1.get(questionId))
+		time2 = int(timeTaken2.get(questionId))
 
 		# -1 refers to time taken by client for each answer
-		cardUser1 = FC(room, flashsetId, questionId, user1, user1AnsChosen, -1)
-		cardUser2 = FC(room, flashsetId, questionId, user2, user2AnsChosen, -1)
+		cardUser1 = FC(room, flashsetId, questionId, user1, user1AnsChosen, time1)
+		cardUser2 = FC(room, flashsetId, questionId, user2, user2AnsChosen, time2)
 		db.session.add(cardUser1)
 		db.session.add(cardUser2)
 
@@ -182,6 +186,7 @@ def getGameStats(userid, gameidForStats):
 
 	noOfQuestions = 0
 	flashcards = []
+	time = oppTime = 0
 
 	# Create array flashcards which shows the cards and answers
 	for row in questionsInGame:
@@ -197,6 +202,7 @@ def getGameStats(userid, gameidForStats):
 					flag = True
 					eachQues = flashcards[i]
 					eachQues['ans'] = row.userAns
+					eachQues['time'] = row.time
 					flashcards[i] = eachQues
 					
 			# Could not find the question in the array so hence create new dict and add it
@@ -204,6 +210,7 @@ def getGameStats(userid, gameidForStats):
 				eachQues = {}
 				eachQues['question'] = row.flashcardId
 				eachQues['ans'] = row.userAns
+				eachQues['time'] = row.time
 				flashcards.append(eachQues)
 		else:
 			flag = False
@@ -214,6 +221,7 @@ def getGameStats(userid, gameidForStats):
 					flag = True
 					eachQues = flashcards[i]
 					eachQues['enemy'] = row.userAns
+					eachQues['enemytime'] = row.time
 					flashcards[i] = eachQues
 
 			# Could not find the question in the array so hence create new dict and add it
@@ -221,6 +229,7 @@ def getGameStats(userid, gameidForStats):
 				eachQues = {}
 				eachQues['question'] = row.flashcardId
 				eachQues['enemy'] = row.userAns
+				eachQues['enemytime'] = row.time
 				flashcards.append(eachQues)
 
 	# To get the other relevant data
