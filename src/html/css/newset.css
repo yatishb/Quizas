@@ -1,0 +1,275 @@
+body,html{
+    overflow: hidden;
+}
+
+@font-face {
+    font-family: font_logo;
+    src: url(font/urban.ttf) format("truetype");
+}
+
+@media screen and (max-width: 500px) {
+    .button_container {
+        width: 50vw;
+    }
+
+    .button {
+        width: 40%;
+        margin: 5px 5px;
+    }
+}
+
+@media screen and (min-width: 501px) {
+    .button_container {
+        max-width: 600px;
+        width: 70%;
+    }
+
+    .button {
+        width: 36%;
+        margin: 10px 10px;
+    }
+}
+
+.page_container.v_original{
+    background-color: #99cfb7;
+    /*background-image: url('images/background.jpg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 100% 100%, auto;
+    -o-background-size: 100% 100%, auto;
+    -ms-background-size: 100% 100%, auto;
+    -moz-background-size: 100% 100%, auto;
+    -webkit-background-size: 100% 100%, auto;*/
+}
+
+.page_container.v_upload {
+    background-color: #e7746f;
+}
+
+.page_container.v_type {
+    background-color: #c8dfeb;
+}
+
+.footer {
+    margin-bottom: 20px;
+    text-align: center;
+    top: 70%;
+}
+
+.copyright {
+    font-size: 10pt;
+    margin: 10px auto;
+}
+
+.page_main {
+    left: 0;
+    right: 0;
+    height: 90vh;
+    text-align: center;
+}
+
+.button_container {
+    position: relative;
+    margin: 5px auto;
+    text-align: center;
+    display: block;
+}
+
+.button_container.v_original {
+    top: 20%;
+}
+
+.button_container.v_upload {
+    top: 0;
+}
+
+.logo_text {
+    font-family: font_logo, sans-serif;
+    color: white;
+    opacity: 0.7;
+    text-align: center;
+    font-size: 80pt;
+    margin: 30px auto;
+}
+
+.subtitle {
+    font-size: 14pt;
+    margin: 5px auto 20px auto;
+}
+
+.copyright,
+.subtitle {
+    font-family: 'Open Sans', sans-serif;
+    color: white;
+    opacity: 0.7;
+}
+
+#finish,
+#upload {
+    display: none;
+}
+
+.button {
+    /* Structure */
+    display: inline-block;
+    *display: inline; /*IE 6/7*/
+    zoom: 1;
+    line-height: normal;
+    white-space: nowrap;
+    vertical-align: baseline;
+    text-align: center;
+    cursor: pointer;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Firefox: Get rid of the inner focus border */
+.button::-moz-focus-inner {
+    padding: 0;
+    border: 0;
+}
+
+/*csslint outline-none:false*/
+
+.button {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 100%;
+    *font-size: 90%; /*IE 6/7 - To reduce IE's oversized button text*/
+    *overflow: visible; /*IE 6/7 - Because of IE's overly large left/right padding on buttons */
+    padding: 0.5em 1em;
+    color: #444; /* rgba not supported (IE 8) */
+    color: rgba(0, 0, 0, 0.80); /* rgba supported */
+    *color: #444; /* IE 6 & 7 */
+    border: 1px solid #999;  /*IE 6/7/8*/
+    border: none rgba(0, 0, 0, 0);  /*IE9 + everything else*/
+    background-color: #E6E6E6;
+    text-decoration: none;
+    border-radius: 2px;
+}
+
+.button-hover,
+.button:hover,
+.button:focus {
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#1a000000',GradientType=0);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(transparent), color-stop(40%, rgba(0,0,0, 0.05)), to(rgba(0,0,0, 0.10)));
+    background-image: -webkit-linear-gradient(transparent, rgba(0,0,0, 0.05) 40%, rgba(0,0,0, 0.10));
+    background-image: -moz-linear-gradient(top, rgba(0,0,0, 0.05) 0%, rgba(0,0,0, 0.10));
+    background-image: -o-linear-gradient(transparent, rgba(0,0,0, 0.05) 40%, rgba(0,0,0, 0.10));
+    background-image: linear-gradient(transparent, rgba(0,0,0, 0.05) 40%, rgba(0,0,0, 0.10));
+}
+.button:focus {
+    outline: 0;
+}
+.button-active,
+.button:active {
+    box-shadow: 0 0 0 1px rgba(0,0,0, 0.15) inset, 0 0 6px rgba(0,0,0, 0.20) inset;
+}
+
+/* Firefox: Get rid of the inner focus border */
+.button::-moz-focus-inner{
+    padding: 0;
+    border: 0;
+}
+
+/*** Page Upload ***/
+
+.page_upload {
+    display: none;
+    text-align: center;
+}
+
+/*** Page Create ***/
+
+.page_create {
+    display: none;
+    text-align: center;
+}
+
+/*** Input Form ***/
+.form_upload {
+    margin-left:auto;
+    margin-right:auto;
+    max-width: 700px;
+    background: #F7F7F7;
+    padding: 18px 15px 25px 10px;
+    font: 12px 'Open Sans', sans-serif;
+    color: #888;
+    text-shadow: 1px 1px 1px #FFF;
+    border:1px solid #E4E4E4;
+}
+.form_upload h1 {
+    font-size: 25px;
+    padding: 0px 0px 10px 40px;
+    display: block;
+    border-bottom:1px solid #E4E4E4;
+    margin: -10px -15px 30px -10px;;
+    color: #888;
+}
+.form_upload h1>span {
+    display: block;
+    font-size: 11px;
+}
+.form_upload label {
+    display: block;
+    margin: 0px;
+}
+.form_upload label>span {
+    float: left;
+    width: 20%;
+    text-align: right;
+    padding-right: 10px;
+    margin-top: 10px;
+    color: #888;
+}
+.form_upload input[type="text"], .form_upload input[type="email"], .form_upload textarea, .form_upload select {
+    border: 1px solid #DADADA;
+    color: #888;
+    height: 30px;
+    margin-bottom: 16px;
+    margin-right: 6px;
+    margin-top: 2px;
+    outline: 0 none;
+    padding: 3px 3px 3px 5px;
+    width: 70%;
+    font: 'Open Sans', sans-serif;
+    font-size: 12px;
+    line-height:15px;
+    box-shadow: inset 0px 1px 4px #ECECEC;
+    -moz-box-shadow: inset 0px 1px 4px #ECECEC;
+    -webkit-box-shadow: inset 0px 1px 4px #ECECEC;
+}
+.form_upload textarea{
+    padding: 5px 3px 3px 5px;
+}
+.form_upload select {
+    background: #FFF url('down-arrow.png') no-repeat right;
+    background: #FFF url('down-arrow.png') no-repeat right);
+    appearance:none;
+    -webkit-appearance:none; 
+    -moz-appearance: none;
+    text-indent: 0.01px;
+    text-overflow: '';
+    width: 70%;
+    height: 35px;
+    line-height: 25px;
+}
+.form_upload textarea{
+    height:100px;
+}
+.form_upload .button {
+    background: #E27575;
+    border: none;
+    padding: 10px 25px 10px 25px;
+    color: #FFF;
+    box-shadow: 1px 1px 5px #B6B6B6;
+    border-radius: 3px;
+    text-shadow: 1px 1px 1px #9E3F3F;
+    cursor: pointer;
+    display: none;
+}
+.form_upload .button:hover {
+    background: #CF7A7A
+}
