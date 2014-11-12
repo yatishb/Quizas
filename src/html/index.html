@@ -20,6 +20,8 @@
     
     <link rel="stylesheet" href="css/main.css"></link>
 
+    <script src="js/quizas_auth_helper.js"></script>
+    <script src="js/quizas_facebook.js"></script>
     <!-- Load the FB JS SDK -->
     <div id="fb-root"></div>
     <script>
@@ -94,7 +96,8 @@
             // authResponse.userID, authResponse.accessToken, authResponse.expiresIn
             quizas_update_auth_cookies("facebook",
                                        response.authResponse.userID,
-                                       response.authResponse.accessToken);
+                                       response.authResponse.accessToken,
+                                       "study.html");
         } else {
             console.log('User cancelled login or did not fully authorize.');
         }
@@ -107,8 +110,6 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
     <script src="js/jquery.mobile.js"></script>
 
-    <script src="js/quizas_auth_helper.js"></script>
-    <script src="js/quizas_facebook.js"></script>
 
     <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
