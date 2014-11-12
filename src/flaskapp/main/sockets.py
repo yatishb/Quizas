@@ -27,13 +27,43 @@ def printSocketsConnected():
 		emit('my response', {'data': 'sessions userid: %r- %r' % (socket['/test'].session['id'], socket['/test'].session['random'])})
 
 
+# This is to send the notification of a game request to another client C2
+# Read this notification and forward this request to the client C2
 @socketio.on('send notification', namespace='/test')
 def sendNotificationToSocket(message):
-	userSendTo = message['user']
-	internalUser = authhelper.lookup(userSendTo)
+	user = message['user']
+	flashset = message['set']
+	userSendTo = message['opponent']
+
+	internalUser = authhelper.lookup(user)
+	internalUserOppo = authhelper.lookup(userSendTo)
+
+	# Check if internal user is the same as the id of the socket.
+	# If not return failure
+	if internalUser != session['id'] and internalUser == None and internalUserOppo == None:
+		# return failure
+		gameRejection = {'rejectedby': userSendTo}
+		emit('game rejected', {'data': json.dumps(gameRejection)})
+	else:
+		gameRequest = {"set": flashset, "requestfrom": user}
+		for sessid, socket in request.namespace.socket.server.sockets.items():
+			if socket['/test'].session['id'] == internalUser:
+				socket['/test'].base_emit('game request', {'data': json.dumps(gameRequest)})
+
+
+# Handle any rejection received as a response.
+# Forward this rejection onto the first client who responded so
+@socketio.on('reject', namespace)
+def gameRejected(message):
+	userInitiatedReq = message['requester']
+	userReceiver = message['receiver']
+
+	internalUserInitiatedReq = authhelper.lookup(userInitiatedReq)
+	gameRejection = {'rejectedby': userReceiver}
 	for sessid, socket in request.namespace.socket.server.sockets.items():
-		if socket['/test'].session['id'] == internalUser:
-			socket['/test'].base_emit('my response', {'data': 'received notif from: %r' % authhelper.lookupInternal(session['id'])})
+		if socket['/test'].session['id'] == internalUserInitiatedReq:
+			socket['/test'].base_emit('game rejected', {'data': json.dumps(gameRejection)})
+
 
 
 
