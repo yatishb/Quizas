@@ -287,8 +287,8 @@
 	var Q = window.Q = Quintus()
     .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
     .setup({
-		width: 320,
-		height: 568,
+		width: 300,
+		height: 550,
 		scaleToFit: true
 		//maximize: true
 	}).touch();
@@ -308,7 +308,7 @@
 		init: function(p) {
 			this._super(p, {
 			  label: Q.state.get("playerScore") + "",
-			  x: 10,
+			  x: 15,
 			  y: 30
 			});
 			Q.state.on("change.playerScore",this,"score");
@@ -323,7 +323,7 @@
 		init: function(p) {
 			this._super({
 			  label: Q.state.get("enemyScore") + "",
-			  x: 290,
+			  x: 295,
 			  y: 30
 			});
 			Q.state.on("change.enemyScore",this,"score");
@@ -355,7 +355,7 @@
 		init: function(p) {
 			this._super({
 			  label: "n/a",
-			  x: 150,
+			  x: 155,
 			  y: 30,
 			});
 		},
@@ -364,7 +364,7 @@
 	Q.PlayerPortrait = Q.Sprite.extend("PlayerPortrait", {
 		init: function(p) {
 			this._super(p, {
-				x: 20,
+				x: 25,
 				y: 530,
 				scale: 0.03,
 				//asset: PLAYER_SPRITE
@@ -375,7 +375,7 @@
 	Q.EnemyPortrait = Q.Sprite.extend("EnemyPortrait", {
 		init: function(p) {
 			this._super(p, {
-				x: 280,
+				x: 285,
 				y: 530,
 				scale: 0.03,
 				asset: enemySprite
@@ -386,7 +386,7 @@
 	Q.Bomb = Q.Sprite.extend("Bomb", {
 		init: function(p) {
 			this._super(p, {
-				x: 150,
+				x: 155,
 				y: 530,
 				scale: 0.03,
 				asset: BOMB_SPRITE
@@ -612,7 +612,7 @@
 		for (i=0;i<totalQuestions;i++) {
 			playerCounters[i] = stage.insert(new Q.UI.Container({
 				fill: "white",
-				x: 5,
+				x: 10,
 				w: 15,
 				border: 2,
 				y: 490 - (210/totalQuestions) - (i*(420/totalQuestions)),
@@ -621,7 +621,7 @@
 			
 			enemyCounters[i] = stage.insert(new Q.UI.Container({
 				fill: "white",
-				x: 295,
+				x: 300,
 				w: 15,
 				border: 2,
 				y: 490 - (210/totalQuestions) - (i*(420/totalQuestions)),
@@ -633,7 +633,7 @@
 		//current question
 		var qContainer = stage.insert(new Q.UI.Container({
 			fill: "gray",
-			x: 150,
+			x: 155,
 			y: 160,
 			border: 2,
 			shadow: 3,
@@ -659,7 +659,7 @@
 		var raceLine = stage.insert(new Q.UI.Container({
 			fill: "black",
 			// from 60 to 260
-			x: 150,
+			x: 155,
 			y: 550,
 			w: 200,
 			h: 3
