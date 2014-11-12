@@ -4,6 +4,7 @@ import json
 
 import authhelper
 import secrets
+import quizletsets
 
 from flask import request, redirect, make_response
 from . import main
@@ -67,6 +68,8 @@ def authparam():
 
 		# Ensure user has an internal user id we can use.
 		authhelper.register(new_userid)
+		quizletsets.ensure_some_flashsets(new_userid)
+
 
 		return resp
 

@@ -2,6 +2,7 @@ from flask import Blueprint
 
 main = Blueprint('main', __name__)
 
+import facebookauth
 import twitterauth
 import quizletauth
 import quizletsets
