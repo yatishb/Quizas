@@ -5,7 +5,7 @@
 	<title></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <script src='http://cdn.html5quintus.com/v0.2.0/quintus-all.js'></script>
-	<script src='http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js'></script>
+	<!-- <script src='http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js'></script> -->
     <!-- <script src='example1.js'></script> -->
 	<link rel="stylesheet" type="text/css" href="css/singlePlayer.css">
 	<script>
@@ -287,10 +287,10 @@
 	var Q = window.Q = Quintus()
     .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
     .setup({
-		width: 400,
-		height: 900,
-		scaleToFit: true
-		//maximize: true
+		//width: 300,
+		//height: 675,
+		//scaleToFit: true
+		maximize: true
 	}).touch();
 	
 	// load initiating form here
@@ -634,7 +634,8 @@
 		var qContainer = stage.insert(new Q.UI.Container({
 			fill: "gray",
 			x: 155,
-			y: 160,
+			//y: 160,
+			y: Q.height/2,
 			border: 2,
 			shadow: 3,
 			shadowColor: "rgba(0,0,0,0.5)",
