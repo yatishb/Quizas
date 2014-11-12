@@ -4,6 +4,7 @@ import json
 
 import authhelper
 import secrets
+import quizletsets
 
 from flask import request, redirect, make_response
 from . import main
@@ -27,5 +28,6 @@ def facebook_notify_auth():
 				resp.set_cookie(site + "_user_id", '', expires = 0)
 	
 	authhelper.register(new_userid)
+	quizletsets.ensure_some_flashsets(new_userid)
 
 	return resp

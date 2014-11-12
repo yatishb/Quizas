@@ -27,13 +27,43 @@ def printSocketsConnected():
 		emit('my response', {'data': 'sessions userid: %r- %r' % (socket['/test'].session['id'], socket['/test'].session['random'])})
 
 
+# This is to send the notification of a game request to another client C2
+# Read this notification and forward this request to the client C2
 @socketio.on('send notification', namespace='/test')
 def sendNotificationToSocket(message):
-	userSendTo = message['user']
-	internalUser = authhelper.lookup(userSendTo)
+	user = message['user']
+	flashset = message['set']
+	userSendTo = message['opponent']
+
+	internalUser = authhelper.lookup(user)
+	internalUserOppo = authhelper.lookup(userSendTo)
+
+	# Check if internal user is the same as the id of the socket.
+	# If not return failure
+	if internalUser != session['id'] and internalUser == None and internalUserOppo == None:
+		# return failure
+		gameRejection = {'rejectedby': userSendTo}
+		emit('game rejected', {'data': json.dumps(gameRejection)})
+	else:
+		gameRequest = {"set": flashset, "requestfrom": user}
+		for sessid, socket in request.namespace.socket.server.sockets.items():
+			if socket['/test'].session['id'] == internalUser:
+				socket['/test'].base_emit('game request', {'data': json.dumps(gameRequest)})
+
+
+# Handle any rejection received as a response.
+# Forward this rejection onto the first client who responded so
+@socketio.on('reject', namespace)
+def gameRejected(message):
+	userInitiatedReq = message['requester']
+	userReceiver = message['receiver']
+
+	internalUserInitiatedReq = authhelper.lookup(userInitiatedReq)
+	gameRejection = {'rejectedby': userReceiver}
 	for sessid, socket in request.namespace.socket.server.sockets.items():
-		if socket['/test'].session['id'] == internalUser:
-			socket['/test'].base_emit('my response', {'data': 'received notif from: %r' % authhelper.lookupInternal(session['id'])})
+		if socket['/test'].session['id'] == internalUserInitiatedReq:
+			socket['/test'].base_emit('game rejected', {'data': json.dumps(gameRejection)})
+
 
 
 
@@ -79,7 +109,7 @@ def assignRoom(message):
 					else:
 						redis.hset("ROOMS", room, socket['/test'].session['id'])
 						redis.save()
-					socket['/test'].base_emit('my response', {'data': 'Joined room'})
+					socket['/test'].base_emit('my response', {'data': 'GAME BEGINS...'})
 				
 				else:
 					emit('my response', {'data': 'Already part of a room'})
@@ -88,11 +118,46 @@ def assignRoom(message):
 		if (session['id'] == user1) or (session['id'] == user2):
 			session['room'] = room
 
-		# Send very first question to the room to kick-start the entire game
-		sendFirstQuestionInfoToClient(room)
+		# Send game initilization json to the clients
+		# Contains information about the enemy name, pic, total num questions
+		gameInitData = {"total":10, 
+						"name": "dummy",
+						"sprite": "dummy",
+						"win": "dummy",
+						"encounter": "dummy"}
+		emit('game accepted', {'data': json.dumps(gameInitData)}, room=room)
+
 
 	else:
 		emit('my response', {'data': 'Either user(s) or flashset is incorrect'})
+
+
+
+# Read the game created beacon from the clients.
+# If this beacon is received from two users part of the same room,
+# this means that the users are ready to receive the first question.
+# Then send first question
+@socket.on('gameinitialised', namespace='/test')
+def gameInitialisedByClient():
+	room = session['room']
+	userid = session['id']
+
+	HASH_INIT = "ROOM_INIT"
+
+	if hexists(HASH_INIT, room) == True:
+		if hget(HASH_INIT, room) != userid:
+			# Received game initiated beacons from both users
+			# Delete this field from redis now
+			redis.hdel(HASH_INIT, room)
+			redis.save()
+			# And send very first question to the room to kick-start the entire game
+			sendFirstQuestionInfoToClient(room)
+	else:
+		# This is the first beacon received.
+		# Only one client is ready to play and so record it
+		# Wait for the second client to get ready also
+		redis.hset(HASH_INIT, room, userid)
+		redis.save()
 
 
 
@@ -124,16 +189,21 @@ def clearRoom():
 		# Verify if quiz is genuinely completed. If not do not write to db
 		HASH_USER1 = "ROOM_" + room + "_" + usersInRoom[0]
 		HASH_USER2 = "ROOM_" + room + "_" + usersInRoom[1]
+		HASH_TIME1 = HASH_USER1 + "_TIME"
+		HASH_TIME2 = HASH_USER2 + "_TIME"
 		# Check if game exists and number of questions answered are same
 		if (redis.hlen(HASH_USER1) == redis.hlen(HASH_USER2) and redis.exists(HASH_USER1) == True):
 			internalstats.documentGame(room, int(usersInRoom[0]), int(usersInRoom[1]), redis.hgetall(HASH_USER1), 
-				redis.hgetall(HASH_USER2), redis.hget("ROOMS_SETS", room))
+				redis.hgetall(HASH_USER2), redis.hget("ROOMS_SETS", room), redis.hgetall(HASH_TIME1),
+				redis.hgetall(HASH_TIME2))
 
 		# Clear hash key from redis
 		# Second parameter here refers to time in msec when key should expire
 		# Setting expiry time as 1msec to delete the key
 		redis.pexpire(HASH_USER1, 1)
 		redis.pexpire(HASH_USER2, 1)
+		redis.pexpire(HASH_TIME1, 1)
+		redis.pexpire(HASH_TIME2, 1)
 		redis.hdel("ROOMS_SETS", room)
 		redis.hdel("ROOMS_CARDS", room)
 		
@@ -143,7 +213,7 @@ def clearRoom():
 				if socket['/test'].session['id'] == int(eachUser):
 					socket['/test'].session['room'] = defaultRoom
 					socket['/test'].leave_room(room)
-					socket['/test'].base_emit('my response', {'data': "cleared room"})
+					socket['/test'].base_emit('gameOver', {'data': "GAME OVER!!"})
 		# emit('my response', {'data': "checking for room"}, room=room) # This doesn't send message to any client. Verified
 		redis.save()
 	else:
@@ -163,15 +233,18 @@ def readAnswerByClient(message):
 	idQuestion = message['id']
 	clientAnswer = message['answer']
 	done = int(message['done']) # num questions including current done
+	time = message['time']
 
 	HASH_USER = "ROOM_" + room + "_" + str(idClient)
 	HASH_SEND = "ROOM_" + room + "_SEND"
+	HASH_TIME = "ROOM_" + room + "_" + str(idClient) + "_TIME"
 
 	# Store result in 2 separate tables in redis
 	# One table is for the purpose of answer retention
 	# Other table is for sending information abt other client's answer
 	redis.hset(HASH_USER, idQuestion, clientAnswer)
 	redis.hset(HASH_SEND, idClient, clientAnswer)
+	redis.hset(HASH_TIME, idQuestion, time)
 	redis.save()
 
 	if redis.hlen(HASH_SEND) == 2:

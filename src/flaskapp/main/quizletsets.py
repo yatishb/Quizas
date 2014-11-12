@@ -306,4 +306,52 @@ def quizlet_user_studied(user_id):
 
 
 
+# Initial quizsets
+initial_flashsets = [# http://quizlet.com/2429383/basic-physics-final-review-flash-cards/
+                     "quizlet:2429383",
+                     # http://quizlet.com/57054880/french-human-body-first-1000-words-flash-cards/
+                     "quizlet:57054880",
+                     # http://quizlet.com/30160654/first-1000-words-in-spanish-la-granja-flash-cards/
+                     "quizlet:30160654",
+                     # http://quizlet.com/17775641/singapore-math-4-vocabulary-flash-cards/
+                     "quizlet:17775641",
+                     # http://quizlet.com/27972497/challenge-a-geography-terms-flash-cards/
+                     # ^^ some of these are quite long; a test for the UI
+                     "quizlet:27972497",
+                     # http://quizlet.com/6860191/chemical-elements-flash-cards/
+                     "quizlet:6860191"]
+
+
+# Possibly repeated code w/ `modify_user_sets`.
+def add_user_set(internal_id, set_id):
+	current = UserFlashSet.query \
+	                      .filter_by(user = internal_id, flashsetId = set_id) \
+	                      .all()
+	if len(current) == 0:
+		user_flashset = UserFlashSet(internal_id, set_id)
+		db.session.add(user_flashset)
+
+	db.session.commit()
+
+
+# This will ensure the user has them; no matter what.
+def assign_initial_flashsets(internal_id):
+	for set_id in initial_flashsets:
+		add_user_set(internal_id, set_id)
+
+
+# If the user has no flashsets; add some.
+def ensure_some_flashsets(userid):
+	internal_id = authhelper.lookup(userid)
+
+	current = UserFlashSet.query \
+	                      .filter_by(user = internal_id) \
+	                      .all()
+	
+	if len(current) == 0:
+		assign_initial_flashsets(internal_id)
+
+		# TODO: For better integration with quizlet,
+		# we could get the user, and add their
+		# studied, favourited, and created flashsets.
 
