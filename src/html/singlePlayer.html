@@ -138,10 +138,10 @@
   var Q = window.Q = Quintus()
     .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
     .setup({
-    //width: 320,
-	//height: 568,
-	//scaleToFit: true
-	maximize: true
+    width: 320,
+	height: 568,
+	scaleToFit: true
+	//maximize: true
   }).touch();
   
   Q.state.set({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
@@ -256,7 +256,7 @@
             highlight: ansColor,
             fontColor: "white",
             x: 90 + (140*j),
-            y: 330 + (130*i),
+            y: 310 + (110*i),
             border: 2,
             shadow: 3,
             shadowColor: "rgba(0,0,0,0.5)",
