@@ -146,16 +146,37 @@ def assignRoom(message):
 
 		# Send game initilization json to the clients
 		# Contains information about the enemy name, pic, total num questions
-		gameInitData = {"total":10, 
-						"name": "dummy",
-						"sprite": "dummy",
-						"win": "dummy",
-						"encounter": "dummy"}
-		emit('game accepted', {'data': json.dumps(gameInitData)}, room=room)
+		for sessid, socket in request.namespace.socket.server.sockets.items():
+			if (socket['/test'].session['id'] == user1) or (socket['/test'].session['id'] == user2):
+				gameInitData = getGameInit(socket['/test'].session['id'], user1, user2)
+				socket['/test'].base_emit('game accepted', {'data': json.dumps(gameInitData)})
 
 
 	else:
 		emit('my response', {'data': 'Either user(s) or flashset is incorrect'})
+
+
+def getGameInit(user, user1, user2):
+	if user == user1:
+		opponent = user2
+	else:
+		opponent = user1
+
+	oppoStats = json.loads( internalstats.getIndividualUserGameStats(opponent) )
+	if oppoStats['played'] == 0:
+		winpercent = 0
+	else:
+		winpercent = oppoStats['wins']*1.0 / oppoStats['played']
+
+	headToHead = json.loads( internalstats.getCommonGamesStats(user, opponent) )
+	encounter = headToHead['played']
+	if encounter == 0:
+		encounterwin = 0
+	else:
+		encounterwin = headToHead['wins'] * 1.0 / encounter
+
+	gameInitData = { "total": NUMQUES, "win": winpercent, "encounter": encounter, "encounterwin": encounterwin}
+	return gameInitData
 
 
 
