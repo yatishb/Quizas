@@ -66,22 +66,41 @@ function quizas_update_auth_cookies(site, authId, authToken, redirectUrl) {
 }
 
 
-function quizas_get_profile(profileCallback) {
-    if(quizas_is_authorized_for("facebook")) {
+// Explicitly, takes *userid*. e.g. 'quizlet:rgoulter'.
+// n.b. currently, you can only get the Profile from the same
+// site as the id is from.
+// (i.e. if it's twitter, can't get facebook profile).
+function quizas_get_profile_for(userid, profileCallback) {
+    if(userid.startsWith("facebook:")) {
         // See quizas_facebook.js
-        var fb_userid = $.cookie("facebook_user_id");
+        var fb_userid = userid;
         var fbid = fb_userid.substr("facebook:".length);
 
         return getFacebookProfile(fbid, profileCallback);
-    } else if(quizas_is_authorized_for("twitter")) {
-        var twitter_userid = $.cookie("twitter_user_id");
+    } else if(userid.startsWith("twitter:")) {
+        var twitter_userid = userid;
         var twid = twitter_userid.substr("twitter:".length);
 
         $.get("/api/profile/twitter/" + twid, profileCallback);
-    } else if(quizas_is_authorized_for("quizlet")) {
-        var quizlet_userid = $.cookie("quizlet_user_id");
+    } else if(userid.startsWith("quizlet:")) {
+        var quizlet_userid = userid;
         var qzid = quizlet_userid.substr("quizlet:".length);
 
+        $.get("/api/profile/quizlet/" + qzid, profileCallback);
+    }
+}
+
+
+function quizas_get_profile(profileCallback) {
+    if(quizas_is_authorized_for("facebook")) {
+        // See quizas_facebook.js
+        var fbid = $.cookie("facebook_user_id");
+        return getFacebookProfile(fbid, profileCallback);
+    } else if(quizas_is_authorized_for("twitter")) {
+        var twid = $.cookie("twitter_user_id");
+        $.get("/api/profile/twitter/" + twid, profileCallback);
+    } else if(quizas_is_authorized_for("quizlet")) {
+        var qzid = $.cookie("quizlet_user_id");
         $.get("/api/profile/quizlet/" + qzid, profileCallback);
     }
 }
