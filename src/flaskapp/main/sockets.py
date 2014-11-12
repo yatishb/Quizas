@@ -94,6 +94,7 @@ def assignRoom(message):
 	shuffledFlashcards = quizletsets.shuffled_flashset_json(flashset, NUMQUES)
 
 	if authhelper.lookup(user1) != None and authhelper.lookup(user2) != None and shuffledFlashcards.has_key('error') == False:
+		print "should assign room"
 		# Get the internal user ids of the clients
 		user1 = authhelper.lookup(user1)
 		user2 = authhelper.lookup(user2)
@@ -122,9 +123,11 @@ def assignRoom(message):
 						usersInRoom += ", %r" % socket['/test'].session['id']
 						redis.hset("ROOMS", room, usersInRoom)
 						redis.save()
+						print "User: %r room: %r" % (socket['/test'].session['id'], socket['/test'].session['room'])
 					else:
 						redis.hset("ROOMS", room, socket['/test'].session['id'])
 						redis.save()
+						print "User: %r room: %r" % (socket['/test'].session['id'], socket['/test'].session['room'])
 					socket['/test'].base_emit('my response', {'data': 'GAME BEGINS...'})
 				
 				else:

@@ -50,10 +50,10 @@ $(document).ready(function() {
         console.log(content);
 
         var result;
-        if (confirm("User " + content.set + " is inviting you to compete set " + content.requestfrom) == true) {
+        if (confirm("User " + content.requestfrom + " is inviting you to compete set " + content.set) == true) {
             socket.emit('assignroom', {
                 'user1': content.requestfrom,
-                'flashset': content.set,
+                'flashset': "quizlet:39748410",
                 'user2': quizas_user_id()
             });
         } else {
@@ -94,7 +94,7 @@ $(document).ready(function() {
     // event handler for accepted request
     socket.on('game accepted', function(msg) {
         content = JSON.parse(msg.data);
-        console.log("Accepted by ")
+        console.log("Accepted by ");
         console.log(content);
 
         initializeGame(content);
