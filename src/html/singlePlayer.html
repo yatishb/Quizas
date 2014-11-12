@@ -138,10 +138,10 @@
   var Q = window.Q = Quintus()
     .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
     .setup({
-    width: 320,
-	height: 568,
-	scaleToFit: true
-	//maximize: true
+    //width: 320,
+	//height: 568,
+	/scaleToFit: true
+	maximize: true
   }).touch();
   
   Q.state.set({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
