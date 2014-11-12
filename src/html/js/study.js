@@ -96,7 +96,7 @@ $(document).ready(function() {
         console.log("Accepted by ");
         console.log(content);
 
-        initializeGame(content);
+        initializeMultiplayerGame(content);
     });
 });
 
@@ -188,12 +188,20 @@ $(document).ajaxComplete(function() {
 });
 
 function initializeGame(content) {
-    //name
-    //sprite
     //win
     //encounter
     //total
     window.location.href="singlePlayer.html";
+}
+
+function initializeMultiplayerGame(content) {
+    //win
+    //encounter
+    //encounterwin
+    //total
+    sessionStorage.setItem("initialization", content);
+    sessionStorage.setItem("socket", socket);
+    window.location.href="example3.html";
 }
 
 function getSetContent() {

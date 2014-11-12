@@ -175,7 +175,7 @@ def getGameInit(user, user1, user2):
 	else:
 		encounterwin = headToHead['wins'] * 1.0 / encounter
 
-	gameInitData = { "total": NUMQUES, "win": winpercent, "encounter": encounter, "encounterwin": encounterwin}
+	gameInitData = { "total": str(NUMQUES), "win": winpercent, "encounter": encounter, "encounterwin": encounterwin}
 	return gameInitData
 
 
