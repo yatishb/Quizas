@@ -290,6 +290,10 @@
 		maximize: true
 	}).touch();
 	
+	// dynamic vars
+	var qx = Q.width/320;
+	var qy = Q.height/568;
+	
 	// load initiating form here
 	enemyName = initiatingJSON.name,
 	  enemySprite = initiatingJSON.sprite,
@@ -305,8 +309,8 @@
 		init: function(p) {
 			this._super(p, {
 			  label: Q.state.get("playerScore") + "",
-			  x: 20,
-			  y: 30
+			  x: 20 * qx,
+			  y: 30 * qy
 			});
 			Q.state.on("change.playerScore",this,"score");
 		},
@@ -320,8 +324,8 @@
 		init: function(p) {
 			this._super({
 			  label: Q.state.get("enemyScore") + "",
-			  x: 300,
-			  y: 30
+			  x: 300 * qx,
+			  y: 30 * qy
 			});
 			Q.state.on("change.enemyScore",this,"score");
 		},
@@ -352,8 +356,8 @@
 		init: function(p) {
 			this._super({
 			  label: "n/a",
-			  x: 160,
-			  y: 30,
+			  x: 160 * qx,
+			  y: 30 * qy,
 			});
 		},
 	});
@@ -361,8 +365,8 @@
 	Q.PlayerPortrait = Q.Sprite.extend("PlayerPortrait", {
 		init: function(p) {
 			this._super(p, {
-				x: 30,
-				y: 530,
+				x: 30 * qx,
+				y: 530 * qy,
 				scale: 0.03,
 				//asset: PLAYER_SPRITE
 			});
@@ -372,8 +376,8 @@
 	Q.EnemyPortrait = Q.Sprite.extend("EnemyPortrait", {
 		init: function(p) {
 			this._super(p, {
-				x: 290,
-				y: 530,
+				x: 290 * qx,
+				y: 530 * qy,
 				scale: 0.03,
 				asset: enemySprite
 			});
@@ -383,8 +387,8 @@
 	Q.Bomb = Q.Sprite.extend("Bomb", {
 		init: function(p) {
 			this._super(p, {
-				x: 160,
-				y: 530,
+				x: 160 * qx,
+				y: 530 * qy,
 				scale: 0.03,
 				asset: BOMB_SPRITE
 			});
@@ -431,8 +435,8 @@
 				border: 2,
 				shadow: 3,
 				shadowColor: "rgba(0,0,0,0.5)",
-				w: 40,
-				h: 40
+				w: 40 * qx,
+				h: 40 * qy
 			}),                     
 			function() {
 					
@@ -490,13 +494,13 @@
 						fill: "gray",
 						highlight: ansColor,
 						fontColor: "white",
-						x: 90 + (140*j),
-						y: 320 + (120*i),
+						x: (90 + (140*j)) * qx,
+						y: (320 + (120*i)) * qy,
 						border: 2,
 						shadow: 3,
 						shadowColor: "rgba(0,0,0,0.5)",
-						w: 110,
-						h: 100,
+						w: 110 * qx,
+						h: 100 * qy,
 						label: fcAns,
 						counter: k,
 						customId: fcAnswers[k].id,
@@ -609,20 +613,20 @@
 		for (i=0;i<totalQuestions;i++) {
 			playerCounters[i] = stage.insert(new Q.UI.Container({
 				fill: "white",
-				x: 15,
-				w: 15,
+				x: 15 * qx,
+				w: 15 * qx,
 				border: 2,
-				y: 490 - (210/totalQuestions) - (i*(420/totalQuestions)),
-				h: 420/totalQuestions
+				y: (490 - (210/totalQuestions) - (i*(420/totalQuestions))) * qy,
+				h: (420/totalQuestions) * qy
 			}));
 			
 			enemyCounters[i] = stage.insert(new Q.UI.Container({
 				fill: "white",
-				x: 305,
-				w: 15,
+				x: 305 * qx,
+				w: 15 * qx,
 				border: 2,
-				y: 490 - (210/totalQuestions) - (i*(420/totalQuestions)),
-				h: 420/totalQuestions
+				y: (490 - (210/totalQuestions) - (i*(420/totalQuestions))) * qy,
+				h: (420/totalQuestions) * qy
 			}));
 		}
 
@@ -630,13 +634,13 @@
 		//current question
 		var qContainer = stage.insert(new Q.UI.Container({
 			fill: "gray",
-			x: 160,
-			y: 160,
+			x: 160 * qx,
+			y: 160 * qy,
 			border: 2,
 			shadow: 3,
 			shadowColor: "rgba(0,0,0,0.5)",
-			w: 250,
-			h: 180
+			w: 250 * qx,
+			h: 180 * qy
 		}));
 		
 		if (Q.state.get("currentIndex") > 0) {
@@ -656,10 +660,10 @@
 		var raceLine = stage.insert(new Q.UI.Container({
 			fill: "black",
 			// from 60 to 260
-			x: 160,
-			y: 550,
-			w: 200,
-			h: 3
+			x: 160 * qx,
+			y: 550 * qy,
+			w: 200 * qx,
+			h: 3 * qy
 		}));
 		
 		/*Q.state.on("change.currentIndex", function() {
@@ -744,7 +748,7 @@
 				var scoreDiff = Q.state.get("playerScore") - Q.state.get("enemyScore");
 				if (remainingQ > 0) {
 					if (scoreDiff <= remainingQ) {
-						bomb.p.x = 160 + ((scoreDiff/remainingQ)*100);
+						bomb.p.x = (160 + ((scoreDiff/remainingQ)*100)) * qx;
 					} else if (scoreDiff > remainingQ) {
 						if (isPhaseOne) {
 							// initiate Phase 2

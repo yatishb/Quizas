@@ -357,7 +357,7 @@
 	
 	Q.UI.TimeCounter = Q.UI.Text.extend("UI.TimeCounter", { 
 		init: function(p) {
-			this._super({
+			this._super(p, {
 			  label: "n/a",
 			  x: 160 * qx,
 			  y: 30 * qy,
@@ -449,11 +449,15 @@
 		
 	// versus screen with countdown
 	Q.scene("scene0", function(stage) {
+		var cdText = stage.insert(new Q.UI.TimeCounter({x: qx*160, y: qy*284}));
+	
 		var cdTimer = new Countdown({
-			seconds: 5,
-			onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
-			onCounterEnd: function() {/*alert("Out of time");*/}
+			seconds: 3,
+			onUpdateStatus: function(sec) {cdText.p.label = "Game starting in " + (Math.ceil(sec)) + " seconds."},
+			onCounterEnd: function() {Q.stageScene("scene1");}
 		});
+		
+		cdTimer.start();
 	});
 	
 	// set scene
@@ -733,9 +737,6 @@
 
 			// express enemy previous answer
 			if (Q.state.get("currentIndex") > 1) {
-			//console.log("TIME OF RECKONING: " + (prevFcQuestion.id == prevEnemyAns));
-			//console.log("prevQnId " + prevFcQuestion.id + " vs enemy " + prevEnemyAns)
-			//console.log("END");
 				if (prevFcQuestion.id == prevEnemyAns) {
 					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "green";
 					Q.state.inc("enemyScore", 1);
@@ -844,10 +845,10 @@
 	
 	// stage scene
 	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE], function() {
-		Q.stageScene("scene1");
+		Q.stageScene("scene0");
 	});
      
-	 setTimeout(function(){Q.state.inc("currentIndex", 1);}, 5000);
+	 //setTimeout(function(){Q.state.inc("currentIndex", 1);}, 5000);
 });
 	</script>
  </body>
