@@ -31,6 +31,56 @@ $(document).ready(function() {
     });
 
     listFacebookFriends(outputFriends);
+
+    namespace = '/test'; // change to an empty string to use the global namespace
+
+    // the socket.io documentation recommends sending an explicit package upon connection
+    // this is specially important when using the global namespace
+    var socket = io.connect('http://' + document.domain + ':' + location.port + namespace, {
+                                "connect timeout": 300,
+                                "close timeout": 30,
+                                "hearbeat timeout": 30
+                            });
+
+    // event handler for server sent data
+    // the data is displayed in the "Received" section of the page
+    socket.on('game request', function(msg) {
+        content = JSON.parse(msg.data);
+        console.log("Request info is ")
+        console.log(content);
+
+        var result;
+        if (confirm("User " + content.set + " is inviting you to compete set " + content.requestfrom) == true) {
+            socket.emit('assignroom', {
+                'user1': content.requestfrom,
+                'flashset': content.set,
+                'user2': quizas_user_id()
+            });
+        } else {
+            socket.emit('reject', {
+                'requester': scontent.requestfrom,
+                'receiver': quizas_user_id()
+            });
+        }
+    });
+
+    // event handler for rejected request
+    socket.on('game rejected', function(msg) {
+        content = JSON.parse(msg.data);
+        console.log("Reject by ")
+        console.log(content);
+
+        alert("Your request was rejected by " + content.rejectedby);
+    });
+
+    // event handler for accepted request
+    socket.on('game accepted', function(msg) {
+        content = JSON.parse(msg.data);
+        console.log("Accepted by ")
+        console.log(content);
+
+        initializeGame(content);
+    });
 });
 
 //$('.list_option ul li').on("click", function() {
@@ -87,9 +137,18 @@ $('.list_bottom').on("click", function () {
 
     console.log("The next page is " + next_page);
 
-    if (next_page=="q") window.location.href="singlePlayer.html";
-    else if (next_page=="c") window.location.href="#";
-    else alert("error in starting game");
+    if (next_page=="q") {
+        socket.emit('send notification', {
+            'opponent': selected_friend_id,
+            'set': selected_set_id,
+            'user': quizas_user_id()
+        });
+
+    }
+
+    // if (next_page=="q") window.location.href="singlePlayer.html";
+    // else if (next_page=="c") window.location.href="#";
+    // else alert("error in starting game");
 });
 
 $(document).ajaxComplete(function() {
@@ -108,6 +167,15 @@ $(document).ajaxComplete(function() {
         // );
     };
 });
+
+function initializeGame(content) {
+    //name
+    //sprite
+    //win
+    //encounter
+    //total
+    window.location.href="singlePlayer.html";
+}
 
 function getSetContent() {
     $.get("/api/user/quizlet:li_yuanda/sets", function(data) {
