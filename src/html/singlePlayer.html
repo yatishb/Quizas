@@ -10,8 +10,6 @@
   <script>
     // helper functions
   
-	alert("TEST"); //test
-  
     function parseBool(param) {
       return (param === 'true');
     }
@@ -140,7 +138,9 @@
   var Q = window.Q = Quintus()
     .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
     .setup({
-    maximize: true
+    width: 320,
+	height: 568,
+	scaleToFit: true
   }).touch();
   
   Q.state.set({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
