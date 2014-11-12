@@ -12,8 +12,8 @@ from .. import db
 
 @main.route('/user/currentid')
 def get_internal_id():
-	cookie_ids = authhelper.get_cookie_user_ids()
-	return json.dumps({"internal_id": authhelper.get_current_id(),
+	cookie_ids = get_cookie_user_ids()
+	return json.dumps({"internal_id": get_current_id(),
 	                   "cookie_user_ids": cookie_ids})
 
 

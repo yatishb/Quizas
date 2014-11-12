@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>Quizas - Study</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <link rel="icon" href="static/img/favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="static/img/touch-icon-iphone.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="images/touch-icon-ipad.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="images/touch-icon-iphone-retina.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="images/touch-icon-ipad-retina.png">
+    <link rel="apple-touch-startup-image" href="images/Geet_App_Startup.png">
+    
+    <link rel="stylesheet" type="text/css" href="css/main.css"></link>
+    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.css"></link>
+    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.icons.css"></link>
+    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.inline-png.css"></link>
+    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.inline-svg.css"></link>
+    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.structure.css"></link>
+    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.theme.css"></link>
+
+    <script src="js/quizas_auth_helper.js"></script>
+    <script src="js/quizas_facebook.js"></script>
+
+    <script type="text/javascript">
+    window.fbAsyncInit = function() {
+        FB.init({
+            appId      : quizas_fbappid,
+            xfbml      : true,
+            version    : 'v2.1'
+        });
+    };
+
+    (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+</head>
+<body>
+    <div data-role="page" id="page1">
+
+    <div id="fb-root"></div>
+
+    <div class="grey_cover"></div>
+    <div class="button_container">
+        <div class="round_button" id="flashcard"><span>Study</span></div>
+        <div class="round_button" id="quiz"><span>Quiz</span></div>
+        <div class="round_button" id="challenge"><span>Challenge</span></div>
+    </div>
+
+    <div class="set_background"></div>
+
+    <div class="add_set">+</div>
+
+    <div class="friend_window">
+        <div class="list_search"><input type="text" placeholder="Search here..."></div>
+        <div class="friend_list">
+            <div class="simple_friend" id="111">
+                <div class="friend_profile"><img src="https://scontent-b-sin.xx.fbcdn.net/hphotos-xap1/v/t1.0-9/1013371_10204609329898999_4183351813545862553_n.jpg?oh=08107a7fa8af7ff5b595006f341bd506&oe=54E48B71"></div>
+                <span>Richard</span>
+            </div>
+            <div class="simple_friend" id="222">
+                <div class="friend_profile"><img src="https://fbcdn-sphotos-c-a.akamaihd.net/hphotos-ak-xfa1/v/t1.0-9/10624735_10154690559390417_2870427952069110535_n.jpg?oh=49008ba4046ef7d7f51eecabb9d4110e&oe=54EBAC06&__gda__=1425070315_fbffdcc7ec8c261219b6986fda631ab6"></div>
+                <span>TK</span>
+            </div>
+            <div class="simple_friend" id="333">
+                <div class="friend_profile"><img src="https://scontent-b-sin.xx.fbcdn.net/hphotos-xpa1/t31.0-8/p960x960/1492336_10151832484735382_1651513007_o.jpg"></div>
+                <span>Yatish</span>
+            </div>
+        </div>
+        <div class="list_bottom">Submit</div>
+    </div>
+
+    <div class="set_info">
+        <div class="simple_set" id="1">
+            <div class="set_content title"><p>CS3216</div>
+            <div class="set_content description"><p>This module is awesome.</div>
+        </div>
+        <div class="simple_set" id="2">
+            <div class="set_content title"><p>CS3216</div>
+            <div class="set_content description"><p>This module is awesome.</div>
+        </div>
+        <div class="simple_set" id="3">
+            <div class="set_content title"><p>CS3216</div>
+            <div class="set_content description"><p>This module is awesome.</div>
+        </div>
+        <div class="simple_set" id="4">
+            <div class="set_content title"><p>CS3216</div>
+            <div class="set_content description"><p>This module is awesome.</div>
+        </div>
+        <div class="simple_set" id="5">
+            <div class="set_content title"><p>CS3216</div>
+            <div class="set_content description"><p>This module is awesome.</div>
+        </div>
+        <div class="simple_set" id="6">
+            <div class="set_content title"><p>CS3216</div>
+            <div class="set_content description"><p>This module is awesome.</div>
+        </div>
+        <div class="simple_set" id="7">
+            <div class="set_content title"><p>CS3216</div>
+            <div class="set_content description"><p>This module is awesome.</div>
+        </div>
+        <div class="simple_set" id="8">
+            <div class="set_content title"><p>CS3216</div>
+            <div class="set_content description"><p>This module is awesome.</div>
+        </div>
+    </div>
+
+    <div data-role="footer" data-id="foo1" data-position="fixed" class="footer">
+        <div data-role="navbar" data-iconpos="top">
+            <ul>
+                <li><a href="#" data-icon="grid" data-prefetch="true" data-transition="none" class="ui-btn-active ui-state-persist">Study</a></li>
+                <li><a href="stats.html" data-icon="info" data-prefetch="true" data-transition="none">Stats</a></li>
+                <li><a href="settings.html" data-icon="gear" data-prefetch="true" data-transition="none">Settings</a></li>
+            </ul>
+        </div><!-- /navbar -->
+    </div><!-- /footer -->
+
+    </div>
+
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+    <script src="js/jquery.mobile.js"></script>
+
+    <script src="js/study.js"></script>
+
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-46324526-3', 'auto');
+        ga('send', 'pageview');
+    </script>
+// http://localhost:8000/Documents/repo_project/2014-final-group04/app/templates/study.html
+// http://dev.localhost:8080/templates/study.html
+</body>
+</html>

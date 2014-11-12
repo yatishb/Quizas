@@ -13,6 +13,7 @@ import tweepy
 
 import secrets
 import authhelper
+import quizletsets
 
 from flask import Blueprint
 from flask import request, redirect
@@ -95,6 +96,7 @@ def get_verification():
 
 	# Ensure user table has an internal id.
 	authhelper.register(new_userid)
+	quizletsets.ensure_some_flashsets(new_userid)
 
 	return resp
 
