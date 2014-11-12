@@ -24,7 +24,7 @@ function quizas_user_id() {
 }
 
 
-function quizas_update_auth_cookies(site, authId, authToken) {
+function quizas_update_auth_cookies(site, authId, authToken, redirectUrl) {
     // site e.g. "quizlet", "twitter", "facebook"
 
     // Check what other cookies Quizas has,
@@ -49,8 +49,11 @@ function quizas_update_auth_cookies(site, authId, authToken) {
              { expires: 365, path: '/' });
 
     // Notify Quizas app about the new auth.
-	// FIXME: This is a bit daft, isn't it? Fix for G+ integ.
-    $.post("/api/facebookauthnotify");
+    // FIXME: This is a bit daft, isn't it? Fix for G+ integ.
+    $.post("/api/facebookauthnotify", function (data) {
+        // Redirect
+        window.location.href = redirectUrl;
+    });
 }
 
 

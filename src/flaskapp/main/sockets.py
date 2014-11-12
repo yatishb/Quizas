@@ -15,6 +15,7 @@ def socketConnect():
     session['id'] = authhelper.get_current_id()
     session['room'] = defaultRoom
     session['random'] = str(uuid.uuid1())
+    print 'Connected %r- %r' % (session['id'], session['random'])
     emit('my response', {'data': 'Connected %r- %r' % (session['id'], session['random'])})
 
 @socketio.on('disconnect', namespace='/test')
@@ -31,30 +32,44 @@ def printSocketsConnected():
 # Read this notification and forward this request to the client C2
 @socketio.on('send notification', namespace='/test')
 def sendNotificationToSocket(message):
+	print "received notification for game request"
 	user = message['user']
 	flashset = message['set']
 	userSendTo = message['opponent']
 
 	internalUser = authhelper.lookup(user)
 	internalUserOppo = authhelper.lookup(userSendTo)
+	flagFoundUser = False
+	print "user: %r  requestto: %r" % (internalUser, internalUserOppo)
 
 	# Check if internal user is the same as the id of the socket.
 	# If not return failure
-	if internalUser != session['id'] and internalUser == None and internalUserOppo == None:
+	if internalUser != session['id'] or internalUser == None or internalUserOppo == None:
 		# return failure
+		print "rejected"
+		flagFoundUser = True
 		gameRejection = {'rejectedby': userSendTo}
-		emit('game rejected', {'data': json.dumps(gameRejection)})
+		emit('user non-existent', {'data': json.dumps(gameRejection)})
 	else:
 		gameRequest = {"set": flashset, "requestfrom": user}
 		for sessid, socket in request.namespace.socket.server.sockets.items():
-			if socket['/test'].session['id'] == internalUser:
+			if socket['/test'].session['id'] == internalUserOppo:
+				print "sending request"
+				flagFoundUser = True
 				socket['/test'].base_emit('game request', {'data': json.dumps(gameRequest)})
+
+	# If user not found
+	if flagFoundUser == False:
+		print "user not found"
+		gameRejection = {'rejectedby': userSendTo}
+		emit('user not online', {'data': json.dumps(gameRejection)})
 
 
 # Handle any rejection received as a response.
 # Forward this rejection onto the first client who responded so
-@socketio.on('reject', namespace)
+@socketio.on('reject', namespace='/test')
 def gameRejected(message):
+	print "game rejected"
 	userInitiatedReq = message['requester']
 	userReceiver = message['receiver']
 
@@ -71,6 +86,7 @@ def gameRejected(message):
 # Socket reads the two usernames and creates a room for both
 @socketio.on('assignroom', namespace='/test')
 def assignRoom(message):
+	print "assigning game now!"
 	room = str(uuid.uuid1())
 	user1 = message['user1']
 	user2 = message['user2']
@@ -78,6 +94,7 @@ def assignRoom(message):
 	shuffledFlashcards = quizletsets.shuffled_flashset_json(flashset, NUMQUES)
 
 	if authhelper.lookup(user1) != None and authhelper.lookup(user2) != None and shuffledFlashcards.has_key('error') == False:
+		print "should assign room"
 		# Get the internal user ids of the clients
 		user1 = authhelper.lookup(user1)
 		user2 = authhelper.lookup(user2)
@@ -113,9 +130,11 @@ def assignRoom(message):
 						usersInRoom += ", %r" % socket['/test'].session['id']
 						redis.hset("ROOMS", room, usersInRoom)
 						redis.save()
+						print "User: %r room: %r" % (socket['/test'].session['id'], socket['/test'].session['room'])
 					else:
 						redis.hset("ROOMS", room, socket['/test'].session['id'])
 						redis.save()
+						print "User: %r room: %r" % (socket['/test'].session['id'], socket['/test'].session['room'])
 					socket['/test'].base_emit('my response', {'data': 'GAME BEGINS...'})
 				
 				else:
@@ -144,8 +163,9 @@ def assignRoom(message):
 # If this beacon is received from two users part of the same room,
 # this means that the users are ready to receive the first question.
 # Then send first question
-@socket.on('gameinitialised', namespace='/test')
+@socketio.on('gameinitialised', namespace='/test')
 def gameInitialisedByClient():
+	print "game initialized by one client"
 	room = session['room']
 	userid = session['id']
 
