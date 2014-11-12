@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
  <head>
-	<meta name="viewport" content="width=device-width, user-scalable=no" />
+	<meta name="viewport" content="width=device-width, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0" />
 	<title></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <script src='http://cdn.html5quintus.com/v0.2.0/quintus-all.js'></script>
@@ -109,6 +109,30 @@
 			return finalDeck;
 		}
 		
+		function createResultsForm(fsId, cArr) {
+			var jsonForm = JSON.stringify({
+				flashset: fsId,
+				cards: cArr
+			});
+			return jsonForm;
+		}
+		
+		function resetResultForm() {
+			RESULT_FORM = "";
+			RESULT_CARDS = [];
+			RESULT_COUNTER = 0;
+		}
+		
+		function getCookie(cname) {
+			var name = cname + "=";
+			var ca = document.cookie.split(';');
+			for(var i=0; i<ca.length; i++) {
+				var c = ca[i];
+				while (c.charAt(0)==' ') c = c.substring(1);
+				if (c.indexOf(name) != -1) return c.substring(name.length,c.length);
+			}
+			return "";
+		}
 	
 		// declare JSON vars for testing purposes
 		var TestFlashCard = createFlashCard('22', 'F=??', 'M x A');
@@ -121,13 +145,21 @@
 			var fc = createFlashCard(stringId, stringQn, stringAns);
 			TestFCArray[i] = fc;
 		}
-		var TestFlashSet = createFlashSet('101', 'Simple Additions', 'Mathematics', TestFCArray);
+		var TestFlashSet = createFlashSet('custom:101', 'Simple Additions', 'Mathematics', TestFCArray);
 		var TestTotalQuestions = 10;
 		
 		// fetching info from server
 		var FLASH_SET = TestFlashSet;
 		var DECK_SIZE = getDeckSize(FLASH_SET);
 		var TOTAL_QUESTIONS = TestTotalQuestions;
+		var FLASH_SET_ID = (JSON.parse(FLASH_SET)).id;
+		
+		// JSON post to server
+		var RESULT_FORM;
+		var RESULT_CARDS = [];
+		var RESULT_COUNTER = 0;
+		var USER_ID = 123; // use user_id helperscript
+		var RESULT_API = "/user/" + USER_ID + "/gameresults";
 	</script>
  </head>
  
@@ -138,7 +170,10 @@
 	var Q = window.Q = Quintus()
     .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
     .setup({
-		maximize: true
+		width: 800,
+		height: 600,
+		scaleToFit: true
+		//maximize: "touch"
 	}).touch();
 	
 	Q.state.set({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
@@ -231,6 +266,7 @@
 	Q.scene("scene1",function(stage) {
 	
 		Q.state.reset({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
+		resetResultForm();
 	
 		var leScore = stage.insert(new Q.UI.Score());
 		var leQC = stage.insert(new Q.UI.QuestionCounter());
@@ -238,12 +274,13 @@
 		
 		function generateAnswers() {
 			ansDeck = dealAnswers(deck[Q.state.get("currentQuestion") - 1], DECK_SIZE);
-		
+			
 			var aBtns = [];
 			var k = 0;
 			for (i=0;i<2;i++) {
 				for (j=0;j<2;j++) {
-					var fcAns = JSON.parse(getFlashCard(FLASH_SET, ansDeck[k])).answer;
+					var fcWhole = getFlashCard(FLASH_SET, ansDeck[k]);
+					var fcAns = (JSON.parse(fcWhole)).answer;
 					var ansColor = "red";
 					if (deck[Q.state.get("currentQuestion") - 1] == ansDeck[k]) {
 						ansColor = "green";
@@ -260,7 +297,8 @@
 						w: 110,
 						h: 100,
 						label: fcAns,
-						name: k
+						name: k,
+						card: fcWhole
 						}, function() {
 							// do something
 							if (deck[Q.state.get("currentQuestion") - 1] == ansDeck[this.p.name]) {
@@ -270,9 +308,16 @@
 								console.log("Placeholder Trigger: Wrong");
 							}
 							
-							if (Q.state.get("currentQuestion") != Q.state.get("totalQuestions")) {
-								Q.state.inc("currentQuestion", 1);
-							}
+							
+							
+							// save answer
+							RESULT_CARDS[RESULT_COUNTER] = {
+								flashcard: String(deck[Q.state.get("currentQuestion") - 1]),
+								result: (JSON.parse(this.p.card)).id};
+							RESULT_COUNTER = RESULT_COUNTER + 1;
+							
+							Q.state.inc("currentQuestion", 1);
+
 					}));
 					k = k + 1;
 				}
@@ -304,7 +349,7 @@
 		qCard.generate(getFlashCard(FLASH_SET, deck[Q.state.get("currentQuestion") - 1]));
 		
 		Q.state.on("change.currentQuestion", function() {
-			if (Q.state.get("currentQuestion") == TOTAL_QUESTIONS) {
+			if (Q.state.get("currentQuestion") > TOTAL_QUESTIONS) {
 				Q.stageScene("scene2");
 			} 
 			qCard.generate(getFlashCard(FLASH_SET, deck[Q.state.get("currentQuestion") - 1]));
@@ -350,6 +395,13 @@
 			window.location.href="study.html";
 		}));
 		
+		// post to server
+		RESULT_FORM = createResultsForm(FLASH_SET_ID, RESULT_CARDS);
+		console.log(RESULT_FORM);
+		$.post(RESULT_API, RESULT_FORM, function(data) {
+			// success handler
+			alert("Posted!");
+		}, "json");
 		
 	});
 	
