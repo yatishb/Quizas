@@ -88,11 +88,40 @@ def assignRoom(message):
 		if (session['id'] == user1) or (session['id'] == user2):
 			session['room'] = room
 
-		# Send very first question to the room to kick-start the entire game
-		sendFirstQuestionInfoToClient(room)
+		# Send game initilization json to the clients
+		# Contains information about the enemy name, pic, total num questions
+
 
 	else:
 		emit('my response', {'data': 'Either user(s) or flashset is incorrect'})
+
+
+
+# Read the game created beacon from the clients.
+# If this beacon is received from two users part of the same room,
+# this means that the users are ready to receive the first question.
+# Then send first question
+@socket.on('gameinitialised', namespace='/test')
+def gameInitialisedByClient():
+	room = session['room']
+	userid = session['id']
+
+	HASH_INIT = "ROOM_INIT"
+
+	if hexists(HASH_INIT, room) == True:
+		if hget(HASH_INIT, room) != userid:
+			# Received game initiated beacons from both users
+			# Delete this field from redis now
+			redis.hdel(HASH_INIT, room)
+			redis.save()
+			# And send very first question to the room to kick-start the entire game
+			sendFirstQuestionInfoToClient(room)
+	else:
+		# This is the first beacon received.
+		# Only one client is ready to play and so record it
+		# Wait for the second client to get ready also
+		redis.hset(HASH_INIT, room, userid)
+		redis.save()
 
 
 
