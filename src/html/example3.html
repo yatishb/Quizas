@@ -7,8 +7,9 @@
     <script src='http://cdn.html5quintus.com/v0.2.0/quintus-all.js'></script>
 	<script src='http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js'></script>
 	<script src='js/quizas_auth_helper.js'></script>
+
     <!-- <script src='example1.js'></script> -->
-	<link rel="stylesheet" type="text/css" href="singlePlayer.css">
+	<link rel="stylesheet" type="text/css" href="css/singlePlayer.css">
 	<script>
 		// socket stuff
 	/*
@@ -234,7 +235,9 @@
 		
 		// Start load test
 			INITIATING_FORM = sessionStorage.getItem("initialization");
-			socket = sessionStorage.getItem("socket");
+			console.log(INITIATING_FORM);
+			socket = CircularJSON.parse(sessionStorage.getItem("socket"));
+			console.log(socket);
 		// End load test
 
 		var FLASH_SET = TestFlashSet;
@@ -248,7 +251,7 @@
 		var TIMER;
 		
 		// interpreting info from server
-		var initiatingJSON = INITIATING_FORM;
+		var initiatingJSON = JSON.parse(INITIATING_FORM);
 		var playerName;
 		var enemyName, enemySprite, enemyWinRate, enemyEncounter, totalQuestions;
 		/*
@@ -298,7 +301,7 @@
 	// load initiating form here
 	//enemyName = initiatingJSON.name,
 	  //enemySprite = initiatingJSON.sprite,
-	  playerName = quizas_user_id();
+	  //playerName = quizas_user_id();
 	  enemyWinRate = initiatingJSON.win,
 	  enemyEncounter = initiatingJSON.encounter,
 	  totalQuestions = initiatingJSON.total;

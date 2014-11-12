@@ -39,7 +39,7 @@ $(document).ready(function() {
                                 "hearbeat timeout": 30
                             });
 
-    console.log("socket: "+socket);
+    console.log(socket);
 
     // event handler for server sent data
     // the data is displayed in the "Received" section of the page
@@ -204,8 +204,9 @@ function initializeMultiplayerGame(content) {
     //encounter
     //encounterwin
     //total
-    sessionStorage.setItem("initialization", content);
-    sessionStorage.setItem("socket", socket);
+    sessionStorage.setItem("initialization", JSON.stringify(content));
+    sessionStorage.setItem("socket", CircularJSON.stringify(socket));
+    console.log(CircularJSON.stringify(socket));
     window.location.href="example3.html";
 }
 
