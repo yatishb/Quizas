@@ -176,6 +176,7 @@ def getGameInit(user, user1, user2):
 		encounterwin = headToHead['wins'] * 1.0 / encounter
 
 	gameInitData = { "total": str(NUMQUES), "win": winpercent, "encounter": encounter, "encounterwin": encounterwin}
+	print gameInitData
 	return gameInitData
 
 
@@ -186,7 +187,15 @@ def getGameInit(user, user1, user2):
 # Then send first question
 @socketio.on('gameinitialised', namespace='/test')
 def gameInitialisedByClient():
-	print "game initialized by one client"
+	print "game initialized by one client %r" % session['room']
+	for sessid, socket in request.namespace.socket.server.sockets.items():
+		print "id : %r  random: %r" % (socket['/test'].session['id'], socket['/test'].session['random'])
+		if (socket['/test'].session['id'] == session['id']) and (socket['/test'].session['random'] != session['random']):
+			session['room'] = socket['/test'].session['room']
+			socket['/test'].leave_room(socket['/test'].session['room'])
+			join_room(session['room'])
+
+	print "the client now belongs to room %r" % session['room']
 	room = session['room']
 	userid = session['id']
 
@@ -357,6 +366,7 @@ def getNextQuestionForRoom(room, done):
 		return {}
 
 	# When there are questions left in the game, retrieve the next game and send
+	print "loading cards for room %r" % room
 	flashcardsJson = json.loads(redis.hget("ROOMS_CARDS", room))
 	nextQues = flashcardsJson[done]['question']
 	nextAns = flashcardsJson[done]['answers']

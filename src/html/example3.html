@@ -10,6 +10,7 @@
 
     <!-- <script src='example1.js'></script> -->
 	<link rel="stylesheet" type="text/css" href="css/singlePlayer.css">
+	<script src="js/socketinit.js" />
 	<script>
 		// socket stuff
 	/*
@@ -232,11 +233,11 @@
 		
 		// fetching info from server
 		var INITIATING_FORM, SERVER_FORM;
-		
+		console.log("abc");
 		// Start load test
 			INITIATING_FORM = sessionStorage.getItem("initialization");
 			console.log(INITIATING_FORM);
-			socket = CircularJSON.parse(sessionStorage.getItem("socket"));
+			//socket = CircularJSON.parse(sessionStorage.getItem("socket"));
 			console.log(socket);
 		// End load test
 
@@ -252,6 +253,7 @@
 		
 		// interpreting info from server
 		var initiatingJSON = JSON.parse(INITIATING_FORM);
+		console.log(initiatingJSON);
 		var playerName;
 		var enemyName, enemySprite, enemyWinRate, enemyEncounter, totalQuestions;
 		/*
@@ -302,8 +304,8 @@
 	//enemyName = initiatingJSON.name,
 	  //enemySprite = initiatingJSON.sprite,
 	  //playerName = quizas_user_id();
-	  enemyWinRate = initiatingJSON.win,
-	  enemyEncounter = initiatingJSON.encounter,
+	  enemyWinRate = initiatingJSON.win;
+	  enemyEncounter = initiatingJSON.encounter;
 	  totalQuestions = initiatingJSON.total;
 	  // encounterwin
 	  

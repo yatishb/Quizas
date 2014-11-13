@@ -29,7 +29,7 @@ $(document).ready(function() {
         });
     });
 
-    namespace = '/test'; // change to an empty string to use the global namespace
+    /*namespace = '/test'; // change to an empty string to use the global namespace
 
     // the socket.io documentation recommends sending an explicit package upon connection
     // this is specially important when using the global namespace
@@ -37,7 +37,7 @@ $(document).ready(function() {
                                 "connect timeout": 300,
                                 "close timeout": 30,
                                 "hearbeat timeout": 30
-                            });
+                            });*/
 
     console.log(socket);
 
@@ -205,8 +205,8 @@ function initializeMultiplayerGame(content) {
     //encounterwin
     //total
     sessionStorage.setItem("initialization", JSON.stringify(content));
-    sessionStorage.setItem("socket", CircularJSON.stringify(socket));
-    console.log(CircularJSON.stringify(socket));
+    /*sessionStorage.setItem("socket", CircularJSON.stringify(socket));
+    console.log(CircularJSON.stringify(socket));*/
     window.location.href="example3.html";
 }
 
