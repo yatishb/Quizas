@@ -51,7 +51,8 @@ def soloGameResultsWriteDb(userid, receivedData) :
 	for eachQues in cards:
 		questionId = eachQues['flashcard']
 		userAns = eachQues['result']
-		cardUser = FC(gameId, flashsetId, questionId, userid, userAns, -1)
+		time = eachQues['time']
+		cardUser = FC(gameId, flashsetId, questionId, userid, userAns, time)
 		db.session.add(cardUser)
 
 	db.session.commit()

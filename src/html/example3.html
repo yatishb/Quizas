@@ -6,11 +6,19 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <script src='http://cdn.html5quintus.com/v0.2.0/quintus-all.js'></script>
 	<script src='http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js'></script>
+	<script src='js/quizas_auth_helper.js'></script>
+
     <!-- <script src='example1.js'></script> -->
-	<link rel="stylesheet" type="text/css" href="example1.css">
+	<link rel="stylesheet" type="text/css" href="css/singlePlayer.css">
+	<script src="js/socketinit.js" />
+	<script>
+		</script>
+ </head>
+ 
+ <body>
 	<script>
 		// socket stuff
-	
+	/*
 			namespace = '/test'; // change to an empty string to use the global namespace
 
             // the socket.io documentation recommends sending an explicit package upon connection
@@ -28,7 +36,7 @@
 		socket.on('initiating', function(msg) {
                 //$('#log').append('<br>Received #' + msg.count + ': ' + msg.data);
             });
-	
+	*/
 		
 	
 		// helper functions
@@ -230,9 +238,12 @@
 		
 		// fetching info from server
 		var INITIATING_FORM, SERVER_FORM;
-		
+		console.log("abc");
 		// Start load test
-			INITIATING_FORM = TestInitiatingForm;
+			INITIATING_FORM = sessionStorage.getItem("initialization");
+			console.log(INITIATING_FORM);
+			//socket = CircularJSON.parse(sessionStorage.getItem("socket"));
+			console.log(socket);
 		// End load test
 
 		var FLASH_SET = TestFlashSet;
@@ -247,6 +258,8 @@
 		
 		// interpreting info from server
 		var initiatingJSON = JSON.parse(INITIATING_FORM);
+		console.log(initiatingJSON);
+		var playerName;
 		var enemyName, enemySprite, enemyWinRate, enemyEncounter, totalQuestions;
 		/*
 		var enemyName = initiatingJSON.name,
@@ -275,15 +288,9 @@
 			};
 		}
 		
-	</script>
- </head>
- 
- <body>
-	<script>
+//HERE********************************************************************************************
 	window.addEventListener("load",function() {
-		setTimeout(function() {
-			socket.emit('assignroom', {flashset: "quizlet:39748410", user1: "quizlet:yatish", user2: "quizlet:byatishyuvaraj"});
-		}, 10000);
+	
 	var Q = window.Q = Quintus()
     .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
     .setup({
@@ -293,13 +300,22 @@
 	// dynamic vars
 	var qx = Q.width/320;
 	var qy = Q.height/568;
+
+	//Interpreting info from server
+	var INITIATING_FORM, SERVER_FORM;
+	INITIATING_FORM = sessionStorage.getItem("initialization");
+	var initiatingJSON = JSON.parse(INITIATING_FORM);
 	
 	// load initiating form here
-	enemyName = initiatingJSON.name,
-	  enemySprite = initiatingJSON.sprite,
-	  enemyWinRate = initiatingJSON.win,
-	  enemyEncounter = initiatingJSON.encounter,
-	  totalQuestions = initiatingJSON.total;	
+	//enemyName = initiatingJSON.name,
+	  //enemySprite = initiatingJSON.sprite,
+	  //playerName = quizas_user_id();
+	  enemyWinRate = initiatingJSON.win;
+	  enemyEncounter = initiatingJSON.encounter;
+	  totalQuestions = initiatingJSON.total;
+	  // encounterwin
+	  
+	  
 	
 	Q.state.set({playerScore: 0, enemyScore: 0, currentIndex: 0, currentQuestion: "", waiting: true});
 	var deck = shuffleDeck(totalQuestions, DECK_SIZE);
@@ -846,4 +862,10 @@
 });
 	</script>
  </body>
+ 
+ <footer>
+	<script>
+		socket.emit('gameinitialised');
+	</script>
+ </footer>
 </html>

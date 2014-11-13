@@ -99,12 +99,6 @@ def assignRoom(message):
 		user1 = authhelper.lookup(user1)
 		user2 = authhelper.lookup(user2)
 
-		#######################Only for integration test
-		for sessid, socket in request.namespace.socket.server.sockets.items():
-			if (socket['/test'].session['id'] == user1) or (socket['/test'].session['id'] == user2):
-				if socket['/test'].session['room'] != defaultRoom:
-					return
-
 
 		# Store the flashsetid for room information in redis
 		# This key should never exist in db. If it does something is wrong
@@ -146,33 +140,68 @@ def assignRoom(message):
 
 		# Send game initilization json to the clients
 		# Contains information about the enemy name, pic, total num questions
-		gameInitData = {"total":10, 
-						"name": "dummy",
-						"sprite": "dummy",
-						"win": "dummy",
-						"encounter": "dummy"}
-		emit('game accepted', {'data': json.dumps(gameInitData)}, room=room)
+		for sessid, socket in request.namespace.socket.server.sockets.items():
+			if (socket['/test'].session['id'] == user1) or (socket['/test'].session['id'] == user2):
+				gameInitData = getGameInit(socket['/test'].session['id'], user1, user2)
+				socket['/test'].base_emit('game accepted', {'data': json.dumps(gameInitData)})
 
 
 	else:
 		emit('my response', {'data': 'Either user(s) or flashset is incorrect'})
 
 
+def getGameInit(user, user1, user2):
+	if user == user1:
+		opponent = user2
+	else:
+		opponent = user1
+
+	oppoStats = json.loads( internalstats.getIndividualUserGameStats(opponent) )
+	if oppoStats['played'] == 0:
+		winpercent = 0
+	else:
+		winpercent = oppoStats['wins']*1.0 / oppoStats['played']
+
+	headToHead = json.loads( internalstats.getCommonGamesStats(user, opponent) )
+	encounter = headToHead['played']
+	if encounter == 0:
+		encounterwin = 0
+	else:
+		encounterwin = headToHead['wins'] * 1.0 / encounter
+
+	gameInitData = { "total": str(NUMQUES), "win": winpercent, "encounter": encounter, "encounterwin": encounterwin}
+	print gameInitData
+	return gameInitData
+
+
 
 # Read the game created beacon from the clients.
+# Copy the information for one client to another socket belonging to the same client
 # If this beacon is received from two users part of the same room,
 # this means that the users are ready to receive the first question.
 # Then send first question
 @socketio.on('gameinitialised', namespace='/test')
 def gameInitialisedByClient():
-	print "game initialized by one client"
+
+	# Find another socket with the same id and copy socket information
+	print "game initialized by one client:%r room: %r" % (session['id'],session['room'])
+
+	for sessid, socket in request.namespace.socket.server.sockets.items():
+		print "id : %r  random: %r" % (socket['/test'].session['id'], socket['/test'].session['random'])
+		if (socket['/test'].session['id'] == session['id']) and (socket['/test'].session['random'] != session['random']):
+			session['room'] = socket['/test'].session['room']
+			socket['/test'].leave_room(socket['/test'].session['room'])
+			join_room(session['room'])
+			break
+
+	print "the client now belongs to room %r" % session['room']
 	room = session['room']
 	userid = session['id']
 
 	HASH_INIT = "ROOM_INIT"
 
-	if hexists(HASH_INIT, room) == True:
-		if hget(HASH_INIT, room) != userid:
+	if redis.hexists(HASH_INIT, room) == True:
+		if redis.hget(HASH_INIT, room) != userid:
 			# Received game initiated beacons from both users
 			# Delete this field from redis now
 			redis.hdel(HASH_INIT, room)
@@ -336,6 +365,7 @@ def getNextQuestionForRoom(room, done):
 		return {}
 
 	# When there are questions left in the game, retrieve the next game and send
+	print "loading cards for room %r" % room
 	flashcardsJson = json.loads(redis.hget("ROOMS_CARDS", room))
 	nextQues = flashcardsJson[done]['question']
 	nextAns = flashcardsJson[done]['answers']
