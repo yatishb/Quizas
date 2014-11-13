@@ -187,13 +187,14 @@ def getGameInit(user, user1, user2):
 # Then send first question
 @socketio.on('gameinitialised', namespace='/test')
 def gameInitialisedByClient():
-	print "game initialized by one client %r" % session['room']
+	print "game initialized by one client:%r room: %r" % (session['id'],session['room'])
 	for sessid, socket in request.namespace.socket.server.sockets.items():
 		print "id : %r  random: %r" % (socket['/test'].session['id'], socket['/test'].session['random'])
 		if (socket['/test'].session['id'] == session['id']) and (socket['/test'].session['random'] != session['random']):
 			session['room'] = socket['/test'].session['room']
 			socket['/test'].leave_room(socket['/test'].session['room'])
 			join_room(session['room'])
+			break
 
 	print "the client now belongs to room %r" % session['room']
 	room = session['room']
