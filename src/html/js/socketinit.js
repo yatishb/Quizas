@@ -6,5 +6,5 @@ var socket = io.connect('http://' + document.domain + ':' + location.port + name
                             "connect timeout": 300,
                             "close timeout": 60,
                             "hearbeat timeout": 40,
-                            "transports": ["htmlfile", "xhr-polling", "jsonp-polling"]
+                            "transports": ["xhr-polling", "jsonp-polling"]
                         });
