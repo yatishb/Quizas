@@ -5,5 +5,6 @@ var namespace = '/test'; // change to an empty string to use the global namespac
 var socket = io.connect('http://' + document.domain + ':' + location.port + namespace, {
                             "connect timeout": 300,
                             "close timeout": 60,
-                            "hearbeat timeout": 40
+                            "hearbeat timeout": 40,
+                            "transports": ["htmlfile", "xhr-polling", "jsonp-polling"]
                         });
