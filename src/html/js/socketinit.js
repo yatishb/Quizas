@@ -1,4 +1,4 @@
-namespace = '/test'; // change to an empty string to use the global namespace
+var namespace = '/test'; // change to an empty string to use the global namespace
 
 // the socket.io documentation recommends sending an explicit package upon connection
 // this is specially important when using the global namespace

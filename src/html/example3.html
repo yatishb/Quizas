@@ -12,6 +12,11 @@
 	<link rel="stylesheet" type="text/css" href="css/singlePlayer.css">
 	<script src="js/socketinit.js" />
 	<script>
+		</script>
+ </head>
+ 
+ <body>
+	<script>
 		// socket stuff
 	/*
 			namespace = '/test'; // change to an empty string to use the global namespace
@@ -283,11 +288,7 @@
 			};
 		}
 		
-	</script>
- </head>
- 
- <body>
-	<script>
+//HERE********************************************************************************************
 	window.addEventListener("load",function() {
 	
 	var Q = window.Q = Quintus()
@@ -299,6 +300,11 @@
 	// dynamic vars
 	var qx = Q.width/320;
 	var qy = Q.height/568;
+
+	//Interpreting info from server
+	var INITIATING_FORM, SERVER_FORM;
+	INITIATING_FORM = sessionStorage.getItem("initialization");
+	var initiatingJSON = JSON.parse(INITIATING_FORM);
 	
 	// load initiating form here
 	//enemyName = initiatingJSON.name,

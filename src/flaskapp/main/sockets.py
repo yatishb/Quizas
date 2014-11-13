@@ -182,12 +182,16 @@ def getGameInit(user, user1, user2):
 
 
 # Read the game created beacon from the clients.
+# Copy the information for one client to another socket belonging to the same client
 # If this beacon is received from two users part of the same room,
 # this means that the users are ready to receive the first question.
 # Then send first question
 @socketio.on('gameinitialised', namespace='/test')
 def gameInitialisedByClient():
+
+	# Find another socket with the same id and copy socket information
 	print "game initialized by one client:%r room: %r" % (session['id'],session['room'])
+
 	for sessid, socket in request.namespace.socket.server.sockets.items():
 		print "id : %r  random: %r" % (socket['/test'].session['id'], socket['/test'].session['random'])
 		if (socket['/test'].session['id'] == session['id']) and (socket['/test'].session['random'] != session['random']):
