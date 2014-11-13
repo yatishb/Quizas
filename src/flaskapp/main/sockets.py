@@ -192,8 +192,8 @@ def gameInitialisedByClient():
 
 	HASH_INIT = "ROOM_INIT"
 
-	if hexists(HASH_INIT, room) == True:
-		if hget(HASH_INIT, room) != userid:
+	if redis.hexists(HASH_INIT, room) == True:
+		if redis.hget(HASH_INIT, room) != userid:
 			# Received game initiated beacons from both users
 			# Delete this field from redis now
 			redis.hdel(HASH_INIT, room)
