@@ -494,7 +494,7 @@
 		}));
 	
 		var cdTimer = new Countdown({
-			seconds: 99,
+			seconds: 10,
 			onUpdateStatus: function(sec) {cdText.p.label = "Game starting in " + (Math.ceil(sec)) + " seconds."},
 			onCounterEnd: function() {Q.stageScene("scene1");}
 		});
