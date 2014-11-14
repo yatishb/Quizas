@@ -566,7 +566,7 @@
 			if (!Q.state.get("waiting")) {
 			Q.state.set("waiting", true);
 			timeTakenCurrent = maxTimeAllowed;
-			currentFcAnswer = "nothing";
+			currentFcAnswer = null;
 			clientJSON = createClientToServerJSON(fcQuestion.id, currentFcAnswer, timeTakenCurrent, Q.state.get("currentIndex") + "");
 			console.log("Post to Server: " + clientJSON);
 			socket.emit("readanswer", clientJSON);

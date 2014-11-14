@@ -57,8 +57,9 @@ $(document).ready(function() {
                 'user2': quizas_user_id()
             });
         } else {
+            console.log('rejected');
             socket.emit('reject', {
-                'requester': scontent.requestfrom,
+                'requester': content.requestfrom,
                 'receiver': quizas_user_id()
             });
         }
