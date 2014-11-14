@@ -106,12 +106,40 @@ $(document).ready(function() {
 $('.set_info').on("click", '.simple_set', function() {
     $('.add_set').hide();
     $('.notification').hide();
+    $('.search_set').hide();
     $('.button_container').show();
     $('.grey_cover').show();
 
     selected_set_id = this.id;
 
     console.log("selected_set_id is " + selected_set_id);
+});
+
+$('.add_set').on("click", function() {
+    if ($('.search_set').is(':visible')) {
+        $('.search_set').hide();
+        $('.notification').show();
+    } else {
+        $('.search_set').show();
+        $('.notification').hide();
+    }
+});
+
+$('#search_set_box').keypress(function( event ) {
+    if ( event.which == 13 ) {
+        var search_txt = $(this).val();
+
+        console.log(search_txt);
+
+        if (search_txt || search_txt != "") {
+            $('.set_info').hide();
+            $('.search_result').show();
+            getSearchResult(search_txt);
+        } else {
+            $('.set_info').show();
+            $('.search_result').hide();
+        }
+    }
 });
 
 $('.grey_cover').on("click", function() {
@@ -218,6 +246,31 @@ function getSetContent() {
     })
     .fail(function() {
         console.log("error in getSetContent call back function");
+    });
+}
+
+function getSearchResult(txt) {
+    $.get("/api/sets/search/" + txt, function(data) {
+        var result = JSON.parse(data);
+        console.log(result);
+
+        var sets = $('.search_result');
+        for (var i = 0; i < result.length; i++) {
+            sets.append(
+                "<div class='simple_set " +
+                ("" + result[i].id).replace(":", "_") +
+                "' id='" +
+                result[i].id +
+                "'><div class='set_content title'><p>" +
+                result[i].name + ' [' + result[i].size + ']' +
+                "</div><div class='set_content description'><p>" +
+                result[i].description +
+                "</div></div>"
+            );
+        }
+    })
+    .fail(function() {
+        console.log("error in getSearchResult call back function");
     });
 }
 

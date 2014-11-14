@@ -493,6 +493,10 @@ img {
         border-bottom-left-radius: 10px;
     }
 
+    .search_set {
+        height: 50px;
+    }
+
     .notification {
         height: 50px;
         width: 50px;
@@ -521,6 +525,10 @@ img {
         text-align: center;
         font-size: 80pt;
         border-bottom-left-radius: 25px;
+    }
+
+    .search_set {
+        height: 100px;
     }
 
     .notification {
@@ -563,9 +571,16 @@ img {
     filter: alpha(opacity=50); /* For IE8 and earlier */
 }
 
-.add_set:hover{
+.add_set:hover {
     opacity: 1;
     filter: alpha(opacity=100); /* For IE8 and earlier */   
+}
+
+.search_set {
+    z-index: 50;
+    position: fixed;
+    top: 0;
+    display: none;
 }
 
 .notification {
@@ -579,9 +594,13 @@ img {
     filter: alpha(opacity=50); /* For IE8 and earlier */
 }
 
-.notification:hover{
+.notification:hover {
     opacity: 1;
     filter: alpha(opacity=100); /* For IE8 and earlier */   
+}
+
+.search_result {
+    display: none;
 }
 
 .set_info {
