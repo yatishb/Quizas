@@ -5,7 +5,7 @@ from .. import socketio, redis
 import internalstats, authhelper, quizletsets
 
 defaultRoom = str(0)
-NUMQUES = 10
+NUMQUES = 2
 clients = []
 
 @socketio.on('connect', namespace='/test')
@@ -349,6 +349,9 @@ def sendNextQuesInfoToClient(hashSend, room, done):
 
 	redis.save()
 
+	if done == NUMQUES:
+		clearRoom()
+
 
 
 # This function send the clients the details of the first question
@@ -368,6 +371,8 @@ def sendFirstQuestionInfoToClient(room, usersInRoom):
 			print "client found id:%r random:%r room:%r" % (client.session['id'], client.session['random'], client.session['room'])
 			client.base_emit('nextQuestion', {'data': json.dumps(commonDataToSend)})
 
+	
+
 
 # For a given room, retrieve and return the next question to be asked
 # Also return array of answers, time and index along with the question in the dict
@@ -375,7 +380,7 @@ def getNextQuestionForRoom(room, done):
 	# Handle situation when we have reached the last question
 	# If this happens then we have to clear the room and record the game into the db
 	if done == NUMQUES:
-		clearRoom()
+		# clearRoom()
 		return {}
 
 	# When there are questions left in the game, retrieve the next game and send

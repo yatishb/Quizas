@@ -716,6 +716,7 @@
 		
 		socket.on('gameOver', function(msg) {
 			console.log(msg.data);
+			socket.emit('disconnect');
 		});
 			
 	
