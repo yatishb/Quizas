@@ -418,7 +418,7 @@
 		// default position is question
 		init: function(p) {
 			this._super(p, {
-				color: "white",
+				color: "black",
 				x: 	0,
 				y: 	0,
 				id: 'fc-null',
@@ -508,9 +508,9 @@
 						ansColor = "green";
 					}
 					aBtns[k] = stage.insert(new Q.UI.Button({
-						fill: "gray",
+						fill: "white",
 						highlight: ansColor,
-						fontColor: "white",
+						fontColor: "black",
 						x: (90 + (140*j)) * qx,
 						y: (320 + (120*i)) * qy,
 						border: 2,
@@ -650,7 +650,7 @@
 	
 		//current question
 		var qContainer = stage.insert(new Q.UI.Container({
-			fill: "gray",
+			fill: "white",
 			x: 160 * qx,
 			y: 160 * qy,
 			border: 2,
