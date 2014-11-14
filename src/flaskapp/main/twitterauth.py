@@ -54,6 +54,10 @@ def send_token():
 # The Callback
 @main.route("/twitterauthstep2")
 def get_verification():
+	# User denied our request.
+	if request.args.get("denied") != None:
+		# Redirect back to homepage.
+		return redirect(secrets.auth["login_failure_url"]);
 	
 	#get the verifier key from the request url
 	verifier = request.args['oauth_verifier']
