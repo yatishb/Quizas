@@ -79,6 +79,26 @@ class UserFlashSet(db.Model):
 		return '<UserFlashSet %r %r>' % (self.gameId, self.flashsetId)
 
 
+class UserChallenge(db.Model):
+	challengerId = db.Column(db.Integer)
+	recipientId  = db.Column(db.Integer)
+	gameId       = db.Column(db.String(40), primary_key = True)
+	status       = db.Column(db.String(80))
+
+	__tablename__ = "UserChallenge"
+	def __init__(self, challengerId, recipientId, gameId, status):
+		self.challengerId = challengerId
+		self.recipientId = recipientId
+		self.gameId = gameId
+		self.status = status
+
+	def __repr__(self):
+		return '<UserChallenge %r %r %r %r>' % (self.challengerId,
+		                                        self.recipientId,
+		                                        self.gameId,
+		                                        self.status)
+
+
 class InternalUserAuth(db.Model):
 	# Because we need ID.
 	id = db.Column(db.Integer)
