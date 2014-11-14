@@ -6,7 +6,7 @@ import internalstats, authhelper, quizletsets
 
 defaultRoom = str(0)
 NUMQUES = 10
-
+clients = []
 
 @socketio.on('connect', namespace='/test')
 def socketConnect():
@@ -17,15 +17,17 @@ def socketConnect():
     session['random'] = str(uuid.uuid1())
     print 'Connected %r- %r' % (session['id'], session['random'])
     emit('my response', {'data': 'Connected %r- %r' % (session['id'], session['random'])})
+    clients.append(request.namespace)
 
 @socketio.on('disconnect', namespace='/test')
 def socketDisconnect():
     print('Client disconnected')
+    clients.remove(request.namespace)
 
 @socketio.on('print connected', namespace='/test')
 def printSocketsConnected():
-	for sessid, socket in request.namespace.socket.server.sockets.items():
-		emit('my response', {'data': 'sessions userid: %r- %r' % (socket['/test'].session['id'], socket['/test'].session['random'])})
+	for client in clients:
+		emit('my response', {'data': "session id: %r random: %r"} % (client.session['id'], client.session['random']))
 
 
 # This is to send the notification of a game request to another client C2
@@ -142,7 +144,7 @@ def assignRoom(message):
 		# Contains information about the enemy name, pic, total num questions
 		for sessid, socket in request.namespace.socket.server.sockets.items():
 			if (socket['/test'].session['id'] == user1) or (socket['/test'].session['id'] == user2):
-				gameInitData = getGameInit(socket['/test'].session['id'], user1, user2)
+				gameInitData = getGameInit(socket['/test'].session['id'], user1, user2, room)
 				socket['/test'].base_emit('game accepted', {'data': json.dumps(gameInitData)})
 
 
@@ -150,7 +152,7 @@ def assignRoom(message):
 		emit('my response', {'data': 'Either user(s) or flashset is incorrect'})
 
 
-def getGameInit(user, user1, user2):
+def getGameInit(user, user1, user2, room):
 	if user == user1:
 		opponent = user2
 	else:
@@ -169,7 +171,7 @@ def getGameInit(user, user1, user2):
 	else:
 		encounterwin = headToHead['wins'] * 1.0 / encounter
 
-	gameInitData = { "total": str(NUMQUES), "win": winpercent, "encounter": encounter, "encounterwin": encounterwin}
+	gameInitData = { "total": str(NUMQUES), "win": winpercent, "encounter": encounter, "encounterwin": encounterwin, "room":room}
 	print gameInitData
 	return gameInitData
 
@@ -181,16 +183,16 @@ def getGameInit(user, user1, user2):
 # this means that the users are ready to receive the first question.
 # Then send first question
 @socketio.on('gameinitialised', namespace='/test')
-def gameInitialisedByClient():
-
+def gameInitialisedByClient(message):
+	roomShouldBe = message['room']
 	# Find another socket with the same id and copy socket information
 	print "game initialized by one client:%r room: %r" % (session['id'],session['room'])
 
-	for sessid, socket in request.namespace.socket.server.sockets.items():
-		print "id : %r  random: %r" % (socket['/test'].session['id'], socket['/test'].session['random'])
-		if (socket['/test'].session['id'] == session['id']) and (socket['/test'].session['random'] != session['random']):
-			session['room'] = socket['/test'].session['room']
-			socket['/test'].leave_room(socket['/test'].session['room'])
+	for client in clients:
+		print "id : %r  random: %r" % (client.session['id'], client.session['random'])
+		if (client.session['id'] == session['id']) and (client.session['random'] != session['random'] and client.session['room'] == roomShouldBe):
+			session['room'] = client.session['room']
+			client.leave_room(client.session['room'])
 			join_room(session['room'])
 			break
 
@@ -330,6 +332,7 @@ def sendNextQuesInfoToClient(hashSend, room, done):
 		# For each client in game, send customized message
 		for sessid, socket in request.namespace.socket.server.sockets.items():
 			if socket['/test'].session['id'] == int(eachClient):
+				print "next question: %r" % dataToSend[eachClient]
 				socket['/test'].base_emit('nextQuestion', {'data': json.dumps(dataToSend[eachClient])})
 
 		# If messages have been sent to the client in the room
@@ -351,6 +354,7 @@ def sendFirstQuestionInfoToClient(room):
 
 	# There is no customized message for the first question
 	# Hence broadcast across room can be used to send the details of the next question
+	print "Start game: %r" % commonDataToSend
 	emit('nextQuestion', {'data': json.dumps(commonDataToSend)}, room= room)
 
 
