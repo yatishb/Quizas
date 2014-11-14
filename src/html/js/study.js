@@ -22,8 +22,10 @@ $(document).ready(function() {
             if(search_txt == "") {
                 this_friend.show();
             } else {
-                if(this_friend.find('span').text().toUpperCase().indexOf(search_txt.toUpperCase()) == -1) {
+                if (this_friend.find('span').text().toUpperCase().indexOf(search_txt.toUpperCase()) == -1) {
                     this_friend.hide();
+                } else {
+                    this_friend.show();
                 }
             }
         });
@@ -108,6 +110,7 @@ $(document).ready(function() {
 //$('.list_option ul li').on("click", function() {
 $('.simple_set').on("click", function() {
     $('.add_set').hide();
+    $('.notification').hide();
     $('.button_container').show();
     $('.grey_cover').show();
 
@@ -123,6 +126,7 @@ $('.grey_cover').on("click", function() {
         $('.grey_cover').hide(); 
         $('.button_container').hide();
         $('.add_set').show();
+        $('.notification').show();
     }
 });
 
@@ -235,22 +239,27 @@ function getSetContent() {
 function outputFriends(friends) {
     friends.forEach(function (f) {
         $('.friend_list').append(
-            "<div class='simple_friend' id='" +
+            "<div class='simple_friend " +
+            ("" + f.userid).replace(":", "_") +
+            "' id='" +
             f.userid +
             "'><div class='friend_profile'><img src='" +
-            getFriendProfile(f.userid) +
             "'></div><span>" +
             f.name +
             "</span></div>"
         );
+
+        quizas_get_profile_for(f.userid, function (p) {
+            var address;
+
+            address = p.picture;
+
+            if (!address || address.length == 0 || address == undefined) {
+                address = '../css/images/profile_default.png';
+            }
+
+            var newname = '.' + ("" + f.userid).replace(":", "_");
+            $(newname).find('.friend_profile img').attr('src', address);
+        });
     });
-}
-
-function getFriendProfile(id) {
-    var address;
-    if (!address || address.length == 0) {
-        address = '../css/images/profile_default.png';
-    }
-
-    return address;
 }

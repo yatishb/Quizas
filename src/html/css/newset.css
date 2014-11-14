@@ -86,6 +86,16 @@ body,html{
     /*_filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');*/
 }
 
+.back_button:active {
+    border-color: transparent #6b6b6b transparent transparent;
+    _border-color: #000000 #6b6b6b #000000 #000000;
+}
+
+.back_button:hover {
+    border-color: transparent #6b6b6b transparent transparent;
+    _border-color: #000000 #6b6b6b #000000 #000000;
+}
+
 .footer {
     margin-bottom: 20px;
     text-align: center;
