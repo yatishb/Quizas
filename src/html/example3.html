@@ -566,7 +566,7 @@
 			if (!Q.state.get("waiting")) {
 			Q.state.set("waiting", true);
 			timeTakenCurrent = maxTimeAllowed;
-			currentFcAnswer = null;
+			currentFcAnswer = "null";
 			clientJSON = createClientToServerJSON(fcQuestion.id, currentFcAnswer, timeTakenCurrent, Q.state.get("currentIndex") + "");
 			console.log("Post to Server: " + clientJSON);
 			socket.emit("readanswer", clientJSON);
@@ -667,7 +667,7 @@
 			  prevPlayerAns = serverJSON.player,
 			  prevEnemyAns = serverJSON.enemy;
 			clearTimeout(timeOutTimer);
-			if (questionNumber == null) {questionNumber = -1;}
+			if (isNaN(questionNumber)) {questionNumber = -1;}
 			Q.state.inc("currentIndex", 1);
 			console.log("yatish socket received: " + msg.data);
         });
@@ -721,7 +721,7 @@
 				} else {
 					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "red";
 				}
-				if (prevPlayerAns == null) {
+				if (prevPlayerAns == "null") {
 					playerCounter[Q.state.get("currentIndex") - 2].p.fill = "red";
 				}
 			}
