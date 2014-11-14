@@ -485,6 +485,7 @@
 		
 		// start receive serverForm
 		var serverJSON, fcQuestion, fcAnswers, questionNumber = "0", maxTimeAllowed, prevPlayerAns, prevEnemyAns;
+		var haveReceivedServerJSON = false;
 		/*var serverJSON = JSON.parse(TestServerForm[0]);
 		var fcQuestion = serverJSON.question,
 		  fcAnswers = serverJSON.answers,
@@ -495,6 +496,8 @@
 		var currentFcAnswer, prevFcQuestion;
 		//Q.state.set("currentQuestion", fcQuestion.id);
 		// end receive serverForm
+		
+		setTimeout(function(){if (!haveReceivedServerJSON && serverJSON == null) {alert("TIMEOUT NIGGA");}}, 2000);
 		
 		function generateAnswers() {
 			Q.state.set("waiting", false);
@@ -569,53 +572,6 @@
 			socket.emit("readanswer", clientJSON);
 			}
 		}
-		
-		/*
-		function generateAnswers() {
-			ansDeck = dealAnswers(deck[Q.state.get("currentIndex") - 1], DECK_SIZE);
-		
-			var aBtns = [];
-			var k = 0;
-			for (i=0;i<2;i++) {
-				for (j=0;j<2;j++) {
-					var fcAns = JSON.parse(getFlashCard(FLASH_SET, ansDeck[k])).answer;
-					var ansColor = "red";
-					if (deck[Q.state.get("currentIndex") - 1] == ansDeck[k]) {
-						ansColor = "green";
-					}
-					aBtns[k] = stage.insert(new Q.UI.Button({
-						fill: "gray",
-						highlight: ansColor,
-						fontColor: "white",
-						x: 90 + (140*j),
-						y: 320 + (120*i),
-						border: 2,
-						shadow: 3,
-						shadowColor: "rgba(0,0,0,0.5)",
-						w: 110,
-						h: 100,
-						label: fcAns,
-						name: k
-						}, function() {
-							// do something
-							if (deck[Q.state.get("currentIndex") - 1] == ansDeck[this.p.name]) {
-								console.log("Placeholder Trigger: Correct");
-								playerCounters[Q.state.get("currentIndex") - 1].p.fill = "green";
-								Q.state.inc("playerScore", 1);
-							} else {
-								console.log("Placeholder Trigger: Wrong");
-								playerCounters[Q.state.get("currentIndex") - 1].p.fill = "red";
-							}
-							
-							Q.state.inc("currentIndex", 1);
-							TIMER.start();
-					}));
-					k = k + 1;
-				}
-			}
-			return aBtns;
-		}
-		*/
 		
 		function destroyAnswers(aBtns) {
 			for (i=0;i<aBtns.length;i++) {
@@ -710,18 +666,19 @@
 			  maxTimeAllowed = parseInt(serverJSON.time),
 			  prevPlayerAns = serverJSON.player,
 			  prevEnemyAns = serverJSON.enemy;
+			 haveReceivedServerJSON = true;
 			 Q.state.inc("currentIndex", 1);
 			 console.log("yatish socket received: " + msg.data);
         });
 		
 		socket.on('gameOver', function(msg) {
 			console.log(msg.data);
-			if (prevFcQuestion.id == prevEnemyAns) {
+			/*if (prevFcQuestion.id == prevEnemyAns) {
 				enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "green";
 				Q.state.inc("enemyScore", 1);
 			} else {
 				enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "red";
-			}
+			}*/
 			socket.emit('disconnect');
 		});
 			
@@ -730,7 +687,7 @@
 			
 			console.log(serverJSON);
 		
-			if (Q.state.get("currentIndex") == questionNumber) {
+			if (Q.state.get("currentIndex") >= questionNumber) {
 			// this part should be in above handler:
 				// if (Q.state.get("currentIndex") > 1) {prevFcQuestion = fcQuestion};
 				
@@ -763,6 +720,9 @@
 				} else {
 					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "red";
 				}
+				if (prevPlayerAns == null) {
+					playerCounter[Q.state.get("currentIndex") - 2].p.fill = "red";
+				}
 			}
 			
 				
@@ -776,7 +736,8 @@
 						if (isPhaseOne) {
 							// initiate Phase 2
 							bomb.destroy();
-							alert("Phase Two");
+							console.log("PHASE TWO");
+							isPhaseOne = false;
 						}
 					}
 				} else {
