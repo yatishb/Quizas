@@ -261,22 +261,6 @@
 		console.log(initiatingJSON);
 		var playerName;
 		var enemyName, enemySprite, enemyWinRate, enemyEncounter, totalQuestions;
-		/*
-		var enemyName = initiatingJSON.name,
-		  enemySprite = initiatingJSON.sprite,
-		  enemyWinRate = initiatingJSON.win,
-		  enemyEncounter = initiatingJSON.encounter,
-		  totalQuestions = initiatingJSON.total;
-		*/
-		//var serverJSON = JSON.parse(SERVER_FORM);
-		/*
-		var fcQuestion = serverJSON.question,
-		  fcAnswers = serverJSON.answers,
-		  questionNumber = serverJSON.index,
-		  maxTimeAllowed = serverJSON.time,
-		  prevPlayerAns = serverJSON.player,
-		  prevEnemyAns = serverJSON.enemy;
-		*/
 		
 		var battleLibrary = []
 		function addBattle(fcQ, playerA, enemyA, playerTime) { // all are flashcard objects
@@ -722,7 +706,7 @@
 					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "red";
 				}
 				if (prevPlayerAns == "null") {
-					playerCounter[Q.state.get("currentIndex") - 2].p.fill = "red";
+					playerCounters[Q.state.get("currentIndex") - 2].p.fill = "red";
 				}
 			}
 			
