@@ -26,40 +26,73 @@
     <link rel="stylesheet" type="text/css" href="css/jquery.mobile.structure.css"></link>
     <link rel="stylesheet" type="text/css" href="css/jquery.mobile.theme.css"></link>
 
+    
+    <script src="js/quizas_auth_helper.js"></script>
+    <script src="js/quizas_facebook.js"></script>
+
+    <!-- Load the FB JS SDK -->
+    <script>
+    window.fbAsyncInit = function() {
+        FB.init({
+            appId      : quizas_fbappid,
+            xfbml      : true,
+            version    : 'v2.1'
+        });
+
+        getFacebookProfile('10204898258962045', outputProfile);
+    };
+
+    (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+    </script>
+
 </head>
 <body>
+    <div id="fb-root"></div>
+
+    <div class="profile_container">
+        <div class="profile_photo">
+            <img src="">
+        </div>        
+        <div class="profile_name">
+            <span class="name_title">Name:</span>
+            <span class="name_content"></span>
+        </div>
+    </div>
+
+    <div class="option_container">
+        <div class="create_set">Add you OWN sets!!!</div>
+        <div class="features">Features</div>
+        <div class="about">About Us</div>
+    </div>
+
+    <div class="login_container">
+        <div class="login_button">
+            <div class="let-icon-bg"></div>
+            <div class="let-bg"></div>
+        </div>
+        <div class="login_button">
+            <div class="fb-icon-bg"></div>
+            <div class="fb-bg"></div>
+        </div>
+        <div class="login_button">
+            <div class="twi-icon-bg"></div>
+            <div class="twi-bg"></div>
+        </div>
+        <div class="login_button">
+            <div class="g-icon-bg"></div>
+            <div class="g-bg"></div>
+        </div>
+    </div>
+
+    <div class="logout" onclick="logout_clear()">Log Out</div>
 
     <div data-role="page" id="page1">
-
-    <div data-role="content">
-        <div class="content-primary list_option">   
-        <ul data-role="listview">
-            <li>
-                <h3>Add your OWN sets!!!</h3>
-                <p>Create your original study sets.</p>
-            </li>
-            <li>
-                <h3>My Account</h3>
-                <p>View details of your account.</p>
-            </li>
-            <li>
-                <h3>Reminder Settings</h3>
-                <p>Set the next study reminder.</p>
-            </li>
-            <li>
-                <h3>Features</h3>
-                <p>View Quizas' cool features.</p>
-            </li>
-            <li>
-                <h3>About Us</h3>
-            </li>
-            <li onclick="location.href='index.html'">
-                <h3>Log Out</h3>
-            </li>
-        </ul>
-        </div><!--/content-primary -->
-    </div><!-- /content -->
-
     <div data-role="footer" data-id="foo data-icon="grid"1" data-position="fixed">
         <div data-role="navbar" data-iconpos="top">
             <ul>
@@ -69,15 +102,15 @@
             </ul>
         </div><!-- /navbar -->
     </div><!-- /footer -->
-
     </div>
 
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="js/jquery.mobile.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script src="js/jquery.mobile.js"></script>
 
     <script src="js/settings.js"></script>
-    <script src="js/quizas_auth_helper.js"></script>
 
     <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

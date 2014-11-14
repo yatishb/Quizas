@@ -5,8 +5,8 @@ body {
 }
 
 body, html {
-    overflow: hidden;
     overflow-x: hidden;
+    overflow-y: auto;
 }
 
 img {
@@ -31,6 +31,10 @@ img {
     font-family: font_set_content;
     src: url(font/american-typewriter-light.ttf) format("truetype"),
          url(font/american-typewriter-light.eot) format('embedded-opentype');
+}
+
+#fb-root {
+    display: none;
 }
 
 .jqm-list .ui-btn-up-d.ui-btn-active, 
@@ -183,7 +187,7 @@ img {
 .logo_text {
     font-family: font_logo, sans-serif;
     color: white;
-    opacity: 0.8;
+    opacity: 0.9;
     text-align: center;
     font-size: 420%;
     margin-left: auto;
@@ -196,7 +200,7 @@ img {
     left: 50%;
     margin-left: -50px;
     margin-bottom: 10px;
-    position: fixed;
+    position: relative;
     width: 100px;
     color: white;
     opacity: 0.7;
@@ -585,8 +589,9 @@ img {
     width: 100%;
     text-align: center;
     z-index: 100;
-    position: fixed;
+    position: relative;
     display: none;
+    cursor: pointer;
 }
 
 .round_button {
@@ -716,7 +721,8 @@ img {
 .list_search input[type="text"] {
     font-family: 'Open Sans', sans-serif;
     padding: 10px;
-    border: none;
+    border: 0;
+    outline: none;
     border-bottom: solid 2px #c9c9c9;
     border-radius: 0;
     -o-border-radius: 0;
@@ -900,4 +906,32 @@ img {
     -ms-transform: rotateY(180deg);
     -moz-transform: rotateY(180deg);
     -webkit-transform: rotateY(180deg);
+}
+
+/*** Start of settings.html ***/
+.profile_container {
+    position: relative;
+    display: inline-block;
+    margin: 10px auto;
+    z-index: 10;
+}
+
+.profile_photo {
+    margin: 10px auto;
+    position: relative;
+}
+
+.profile_photo img {
+
+}
+
+.profile_name {
+
+}
+
+.option_container {
+    position: relative;
+    display: inline-block;
+    margin: 10px auto;
+    z-index: 10;
 }

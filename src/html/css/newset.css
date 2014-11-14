@@ -16,6 +16,10 @@ body,html{
         width: 40%;
         margin: 5px 5px;
     }
+
+    .logo_text {
+        font-size: 60pt;
+    }
 }
 
 @media screen and (min-width: 501px) {
@@ -27,6 +31,10 @@ body,html{
     .button {
         width: 36%;
         margin: 10px 10px;
+    }
+
+    .logo_text {
+        font-size: 90pt;
     }
 }
 
@@ -48,6 +56,34 @@ body,html{
 
 .page_container.v_type {
     background-color: #c8dfeb;
+}
+
+.top_bar {
+    width: 100%;
+    height: 40px;
+    top: 0;
+    left: 0;
+    position: fixed;
+    background-color: #3e8871;
+    z-index: 100;
+    color: white;
+    text-align: center;
+    line-height: 40px;
+}
+
+.back_button {
+    width: 0;
+    height: 0;
+    top: 0;
+    left: 0;
+    margin: 5px 0 0 5px;
+    z-index: 200;
+    border-style: solid;
+    border-width: 25px 43.3px 25px 0;
+    border-color: transparent #e3e3e3 transparent transparent;
+    line-height: 0px;
+    _border-color: #000000 #e3e3e3 #000000 #000000;
+    /*_filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');*/
 }
 
 .footer {
@@ -86,15 +122,14 @@ body,html{
 .logo_text {
     font-family: font_logo, sans-serif;
     color: white;
-    opacity: 0.7;
+    opacity: 0.9;
     text-align: center;
-    font-size: 80pt;
     margin: 30px auto;
 }
 
 .subtitle {
     font-size: 14pt;
-    margin: 5px auto 20px auto;
+    margin: -5px auto 25px auto;
 }
 
 .copyright,

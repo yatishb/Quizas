@@ -9,7 +9,6 @@ $(document).ready(function() {
     if(result.length == 0)
         this.location.href='/index.html';
 
-    $('body,html').css('overflow','visible');
     $('body,html').css('overflow-x','hidden');
 
     getSetContent();
@@ -30,7 +29,7 @@ $(document).ready(function() {
         });
     });
 
-    namespace = '/test'; // change to an empty string to use the global namespace
+    /*namespace = '/test'; // change to an empty string to use the global namespace
 
     // the socket.io documentation recommends sending an explicit package upon connection
     // this is specially important when using the global namespace
@@ -38,9 +37,9 @@ $(document).ready(function() {
                                 "connect timeout": 300,
                                 "close timeout": 30,
                                 "hearbeat timeout": 30
-                            });
+                            });*/
 
-    console.log("socket: "+socket);
+    console.log(socket);
 
     // event handler for server sent data
     // the data is displayed in the "Received" section of the page
@@ -56,6 +55,11 @@ $(document).ready(function() {
                 'flashset': "quizlet:39748410",
                 'user2': quizas_user_id()
             });
+            /*socket.emit('assignroom', {
+                'user1': content.requestfrom,
+                'flashset': content.set,
+                'user2': quizas_user_id()
+            });*/
         } else {
             socket.emit('reject', {
                 'requester': scontent.requestfrom,
@@ -97,7 +101,7 @@ $(document).ready(function() {
         console.log("Accepted by ");
         console.log(content);
 
-        initializeGame(content);
+        initializeMultiplayerGame(content);
     });
 });
 
@@ -189,12 +193,20 @@ $(document).ajaxComplete(function() {
 });
 
 function initializeGame(content) {
-    //name
-    //sprite
     //win
     //encounter
     //total
     window.location.href="singlePlayer.html";
+}
+
+function initializeMultiplayerGame(content) {
+    //win
+    //encounter
+    //encounterwin
+    //total
+    sessionStorage.setItem("initialization", JSON.stringify(content));
+    socket.emit('disconnect');
+    window.location.href="example3.html";
 }
 
 function getSetContent() {

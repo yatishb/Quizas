@@ -20,11 +20,14 @@
 
     <link rel="stylesheet" href="css/newset.css" />
 
+    <script src="js/quizas_auth_helper.js"></script>
 </head>
 
 <body class="page_container v_original">
     <div class="page_main">
         <div class="background"></div>
+
+        <div class="back_button"></div>
 
         <div class="button_container v_original">
             <div class="logo_text">Quizas</div>
@@ -40,6 +43,19 @@
             <h1>Study Set Details
                 <span>Please check all the texts in the fields.</span>
             </h1>
+            <label class="not_sign_in">
+                <span>Your social account</span>
+                <select name="selection">
+                    <option value="Quizlet">Quizlet</option>
+                    <option value="Facebook">Facebook</option>
+                    <option value="Twitter">Twitter</option>
+                    <option value="Google+">Google+</option>
+                </select>
+            </label>
+            <label class="not_sign_in">
+                <span>Your user name :</span>
+                <input id="user" type="text" name="user" placeholder="Your user name" />
+            </label>
             <label>
                 <span>Name of Study Set :</span>
                 <input id="name" type="text" name="name" placeholder="The Full Name" />
@@ -90,6 +106,19 @@
             <h1>Study Set Details
                 <span>Please enter texts in the fields.</span>
             </h1>
+            <label class="not_sign_in">
+                <span>Your social account</span>
+                <select name="selection">
+                    <option value="Quizlet">Quizlet</option>
+                    <option value="Facebook">Facebook</option>
+                    <option value="Twitter">Twitter</option>
+                    <option value="Google+">Google+</option>
+                </select>
+            </label>
+            <label class="not_sign_in">
+                <span>Your user name :</span>
+                <input id="user" type="text" name="user" placeholder="Your user name" />
+            </label>
             <label>
                 <span>Name of Study Set :</span>
                 <input id="name" type="text" name="name" placeholder="The Full Name" />
@@ -142,8 +171,10 @@
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="js/createNewSet.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
     <script src="js/jquery.mobile.js"></script>
+
+    <script src="js/createNewSet.js"></script>
 
     <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

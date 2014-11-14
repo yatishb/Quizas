@@ -138,7 +138,10 @@
   var Q = window.Q = Quintus()
     .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
     .setup({
-    maximize: true
+    width: 320,
+	height: 568,
+	scaleToFit: true
+	//maximize: "touch"
   }).touch();
   
   Q.state.set({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
@@ -149,7 +152,7 @@
       this._super({
         label: "[score: " + Q.state.get('score') + "]",
         x: 90,
-        y: 30
+        y: 20
       });
       Q.state.on("change.score",this,"score");
     },
@@ -164,7 +167,7 @@
       this._super({
         label: "[Q: 1/" + Q.state.get("totalQuestions") + "]",
         x: 240,
-        y: 30
+        y: 20
       });
       Q.state.on("change.currentQuestion",this,"qc");
     },
@@ -253,7 +256,7 @@
             highlight: ansColor,
             fontColor: "white",
             x: 90 + (140*j),
-            y: 360 + (130*i),
+            y: 290 + (110*i),
             border: 2,
             shadow: 3,
             shadowColor: "rgba(0,0,0,0.5)",
@@ -290,13 +293,14 @@
     var qContainer = stage.insert(new Q.UI.Container({
       fill: "gray",
       x: 160,
-      y: 160,
+      y: 140,
       border: 2,
       shadow: 3,
       shadowColor: "rgba(0,0,0,0.5)",
       w: 250,
       h: 180
     }));
+
     
     var aBtns = generateAnswers();
     
