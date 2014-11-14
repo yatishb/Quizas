@@ -205,8 +205,7 @@ function initializeMultiplayerGame(content) {
     //encounterwin
     //total
     sessionStorage.setItem("initialization", JSON.stringify(content));
-    /*sessionStorage.setItem("socket", CircularJSON.stringify(socket));
-    console.log(CircularJSON.stringify(socket));*/
+    socket.emit('disconnect');
     window.location.href="example3.html";
 }
 
