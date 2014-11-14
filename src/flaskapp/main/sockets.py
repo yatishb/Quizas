@@ -6,7 +6,7 @@ import internalstats, authhelper, quizletsets
 
 defaultRoom = str(0)
 NUMQUES = 10
-
+clients = []
 
 @socketio.on('connect', namespace='/test')
 def socketConnect():
@@ -17,15 +17,17 @@ def socketConnect():
     session['random'] = str(uuid.uuid1())
     print 'Connected %r- %r' % (session['id'], session['random'])
     emit('my response', {'data': 'Connected %r- %r' % (session['id'], session['random'])})
+    clients.append(request.namespace)
 
 @socketio.on('disconnect', namespace='/test')
 def socketDisconnect():
     print('Client disconnected')
+    clients.remove(request.namespace)
 
 @socketio.on('print connected', namespace='/test')
 def printSocketsConnected():
-	for sessid, socket in request.namespace.socket.server.sockets.items():
-		emit('my response', {'data': 'sessions userid: %r- %r' % (socket['/test'].session['id'], socket['/test'].session['random'])})
+	for client in clients:
+		emit('my response', {'data': "session id: %r random: %r" % (client.session['id'], client.session['random'])})
 
 
 # This is to send the notification of a game request to another client C2
@@ -52,11 +54,11 @@ def sendNotificationToSocket(message):
 		emit('user non-existent', {'data': json.dumps(gameRejection)})
 	else:
 		gameRequest = {"set": flashset, "requestfrom": user}
-		for sessid, socket in request.namespace.socket.server.sockets.items():
-			if socket['/test'].session['id'] == internalUserOppo:
+		for client in clients:
+			if client.session['id'] == internalUserOppo:
 				print "sending request"
 				flagFoundUser = True
-				socket['/test'].base_emit('game request', {'data': json.dumps(gameRequest)})
+				client.base_emit('game request', {'data': json.dumps(gameRequest)})
 
 	# If user not found
 	if flagFoundUser == False:
@@ -75,9 +77,9 @@ def gameRejected(message):
 
 	internalUserInitiatedReq = authhelper.lookup(userInitiatedReq)
 	gameRejection = {'rejectedby': userReceiver}
-	for sessid, socket in request.namespace.socket.server.sockets.items():
-		if socket['/test'].session['id'] == internalUserInitiatedReq:
-			socket['/test'].base_emit('game rejected', {'data': json.dumps(gameRejection)})
+	for client in clients:
+		if client.session['id'] == internalUserInitiatedReq:
+			client.base_emit('game rejected', {'data': json.dumps(gameRejection)})
 
 
 
@@ -110,26 +112,25 @@ def assignRoom(message):
 		redis.hset("ROOMS_CARDS", room, json.dumps(flashcardsJson))
 		redis.save()
 
-		for sessid, socket in request.namespace.socket.server.sockets.items():
-			if (socket['/test'].session['id'] == user1) or (socket['/test'].session['id'] == user2):
-				if socket['/test'].session['room'] == defaultRoom:
-					socket['/test'].session['room'] = room
-					socket['/test'].join_room(room)
-					# print "Assigned: user:%r room:%r" % (socket['/test'].session['id'], socket['/test'].session['room'])
+		for client in clients:
+			if (client.session['id'] == user1) or (client.session['id'] == user2):
+				if client.session['room'] == defaultRoom:
+					client.session['room'] = room
+					# print "Assigned: user:%r room:%r" % (client.session['id'], client.session['room'])
 					
 					# Check redis if room exists
 					# Add client to room and create room if not found
 					if redis.hexists("ROOMS", room) == True :
 						usersInRoom = redis.hget("ROOMS", room)
-						usersInRoom += ", %r" % socket['/test'].session['id']
+						usersInRoom += ", %r" % client.session['id']
 						redis.hset("ROOMS", room, usersInRoom)
 						redis.save()
-						print "User: %r room: %r" % (socket['/test'].session['id'], socket['/test'].session['room'])
+						print "User: %r room: %r" % (client.session['id'], client.session['room'])
 					else:
-						redis.hset("ROOMS", room, socket['/test'].session['id'])
+						redis.hset("ROOMS", room, client.session['id'])
 						redis.save()
-						print "User: %r room: %r" % (socket['/test'].session['id'], socket['/test'].session['room'])
-					socket['/test'].base_emit('my response', {'data': 'GAME BEGINS...'})
+						print "User: %r room: %r" % (client.session['id'], client.session['room'])
+					client.base_emit('my response', {'data': 'GAME BEGINS...'})
 				
 				else:
 					emit('my response', {'data': 'Already part of a room'})
@@ -140,17 +141,17 @@ def assignRoom(message):
 
 		# Send game initilization json to the clients
 		# Contains information about the enemy name, pic, total num questions
-		for sessid, socket in request.namespace.socket.server.sockets.items():
-			if (socket['/test'].session['id'] == user1) or (socket['/test'].session['id'] == user2):
-				gameInitData = getGameInit(socket['/test'].session['id'], user1, user2)
-				socket['/test'].base_emit('game accepted', {'data': json.dumps(gameInitData)})
+		for client in clients:
+			if (client.session['id'] == user1) or (client.session['id'] == user2):
+				gameInitData = getGameInit(client.session['id'], user1, user2, room)
+				client.base_emit('game accepted', {'data': json.dumps(gameInitData)})
 
 
 	else:
 		emit('my response', {'data': 'Either user(s) or flashset is incorrect'})
 
 
-def getGameInit(user, user1, user2):
+def getGameInit(user, user1, user2, room):
 	if user == user1:
 		opponent = user2
 	else:
@@ -169,7 +170,7 @@ def getGameInit(user, user1, user2):
 	else:
 		encounterwin = headToHead['wins'] * 1.0 / encounter
 
-	gameInitData = { "total": str(NUMQUES), "win": winpercent, "encounter": encounter, "encounterwin": encounterwin}
+	gameInitData = { "total": str(NUMQUES), "win": winpercent, "encounter": encounter, "encounterwin": encounterwin, "room":room}
 	print gameInitData
 	return gameInitData
 
@@ -181,22 +182,30 @@ def getGameInit(user, user1, user2):
 # this means that the users are ready to receive the first question.
 # Then send first question
 @socketio.on('gameinitialised', namespace='/test')
-def gameInitialisedByClient():
-
-	# Find another socket with the same id and copy socket information
+def gameInitialisedByClient(message):
+	roomShouldBe = str(message['room'])
 	print "game initialized by one client:%r room: %r" % (session['id'],session['room'])
 
-	for sessid, socket in request.namespace.socket.server.sockets.items():
-		print "id : %r  random: %r" % (socket['/test'].session['id'], socket['/test'].session['random'])
-		if (socket['/test'].session['id'] == session['id']) and (socket['/test'].session['random'] != session['random']):
-			session['room'] = socket['/test'].session['room']
-			socket['/test'].leave_room(socket['/test'].session['room'])
-			join_room(session['room'])
+	# Check if user part of the room
+	# If so then add room information to the connection
+	userPartOfRoom = False
+	usersInRoom = redis.hget("ROOMS", roomShouldBe)
+	usersInRoom = usersInRoom.split(", ")
+	for eachUser in usersInRoom:
+		if session['id'] == int(eachUser):
+			userPartOfRoom = True
 			break
+
+	if userPartOfRoom == True:
+		session['room'] = roomShouldBe
+	else:
+		emit('error', {'data' : 'INTRUDER!'})
+		return
 
 	print "the client now belongs to room %r" % session['room']
 	room = session['room']
 	userid = session['id']
+	join_room(session['room'])
 
 	HASH_INIT = "ROOM_INIT"
 
@@ -265,11 +274,11 @@ def clearRoom():
 		
 		for eachUser in usersInRoom :
 			# Sending expiry information to client
-			for sessid, socket in request.namespace.socket.server.sockets.items():
-				if socket['/test'].session['id'] == int(eachUser):
-					socket['/test'].session['room'] = defaultRoom
-					socket['/test'].leave_room(room)
-					socket['/test'].base_emit('gameOver', {'data': "GAME OVER!!"})
+			for client in clients:
+				if client.session['id'] == int(eachUser):
+					client.session['room'] = defaultRoom
+					client.leave_room(room)
+					client.base_emit('gameOver', {'data': "GAME OVER!!"})
 		# emit('my response', {'data': "checking for room"}, room=room) # This doesn't send message to any client. Verified
 		redis.save()
 	else:
@@ -328,9 +337,10 @@ def sendNextQuesInfoToClient(hashSend, room, done):
 
 	for eachClient in clientsList:
 		# For each client in game, send customized message
-		for sessid, socket in request.namespace.socket.server.sockets.items():
-			if socket['/test'].session['id'] == int(eachClient):
-				socket['/test'].base_emit('nextQuestion', {'data': json.dumps(dataToSend[eachClient])})
+		for client in clients:
+			if client.session['id'] == int(eachClient):
+				print "next question: %r" % dataToSend[eachClient]
+				client.base_emit('nextQuestion', {'data': json.dumps(dataToSend[eachClient])})
 
 		# If messages have been sent to the client in the room
 		# Remove the redis key-value pair for message to be sent to a client
@@ -351,8 +361,10 @@ def sendFirstQuestionInfoToClient(room):
 
 	# There is no customized message for the first question
 	# Hence broadcast across room can be used to send the details of the next question
+	print "Start game: %r" % commonDataToSend
+	# for client in clients:
+	# 	print "client found id:%r random:%r room:%r" % (client.session['id'], client.session['random'], client.session['room'])
 	emit('nextQuestion', {'data': json.dumps(commonDataToSend)}, room= room)
-
 
 
 # For a given room, retrieve and return the next question to be asked

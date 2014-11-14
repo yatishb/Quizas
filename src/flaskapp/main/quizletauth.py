@@ -26,13 +26,20 @@ def auth1():
 
 @main.route("/quizletauthstep2")
 def authparam():
+	# When user declines request,
+	# No arguments are given; whereas on success, is 'state' and 'code'.
+	if request.args.get('state') == None and \
+	   request.args.get('code') == None:
+		# Redirect back to homepage.
+		return redirect(secrets.auth["login_failure_url"]);
+
 	tokenUrl = "https://api.quizlet.com/oauth/token"
 	randomStateString = "quiwas"
 	clientID = CONSUMER_TOKEN
 	keySecret = CONSUMER_SECRET
 
 	state = request.args.get('state')
-	if state != randomStateString :
+	if state != randomStateString:
 		return "Didn't receive correct state"
 
 	code = request.args.get('code')

@@ -313,6 +313,7 @@
 	  enemyWinRate = initiatingJSON.win;
 	  enemyEncounter = initiatingJSON.encounter;
 	  totalQuestions = initiatingJSON.total;
+	  var gameroom = initiatingJSON.room;
 	  // encounterwin
 	  
 	  
@@ -865,7 +866,11 @@
  
  <footer>
 	<script>
-		socket.emit('gameinitialised');
+		INITIATING_FORM = sessionStorage.getItem("initialization");
+		initiatingJSON = JSON.parse(INITIATING_FORM);
+		gameroom = initiatingJSON.room;
+		console.log(gameroom);
+		socket.emit('gameinitialised', {"room":gameroom});
 	</script>
  </footer>
 </html>
