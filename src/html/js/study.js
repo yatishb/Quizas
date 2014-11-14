@@ -1,4 +1,3 @@
-var set_ids;
 var content;
 var next_page;
 var selected_set_id;
@@ -108,7 +107,7 @@ $(document).ready(function() {
 });
 
 //$('.list_option ul li').on("click", function() {
-$('.simple_set').on("click", function() {
+$('.set_info').on("click", '.simple_set', function() {
     $('.add_set').hide();
     $('.notification').hide();
     $('.button_container').show();
@@ -133,7 +132,6 @@ $('.grey_cover').on("click", function() {
 $('#quiz').on("tap", function(){
     next_page = "q";
     $('.friend_window').show();
-    //window.location.href="singlePlayer.html";
 });
 
 $('#flashcard').on("tap", function(){
@@ -155,15 +153,6 @@ $('.friend_list').on("click", '.simple_friend', function () {
     console.log("selected_friend_id is " + selected_friend_id);
 });
 
-// $('.friend_list').on("click", '.simple_friend span', function () {
-//     $('.selected').removeClass('selected');
-//     $(this).parent().find('.friend_profile').addClass('selected');
-
-//     selected_friend_id = $(this).parent().attr('id');
-
-//     console.log("selected_friend_id is " + selected_friend_id);
-// });
-
 $('.list_bottom').on("click", function () {
     if (selected_friend_id=="0") {
         alert("Please select a friend");
@@ -180,29 +169,10 @@ $('.list_bottom').on("click", function () {
             'set': selected_set_id,
             'user': quizas_user_id()
         });
-
     }
 
-    // if (next_page=="q") window.location.href="singlePlayer.html";
     // else if (next_page=="c") window.location.href="#";
     // else alert("error in starting game");
-});
-
-$(document).ajaxComplete(function() {
-    if(set_ids == null) return;
-    
-    var sets = $('.set_info');
-    for (var i = 0; i < set_ids.length; i++) {
-        // sets.append(
-        //     "<div class='simple_set' id='" +
-        //     i +
-        //     "'><div class='set_content title'><p>" +
-        //         set_ids.cards[i].question +
-        //         "</div><div class='set_content description'><p>" +
-        //         set_ids.cards[i].answer +
-        //         "</div></div>"
-        // );
-    };
 });
 
 function initializeGame(content) {
@@ -224,15 +194,33 @@ function initializeMultiplayerGame(content) {
 
 function getSetContent() {
     $.get("/api/user/" + quizas_user_id() + "/sets", function(data) {
-           set_ids = JSON.parse(data);
-           console.log(set_ids);
-           if(set_ids != null)
-               console.log("Set data is empty.");
-           else
-               console.log("Failed to fetch data.");
+        var set_ids = JSON.parse(data);
+        console.log(set_ids);
+        // if(set_ids != null)
+        //     console.log("Set data is empty.");
+        // else
+        //     console.log("Failed to fetch data.");
+
+        var sets = $('.set_info');
+        for (var i = 0; i < set_ids.length; i++) {
+            $.get("/api/sets/" + set_ids[i], function(data) {
+                var set_content = JSON.parse(data);
+                // console.log(data);
+
+                sets.append(
+                    "<div class='simple_set " +
+                    ("" + set_content.id).replace(":", "_") +
+                    "' id='" +
+                    set_content.id +
+                    "'><div class='set_content title'><p>" +
+                    set_content.name +
+                    "</div></div>"
+                );
+            });
+        };
     })
-     .fail(function() {
-        alert("error in getSetContent call back function");
+    .fail(function() {
+        console.log("error in getSetContent call back function");
     });
 }
 

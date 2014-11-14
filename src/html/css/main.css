@@ -33,6 +33,10 @@ img {
          url(font/american-typewriter-light.eot) format('embedded-opentype');
 }
 
+@font-face {
+
+}
+
 #fb-root {
     display: none;
 }
@@ -611,13 +615,17 @@ img {
 .set_content p{
     display: table-cell;
     vertical-align: middle;
-    font-family: 'font_set_content', Fallback, sans-serif;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: light;
 }
 
 .set_content.title {
-    height: 65%;
+    height: 100%;
+    max-width: 88%;
     font-weight: 800;
-    font-size: 35pt;
+    font-size: 16pt;
+    text-align: center;
+    word-wrap: break-word;
 }
 
 .set_content.description {
