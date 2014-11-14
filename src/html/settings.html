@@ -49,29 +49,40 @@
         js.src = "//connect.facebook.net/en_US/sdk.js";
         fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
+
+    function outputProfile (profile) {
+        $('.profile_photo img').attr('src', profile.picture);
+        $('.name_content').text(profile.name);
+    }
     </script>
 
 </head>
 <body>
+    <div data-role="page" id="page1">
+
     <div id="fb-root"></div>
 
+    <div class="container settings">
     <div class="profile_container">
         <div class="profile_photo">
             <img src="">
         </div>        
         <div class="profile_name">
-            <span class="name_title">Name:</span>
-            <span class="name_content"></span>
+            <div class="container">
+                <div class="name_title">Name:</div>
+                <div class="name_content"></div>
+            </div>
         </div>
     </div>
 
     <div class="option_container">
-        <div class="create_set">Add you OWN sets!!!</div>
-        <div class="features">Features</div>
-        <div class="about">About Us</div>
+        <div class="option create_set">Add you OWN sets!!!</div>
+        <div class="option about">About Us</div>
+        <div class="option features">Features</div>
+        <div class="option add_sns">Link with more accounts!</div>
     </div>
 
-    <div class="login_container">
+    <div class="login_container v_setting">
         <div class="login_button">
             <div class="let-icon-bg"></div>
             <div class="let-bg"></div>
@@ -91,13 +102,13 @@
     </div>
 
     <div class="logout" onclick="logout_clear()">Log Out</div>
+    </div>
 
-    <div data-role="page" id="page1">
     <div data-role="footer" data-id="foo data-icon="grid"1" data-position="fixed">
         <div data-role="navbar" data-iconpos="top">
             <ul>
-                <li><a href="study.html" data-icon="grid" data-prefetch="true" data-transition="none">Study</a></li>
-                <li><a href="stats.html" data-icon="info" data-icon="grid" data-prefetch="true" data-transition="none">Stats</a></li>
+                <li><a onclick="window.open('study.html','_self');" data-icon="grid" data-prefetch="true" data-transition="none">Study</a></li>
+                <li><a onclick="window.open('stats.html','_self');" data-icon="info" data-icon="grid" data-prefetch="true" data-transition="none">Stats</a></li>
                 <li><a href="#" data-icon="gear" data-prefetch="true" data-transition="none" class="ui-btn-active ui-state-persist">Settings</a></li>
             </ul>
         </div><!-- /navbar -->

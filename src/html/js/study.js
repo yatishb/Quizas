@@ -142,7 +142,7 @@ $('#challenge').on("tap", function(){
     $('.friend_window').show();
 });
 
-$('.simple_friend').on("click", function () {
+$('.friend_list').on("click", '.simple_friend', function () {
     $('.selected').removeClass('selected');
     $(this).find('.friend_profile').addClass('selected');
 
@@ -150,6 +150,15 @@ $('.simple_friend').on("click", function () {
 
     console.log("selected_friend_id is " + selected_friend_id);
 });
+
+// $('.friend_list').on("click", '.simple_friend span', function () {
+//     $('.selected').removeClass('selected');
+//     $(this).parent().find('.friend_profile').addClass('selected');
+
+//     selected_friend_id = $(this).parent().attr('id');
+
+//     console.log("selected_friend_id is " + selected_friend_id);
+// });
 
 $('.list_bottom').on("click", function () {
     if (selected_friend_id=="0") {
@@ -230,10 +239,19 @@ function outputFriends(friends) {
             "<div class='simple_friend' id='" +
             f.userid +
             "'><div class='friend_profile'><img src='" +
-
+            getFriendProfile(f.userid) +
             "'></div><span>" +
             f.name +
             "</span></div>"
         );
     });
+}
+
+function getFriendProfile(id) {
+    var address;
+    if (!address || address.length == 0) {
+        address = '../css/images/profile_default.png';
+    }
+
+    return address;
 }

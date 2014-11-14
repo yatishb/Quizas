@@ -238,10 +238,12 @@ img {
 
 .login_container {
     margin: 5px auto;
+    height: 180px
 }
 
 .login_button {
     margin: 15px auto;
+    cursor: pointer;
 }
 
 .let-icon-bg, .let-bg,
@@ -250,6 +252,7 @@ img {
 .g-icon-bg, .g-bg {
     margin-bottom: 5px;
     margin-top: 5px;
+    cursor: pointer;
 }
 
 .let-bg:after,
@@ -589,9 +592,8 @@ img {
     width: 100%;
     text-align: center;
     z-index: 100;
-    position: relative;
+    position: fixed;
     display: none;
-    cursor: pointer;
 }
 
 .round_button {
@@ -623,6 +625,10 @@ img {
     margin-left: 5%;
 }
 
+#flashcard:active {
+    background-color: 2B5F4F;
+}
+
 #quiz {
     background-color: #fbd546;
     display: inline-block;
@@ -630,10 +636,18 @@ img {
     margin-right: auto;
 }
 
+#quiz:active {
+    background-color: C9AA38;
+}
+
 #challenge {
     background-color: #eb6566;
     float: right;
     margin-right: 5%;
+}
+
+#challenge:active {
+    background-color: BC5152;
 }
 
 /*** The Friend List ***/
@@ -759,7 +773,7 @@ img {
 
 .simple_friend {
     margin: 5px 10px;
-    height: 70px;
+    height: 110px;
     width: 70px;
     display: inline-block;
     text-align: center;
@@ -774,6 +788,8 @@ img {
     margin: 3px;
     width: 90%;
     height: auto;
+    border-radius: 3px;
+    min-height: 50px;
 }
 
 .simple_friend span{
@@ -909,29 +925,93 @@ img {
 }
 
 /*** Start of settings.html ***/
+.container.settings {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    font-family: 'Open Sans', sans-serif;
+}
+
 .profile_container {
     position: relative;
-    display: inline-block;
-    margin: 10px auto;
-    z-index: 10;
+    width: 90%;
+    height: 25%;
+    max-width: 500px;
+    max-height: 200px;
+    margin: 20px auto;
+    text-align: center;
 }
 
 .profile_photo {
-    margin: 10px auto;
-    position: relative;
+    margin: 20px auto;
+    display: inline-block;
 }
 
 .profile_photo img {
-
+    margin: auto;
+    border-radius: 8px;
+    box-shadow: 3px 3px 10px #888888;
+    width: 100%;
+    height: auto;
+    max-width: 150px;
 }
 
 .profile_name {
+    margin: 20px 10px;
+    display: inline-block;
+    text-align: left;
+    max-width: 150px;
+}
 
+.profile_name .container {
+    margin: auto;
+}
+
+.name_title,
+.name_content {
+    word-wrap: break-word;
 }
 
 .option_container {
     position: relative;
-    display: inline-block;
     margin: 10px auto;
-    z-index: 10;
+    width: 100%;
+    height: 20%;
+    max-height: 200px;
+    text-align: center;
+}
+
+.option {
+    cursor: pointer;
+    height: 50px;
+    line-height: 45px;
+    left: 0;
+    right: 0; 
+    background-color: #eeeeee;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: #e6e6e6;
+}
+
+.option:active {
+    background-color: #b8b8b8;
+}
+
+.option.clicked {
+    background-color: #CFCFCF;   
+}
+
+.login_container.v_setting {
+    display: none;
+}
+
+.logout {
+    margin: auto;
+    height: 100px;
+    width: 50%;
+    max-width: 500px;
+    line-height: 95px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
 }

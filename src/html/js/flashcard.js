@@ -26,16 +26,33 @@ $(document).ajaxComplete(function() {
     top_bar.html(content.name);
 
     var flashcards = $('.flashcards');
+    var wait = 0;
     for (var i = 0; i < content.cards.length; i++) {
         flashcards.append(
-            "<div class='simple_card' id='" +
+            "<div class='card' id='" +
             i +
-            "'><div class='flipper'><div class='card_content question'><p class='text_field'>" +
+            "'><div class='flip'><div class='card_c'><p class='t_field'>" +
                 content.cards[i].question +
-                "</div><div class='card_content answer'><p>" +
+                "</div><div class='card_c'><p>" +
                 content.cards[i].answer +
                 "</div></div></div>"
         );
+        // if (i>0 && i%10 == 0)
+        //     wait = 10000;
+        // else wait = 0;
+
+        // setTimeout(function(content){
+        //     console.log(content);
+        //     flashcards.append(
+        //         "<div class='simple_card' id='" +
+        //         i +
+        //         "'><div class='flipper'><div class='card_content question'><p class='text_field'>" +
+        //             content.cards[i].question +
+        //             "</div><div class='card_content answer'><p>" +
+        //             content.cards[i].answer +
+        //             "</div></div></div>"
+        //     );
+        // }, wait);
     };
 });
 
