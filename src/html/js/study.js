@@ -53,14 +53,9 @@ $(document).ready(function() {
         if (confirm("User " + content.requestfrom + " is inviting you to compete set " + content.set) == true) {
             socket.emit('assignroom', {
                 'user1': content.requestfrom,
-                'flashset': "quizlet:39748410",
-                'user2': quizas_user_id()
-            });
-            /*socket.emit('assignroom', {
-                'user1': content.requestfrom,
                 'flashset': content.set,
                 'user2': quizas_user_id()
-            });*/
+            });
         } else {
             socket.emit('reject', {
                 'requester': scontent.requestfrom,
