@@ -485,7 +485,7 @@
 		
 		// start receive serverForm
 		var serverJSON, fcQuestion, fcAnswers, questionNumber = "0", maxTimeAllowed, prevPlayerAns, prevEnemyAns;
-		var haveReceivedServerJSON = false;
+		var timeOutTimer;
 		/*var serverJSON = JSON.parse(TestServerForm[0]);
 		var fcQuestion = serverJSON.question,
 		  fcAnswers = serverJSON.answers,
@@ -497,7 +497,7 @@
 		//Q.state.set("currentQuestion", fcQuestion.id);
 		// end receive serverForm
 		
-		setTimeout(function(){if (!haveReceivedServerJSON && serverJSON == null) {alert("TIMEOUT NIGGA");}}, 10000);
+		timeOutTimer = setTimeout(function(){if (serverJSON == null) {alert("TIMEOUT NIGGA");}}, 10000);
 		
 		function generateAnswers() {
 			Q.state.set("waiting", false);
@@ -666,9 +666,10 @@
 			  maxTimeAllowed = parseInt(serverJSON.time),
 			  prevPlayerAns = serverJSON.player,
 			  prevEnemyAns = serverJSON.enemy;
-			 haveReceivedServerJSON = true;
-			 Q.state.inc("currentIndex", 1);
-			 console.log("yatish socket received: " + msg.data);
+			clearTimeout(timeOutTimer);
+			if (questionNumber == null) {questionNumber = -1;}
+			Q.state.inc("currentIndex", 1);
+			console.log("yatish socket received: " + msg.data);
         });
 		
 		socket.on('gameOver', function(msg) {
