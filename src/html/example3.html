@@ -716,6 +716,12 @@
 		
 		socket.on('gameOver', function(msg) {
 			console.log(msg.data);
+			if (prevFcQuestion.id == prevEnemyAns) {
+				enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "green";
+				Q.state.inc("enemyScore", 1);
+			} else {
+				enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "red";
+			}
 			socket.emit('disconnect');
 		});
 			
@@ -758,7 +764,6 @@
 					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "red";
 				}
 			}
-
 			
 				
 			// result in bomb movement
