@@ -351,7 +351,19 @@ def ensure_some_flashsets(userid):
 	if len(current) == 0:
 		assign_initial_flashsets(internal_id)
 
-		# TODO: For better integration with quizlet,
+		# For better integration with quizlet,
 		# we could get the user, and add their
-		# studied, favourited, and created flashsets.
+		quizlet_user_info = quizlet_user(userid)
+		
+		created_set_ids   = ["quizlet:" + str(s["id"]) for s in quizlet_user_info["sets"]]
+		favorited_set_ids = ["quizlet:" + str(s["id"]) for s in quizlet_user_info["favorite_sets"]]
+		studied_set_ids   = ["quizlet:" + str(s["set"]["id"]) for s in quizlet_user_info["studied"]]
+
+		for set_id in created_set_ids + favorited_set_ids + studied_set_ids:
+			# Ughh, this makes many more DB transactions than necessary
+			add_user_set(internal_id, set_id)
+
+
+
+
 
