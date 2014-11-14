@@ -183,15 +183,24 @@ def getGameInit(user, user1, user2, room):
 # Then send first question
 @socketio.on('gameinitialised', namespace='/test')
 def gameInitialisedByClient(message):
-	roomShouldBe = message['room']
-	# Find another socket with the same id and copy socket information
+	roomShouldBe = str(message['room'])
 	print "game initialized by one client:%r room: %r" % (session['id'],session['room'])
 
-	for client in clients:
-		print "id : %r  random: %r" % (client.session['id'], client.session['random'])
-		if (client.session['id'] == session['id']) and (client.session['random'] != session['random'] and client.session['room'] == roomShouldBe):
-			session['room'] = str(roomShouldBe)
+	# Check if user part of the room
+	# If so then add room information to the connection
+	userPartOfRoom = False
+	usersInRoom = redis.hget("ROOMS", roomShouldBe)
+	usersInRoom = usersInRoom.split(", ")
+	for eachUser in usersInRoom:
+		if session['id'] == int(eachUser):
+			userPartOfRoom = True
 			break
+
+	if userPartOfRoom == True:
+		session['room'] = roomShouldBe
+	else:
+		emit('error', {'data' : 'INTRUDER!'})
+		return
 
 	print "the client now belongs to room %r" % session['room']
 	room = session['room']
