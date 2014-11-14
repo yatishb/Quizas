@@ -599,6 +599,8 @@ img {
     border-bottom-width: 1px;
     border-bottom-color: #47A347;
     cursor: pointer;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: light;
     /*border-top-style: solid;
     border-top-width: 1px;
     border-top-color: #0099FF;*/
@@ -610,13 +612,13 @@ img {
     margin-left: auto;
     margin-right: auto;
     color: white;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: light;
 }
 
 .set_content p{
     display: table-cell;
     vertical-align: middle;
-    font-family: 'Open Sans', sans-serif;
-    font-weight: light;
 }
 
 .set_content.title {

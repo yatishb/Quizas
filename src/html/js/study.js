@@ -131,7 +131,8 @@ $('#quiz').on("tap", function(){
 });
 
 $('#flashcard').on("tap", function(){
-    window.location.href="flashcard.html";
+    link = 'flashcard.html?setid=' + selected_set_id;
+    window.location.href = link;
 });
 
 $('#challenge').on("tap", function(){
