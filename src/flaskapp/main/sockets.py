@@ -116,7 +116,6 @@ def assignRoom(message):
 			if (client.session['id'] == user1) or (client.session['id'] == user2):
 				if client.session['room'] == defaultRoom:
 					client.session['room'] = room
-					client.join_room(room)
 					# print "Assigned: user:%r room:%r" % (client.session['id'], client.session['room'])
 					
 					# Check redis if room exists
@@ -192,13 +191,12 @@ def gameInitialisedByClient(message):
 		print "id : %r  random: %r" % (client.session['id'], client.session['random'])
 		if (client.session['id'] == session['id']) and (client.session['random'] != session['random'] and client.session['room'] == roomShouldBe):
 			session['room'] = str(roomShouldBe)
-			client.leave_room(client.session['room'])
-			join_room(session['room'])
 			break
 
 	print "the client now belongs to room %r" % session['room']
 	room = session['room']
 	userid = session['id']
+	join_room(session['room'])
 
 	HASH_INIT = "ROOM_INIT"
 
@@ -355,11 +353,8 @@ def sendFirstQuestionInfoToClient(room):
 	# There is no customized message for the first question
 	# Hence broadcast across room can be used to send the details of the next question
 	print "Start game: %r" % commonDataToSend
-	for client in clients:
-		print "client found id:%r random:%r room:%r" % (client.session['id'], client.session['random'], client.session['room'])
-		# if client.session['room'] == room:
-		# 	client.base_emit('nextQuestion', {'data': json.dumps(commonDataToSend)})
-		# 	print "sending to client id:%r random:%r room:%r" % (client.session['id'], client.session['random'], client.session['room'])
+	# for client in clients:
+	# 	print "client found id:%r random:%r room:%r" % (client.session['id'], client.session['random'], client.session['room'])
 	emit('nextQuestion', {'data': json.dumps(commonDataToSend)}, room= room)
 
 
