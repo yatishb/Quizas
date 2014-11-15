@@ -1,17 +1,6 @@
-// (function() {
-//     var link = "singlePlayer.html";
-
-//     $('.list_option ul li').click(function() {
-//         //document.getElementById('top_layer').style.display = "block";
-//         $('.study_button').show();
-//         //window.location.href=link;
-//     });
-// })();
-
-// function getStudySetContent(){
-//     AjaxManager.prototype.GetContentBySetId();
-// }
 var content;
+var cardIndex;
+var cardPerPage = 10;
 
 $(document).ready(function() {
     var result = quizas_authorized_sites();
@@ -23,24 +12,49 @@ $(document).ready(function() {
     var setid = address.substring(address.indexOf("=")+1, address.length);
     
     getStudySetContent(setid);
+
+    $(window).scroll(function() {
+        if($(window).scrollTop() == $(document).height() - $(window).height()) {
+            var flashcards = $('.flashcards');
+
+            if (content != null) {
+                for (var i = 0; i < content.cards.length && i < cardPerPage; i++) {
+                    flashcards.append(
+                        "<div class='simple_card' id='" +
+                        cardIndex +
+                        "'><div class='flipper'><div class='card_content question'><span>" +
+                            content.cards[cardIndex].question +
+                            "</span></div><div class='card_content answer'><span>" +
+                            content.cards[cardIndex].answer +
+                            "</span></div></div></div>"
+                    );
+                    cardIndex++;
+                }
+            }
+        }
+    });
 });
 
 $(document).ajaxComplete(function() {
+    cardIndex = 0;
+
     var top_bar = $('.top_bar');
     top_bar.html(content.name);
 
     var flashcards = $('.flashcards');
-    var wait = 0;
-    for (var i = 0; i < content.cards.length; i++) {
+    for (var i = 0; i < content.cards.length && i < cardPerPage; i++) {
         flashcards.append(
-            "<div class='card' id='" +
-            i +
-            "'><div class='flip'><div class='card_c'><p class='t_field'>" +
-                content.cards[i].question +
-                "</div><div class='card_c'><p>" +
-                content.cards[i].answer +
-                "</div></div></div>"
+            "<div class='simple_card' id='" +
+            cardIndex +
+            "'><div class='flipper'><div class='card_content question'><span>" +
+                content.cards[cardIndex].question +
+                "</span></div><div class='card_content answer'><span>" +
+                content.cards[cardIndex].answer +
+                "</span></div></div></div>"
         );
+
+        cardIndex++;
+
         // if (i>0 && i%10 == 0)
         //     wait = 10000;
         // else wait = 0;
@@ -57,7 +71,7 @@ $(document).ajaxComplete(function() {
         //             "</div></div></div>"
         //     );
         // }, wait);
-    };
+    }
 });
 
 function getStudySetContent(setid) {

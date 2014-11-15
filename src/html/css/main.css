@@ -1058,6 +1058,7 @@ img {
     width: 100%;
     height: 100%;
     margin-top: 50px;
+    text-align: center;
 }
 
 @media screen and (max-width: 500px) {
@@ -1131,7 +1132,7 @@ img {
     display: table;
 }
 
-.card_content p{
+.card_content span{
     display: table-cell;
     vertical-align: middle;
 }
