@@ -103,11 +103,9 @@ $(document).ready(function() {
 });
 
 $('.set_info').on("click", '.content_container', function() {
-    $('.add_set').hide();
-    $('.add_sign').text('+');
     $('.search_set').hide();
-    $('.search_set').removeClass("slideLeft");
-    $('.notification').hide();
+    $('.search_result').hide();
+    $('.add_set i').removeClass('rotate');
     $('.button_container').show();
     $('.grey_cover').show();
 
@@ -145,17 +143,14 @@ $('.search_result').on("click", '.add', function() {
 
 $('.add_set').on("click", function() {
     if ($('.search_set').is(':visible')) {
-        $('.add_sign').text('+');
+        $(this).find('i').removeClass('rotate');
         $('.search_set').removeClass("slideLeft");
         $('.search_set').hide();
         $('.search_result').hide();
-        $('.notification').show();
-        $('.set_info').show();
     } else {
-        $('.add_sign').text('x');
+        $(this).find('i').addClass('rotate');
         $('.search_set').show();
         $('.search_set').addClass("slideLeft");
-        $('.notification').hide();
         $('#search_set_box').focus();
     }
 });
@@ -208,7 +203,8 @@ $('#challenge').on("tap", function(){
 
 $('.friend_list').on("click", '.simple_friend', function () {
     $('.selected').removeClass('selected');
-    $(this).find('.friend_profile').addClass('selected');
+    $(this).addClass('selected');
+    // $(this).find('.friend_profile').addClass('selected');
 
     selected_friend_id = this.id;
 
