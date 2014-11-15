@@ -43,13 +43,17 @@ $.get("/api/user/" + user_id + "/stats", function (data) {
 <br/><br/>
 
 <script>
-$.get("/api/user/" + user_id + "/stats/games", function (data) {
-    $("#stats_games").text(data);
+$(document).ready(function() {
+    // Since we want to use outputStatsForGame,
+    // wait for the rest of the page to load.
+    $.get("/api/user/" + user_id + "/stats/games", function (data) {
+        $("#stats_games").text(data);
 
-    // Call on for-each game.
-    var response = JSON.parse(data);
-    response.forEach(function (gameId) {
-        outputStatsForGame(gameId);
+        // Call on for-each game.
+        var response = JSON.parse(data);
+        response.forEach(function (gameId) {
+            outputStatsForGame(gameId);
+        });
     });
 });
 </script>
@@ -71,6 +75,15 @@ function outputStatsForGame(gameId) {
         }).appendTo("#stats_for_games");
 
         $("#" + gameDivId).text(data);
+
+        // Line chart!
+        // D3 doesn't like `-` in its IDs!
+        // D3 doesn't even fucking like .. numbers?
+        var lineGraphId = "ID" + gameId + "gameLineGraph";
+        $("<div/>", {
+                "id": lineGraphId,
+        }).appendTo("#gameLineGraphs");
+        outputGameResultsLineChart(lineGraphId, JSON.parse(data));
     });
 }
 </script>
@@ -235,8 +248,136 @@ outputWinLossDrawPieChart({wins: 3, draws: 2, losses: 1});
 
 
 
+<!-- http://bl.ocks.org/benjchristensen/2579599 -->
 <b>Line Chart of a Game</b><br/>
 This could be useful for post-game stats.
+
+<div id="gameLineGraphs" class="aGraph" />
+
+<!-- Move to some graph .css or whatever? -->
+
+<style>
+/* tell the SVG path to be a thin blue line without any area fill */
+#gameLineGraphs .axis {
+    shape-rendering: crispEdges;
+}
+
+#gameLineGraphs .x.axis line {
+    stroke: lightgrey;
+}
+
+#gameLineGraphs .x.axis .minor {
+    stroke-opacity: .5;
+}
+
+#gameLineGraphs .x.axis path {
+    display: none;
+}
+
+#gameLineGraphs .y.axis line, .y.axis path {
+    fill: none;
+    stroke: #000;
+}
+</style>
+
+<script>
+
+function outputGameResultsLineChart(lineGraphId, gameResults) {
+    // constraints: two opponents. (gameResults makes this constraint, also).
+    var graphWidth = 1000;
+    var graphHeight = 400;
+
+    // againstUser : userid
+    // result
+    // questions : #
+    // flashcards:[{ enemy: fcid
+    //               question: fcid
+    //               ans: fcid }]
+    var maxResult = gameResults.questions;
+
+    // implementation adapted from http://bl.ocks.org/benjchristensen/2579599
+    // implementation heavily influenced by http://bl.ocks.org/1166403
+
+    // define dimensions of graph
+    var m = [80, 80, 80, 80]; // margins
+    var w = graphWidth  - m[1] - m[3]; // width
+    var h = graphHeight - m[0] - m[2]; // height
+
+    // create a simple data array that we'll plot with a line
+    // (this array represents only the Y values,
+    //  X will just be the index location)
+    var userData = [0];
+    var oppoData = [0];
+
+    // Construct data from `gameResults`
+    for (var i = 0; i < gameResults.flashcards.length; i += 1) {
+        var fc = gameResults.flashcards[i];
+        userData.push(fc.question === fc.ans   ? userData[i] + 1 : userData[i]) ;
+        oppoData.push(fc.question === fc.enemy ? oppoData[i] + 1 : oppoData[i]) ;
+    }
+
+    // X scale will fit all values from data[] within pixels 0-w
+    var x = d3.scale.linear().domain([0, userData.length - 1]).range([0, w]);
+    // Y scale will fit values from 0-10 within pixels h-0 (Note the inverted domain for the y-scale: bigger is up!)
+    var y = d3.scale.linear().domain([0, maxResult]).range([h, 0]);
+    // automatically determining max range can work something like this
+    // var y = d3.scale.linear().domain([0, d3.max(userData)]).range([h, 0]);
+
+    // create a line function that can convert data[] into x and y points
+    var line = d3.svg.line()
+    // assign the X function to plot our line as we wish
+    .x(function(d,i) {
+        // verbose logging to show what's actually being done
+        console.log('Plotting X value for data point: ' + d + ' using index: ' + i + ' to be at: ' + x(i) + ' using our xScale.');
+        // return the X coordinate where we want to plot this datapoint
+        return x(i);
+    })
+    .y(function(d) {
+        // verbose logging to show what's actually being done
+        console.log('Plotting Y value for data point: ' + d + ' to be at: ' + y(d) + " using our yScale.");
+        // return the Y coordinate where we want to plot this datapoint
+        return y(d);
+    })
+
+    // Add an SVG element with the desired dimensions and margin.
+    var graph = d3.select("#" + lineGraphId).append("svg:svg")
+    .attr("width", w + m[1] + m[3])
+    .attr("height", h + m[0] + m[2])
+    .append("svg:g")
+    .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+    // create yAxis
+    var xAxis = d3.svg.axis().scale(x).tickSize(-h).tickSubdivide(true);
+    // Add the x-axis.
+    graph.append("svg:g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + h + ")")
+    .call(xAxis);
+
+
+    // create left yAxis
+    var yAxisLeft = d3.svg.axis().scale(y).ticks(4).orient("left");
+    // Add the y-axis to the left
+    graph.append("svg:g")
+    .attr("class", "y axis")
+    .attr("transform", "translate(-25,0)")
+    .call(yAxisLeft);
+
+    // Add the line by appending an svg:path element with the data line we created above
+    // do this AFTER the axes above so that the line is above the tick-lines
+
+    // Possible to set colors & such via CSS, or using `.attr`
+    graph.append("svg:path").attr("d", line(userData))
+        .attr("stroke", "steelblue")
+        .attr("stroke-width", 1)
+        .attr("fill", "none");
+    graph.append("svg:path").attr("d", line(oppoData))
+        .attr("stroke", "red")
+        .attr("stroke-width", 1)
+        .attr("fill", "none");
+}
+
+</script>
 
 
 </body>
