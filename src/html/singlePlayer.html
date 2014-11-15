@@ -216,23 +216,11 @@
       },
     
     // load flashcard properties
-      /*generate: function(param) {
-        parsedArgument = JSON.parse(param);     
-        this.p.id = parsedArgument.id;
-        this.p.question = parsedArgument.question;
-        this.p.answer = parsedArgument.answer;
-        if (this.p.isQuestion) {
-          this.p.label = this.p.question;
-        } else {
-          this.p.label = this.p.answer;
-        }
-      },
-    });*/
-    generate: function(param) {
-        parsedArgument = JSON.parse(param);     
-        this.p.id = parsedArgument.id;
-        this.p.question = parsedArgument.question;
-        this.p.answer = parsedArgument.answer;
+    generate: function(index) {
+        questionCard = quesDeck[index];   
+        this.p.id = questionCard.id;
+        this.p.question = questionCard.question;
+        this.p.answer = questionCard.answer;
         if (this.p.isQuestion) {
           this.p.label = this.p.question;
         } else {
@@ -265,7 +253,6 @@
       });    
 
     Q.scene("scene1",function(stage) {
-      console.log("called");
 
       var answersChosen = [];
     
@@ -277,8 +264,6 @@
       
       function generateAnswers() {
         ansDeck = answersDeck[Q.state.get("currentQuestion") - 1];
-        console.log("Question: "+Q.state.get("currentQuestion") - 1);
-        console.log(ansDeck);
 
         var aBtns = [];
         var k = 0;
@@ -304,8 +289,8 @@
               name: k
               }, function() {
                 // do something
-                answersChosen.push(deck[Q.state.get("currentQuestion") - 1]);
-                if (deck[Q.state.get("currentQuestion") - 1] == ansDeck[this.p.name]) {
+                answersChosen.push( ansDeck[this.p.name].id );
+                if (quesDeck[Q.state.get("currentQuestion") - 1].id == ansDeck[this.p.name].id) {
                   console.log("Placeholder Trigger: Correct");
                   Q.state.inc("score", 1);
                 } else {
@@ -345,14 +330,13 @@
       
       var qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
       //qCard.generate(getFlashCard(FLASH_SET, deck[Q.state.get("currentQuestion") - 1]));
-      qCard.generate(getFlashCard(FLASH_SET, deck[Q.state.get("currentQuestion") - 1]));
+      qCard.generate(Q.state.get("currentQuestion") - 1);
       
       Q.state.on("change.currentQuestion", function() {
         if (Q.state.get("currentQuestion") == TOTAL_QUESTIONS) {
           Q.stageScene("scene2");
         } 
-        qCard.generate(getFlashCard(FLASH_SET, deck[Q.state.get("currentQuestion") - 1]));
-        console.log("Question number : " +Q.state.get("currentQuestion")-1);
+        qCard.generate(Q.state.get("currentQuestion") - 1);
         destroyAnswers(aBtns);
         aBtns = generateAnswers();
         console.log(answersChosen);
