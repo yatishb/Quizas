@@ -28,13 +28,7 @@
     
     <link rel="stylesheet" type="text/css" href="css/main.css"></link>
     <link rel="stylesheet" type="text/css" href="css/animations.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/font-awesome.css">
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.icons.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.inline-png.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.inline-svg.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.structure.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.theme.css"></link>
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.css"></link>
 
     <script type="text/javascript">
     window.fbAsyncInit = function() {
@@ -58,8 +52,7 @@
     </script>
 
 </head>
-<body>
-    <div data-role="page" id="page1">
+<body class="background_set">
 
     <div id="fb-root"></div>
 
@@ -69,8 +62,6 @@
         <div class="round_button" id="quiz"><span>Quiz</span></div>
         <div class="round_button" id="challenge"><span>Challenge</span></div>
     </div>
-
-    <div class="set_background"></div>
 
     <div class="notification">i</div>
     <div class="add_set"><span class="add_sign">+</span></div>
@@ -87,16 +78,14 @@
     <div class="search_result"></div>
     <div class="set_info"><div class="space"></div></div>
 
-    <div data-role="footer" data-id="foo1" data-position="fixed" class="footer">
-        <div data-role="navbar" data-iconpos="top">
-            <ul>
-                <li><a href="#" data-icon="grid" data-prefetch="true" data-transition="none" class="ui-btn-active ui-state-persist">Study</a></li>
-                <li><a onclick="window.open('stats.html','_self');" data-icon="info" data-prefetch="true" data-transition="none">Stats</a></li>
-                <li><a onclick="window.open('settings.html','_self');" data-icon="gear" data-prefetch="true" data-transition="none">Settings</a></li>
-            </ul>
-        </div><!-- /navbar -->
-    </div><!-- /footer -->
+    <div></div>
 
+    <div class="footer">
+        <ul class="footer_container group_3">
+            <li class="current_tab" href="#"><a><i class="fa fa-book"></i> Study</a></li>
+            <li onclick="window.open('stats.html','_self');"><a><i class="fa fa-line-chart"></i> Stats</a></li>
+            <li onclick="window.open('settings.html','_self');"><a><i class="fa fa-gears"></i> Settings</a></li>
+        </ul>
     </div>
 
     <link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,300,400'>

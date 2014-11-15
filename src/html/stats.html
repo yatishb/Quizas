@@ -19,18 +19,9 @@
     <link rel="apple-touch-startup-image" href="images/Geet_App_Startup.png">
     
     <link rel="stylesheet" type="text/css" href="css/main.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.icons.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.inline-png.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.inline-svg.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.structure.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.theme.css"></link>
-
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.css"></link>
 </head>
 <body>
-
-    <div data-role="page" id="page1">
-
     <div data-role="content">
         <div class="content-primary list_option">   
         <ul data-role="listview">
@@ -53,16 +44,12 @@
         </div>
     </div>
 
-    <div data-role="footer" data-id="foo1" data-position="fixed">
-        <div data-role="navbar" data-iconpos="top">
-            <ul>
-                <li><a onclick="window.open('study.html','_self');" data-icon="grid" data-prefetch="true" data-transition="none">Study</a></li>
-                <li><a href="#" data-icon="info" data-icon="grid" data-prefetch="true" data-transition="none" class="ui-btn-active ui-state-persist">Stats</a></li>
-                <li><a onclick="window.open('settings.html','_self');" data-icon="gear" data-prefetch="true" data-transition="none">Settings</a></li>
-            </ul>
-        </div><!-- /navbar -->
-    </div><!-- /footer -->
-
+    <div class="footer">
+        <ul class="footer_container group_3">
+            <li onclick="window.open('study.html','_self');"><a><i class="fa fa-book"></i> Study</a></li>
+            <li class="current_tab" href="#"><a><i class="fa fa-line-chart"></i> Stats</a></li>
+            <li onclick="window.open('settings.html','_self');"><i class="fa fa-gears"></i> Settings</a></li>
+        </ul>
     </div>
 
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,300,400' rel='stylesheet' type='text/css'>
