@@ -17,8 +17,12 @@ $(document).ready(function() {
     var result = quizas_authorized_sites();
     if(result.length == 0)
         this.location.href='/index.html';
+
+    var address = document.URL;
+
+    var setid = address.substring(address.indexOf("=")+1, address.length);
     
-    getStudySetContent();
+    getStudySetContent(setid);
 });
 
 $(document).ajaxComplete(function() {
@@ -56,8 +60,8 @@ $(document).ajaxComplete(function() {
     };
 });
 
-function getStudySetContent() {
-    $.get("/api/sets/quizlet:24957714", function(data) {
+function getStudySetContent(setid) {
+    $.get("/api/sets/" + setid, function(data) {
            content = JSON.parse(data);
            console.log(content);
            if(content != null)

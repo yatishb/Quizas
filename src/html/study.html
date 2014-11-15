@@ -27,13 +27,13 @@
     <link rel="apple-touch-startup-image" href="images/Geet_App_Startup.png">
     
     <link rel="stylesheet" type="text/css" href="css/main.css"></link>
+    <link rel="stylesheet" type="text/css" href="css/animations.css"></link>
     <link rel="stylesheet" type="text/css" href="css/jquery.mobile.css"></link>
     <link rel="stylesheet" type="text/css" href="css/jquery.mobile.icons.css"></link>
     <link rel="stylesheet" type="text/css" href="css/jquery.mobile.inline-png.css"></link>
     <link rel="stylesheet" type="text/css" href="css/jquery.mobile.inline-svg.css"></link>
     <link rel="stylesheet" type="text/css" href="css/jquery.mobile.structure.css"></link>
     <link rel="stylesheet" type="text/css" href="css/jquery.mobile.theme.css"></link>
-
 
     <script type="text/javascript">
     window.fbAsyncInit = function() {
@@ -72,7 +72,10 @@
     <div class="set_background"></div>
 
     <div class="notification">i</div>
-    <div class="add_set">+</div>
+    <div class="add_set"><span class="add_sign">+</span></div>
+    <div class="search_set">
+        <input type="text" id="search_set_box" placeholder="Search for study sets">
+    </div>
 
     <div class="friend_window">
         <div class="list_search"><input type="text" placeholder="Search here..."></div>
@@ -80,6 +83,7 @@
         <div class="list_bottom">Submit</div>
     </div>
 
+    <div class="search_result"></div>
     <div class="set_info"></div>
 
     <div data-role="footer" data-id="foo1" data-position="fixed" class="footer">
@@ -94,7 +98,7 @@
 
     </div>
 
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,300,400' rel='stylesheet' type='text/css'>
+    <link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,300,400'>
 
     <script src="js/jquery.mobile.js"></script>
 

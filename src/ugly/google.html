@@ -1,0 +1,179 @@
+<html>
+<head>
+
+<!-- https://developers.google.com/+/web/signin/javascript-flow` -->
+<!-- Load G+ script. This should be in HEAD, apparently. -->
+<script src="https://apis.google.com/js/client:platform.js" async defer></script>
+
+<!-- https://developers.google.com/+/web/signin/javascript-flow` -->
+<!-- Client ID here probably can't be shared for local and quizas.me?? -->
+<meta name="google-signin-clientid" content="688986589673-thk2q9k59op5c2b0fnsvbqbph90dlsc6.apps.googleusercontent.com" />
+<meta name="google-signin-scope" content="https://www.googleapis.com/auth/plus.login" />
+<meta name="google-signin-requestvisibleactions" content="http://schema.org/AddAction" />
+<meta name="google-signin-cookiepolicy" content="single_host_origin" />
+
+</head>
+<body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+<script src="https://apis.google.com/js/client:platform.js?onload=render" async defer></script>
+
+<script>
+/* Executed when the APIs finish loading */
+function render() {
+  // Additional params including the callback, the rest of the params will
+  // come from the page-level configuration.
+  // Details about page-level config:
+  // see https://developers.google.com/+/web/signin/reference#page-config
+  var additionalParams = {
+    'callback': afterGooglePlusLogin
+  };
+
+  // Attach a click listener to a button to trigger the flow.
+  var signinButton = document.getElementById('signinButton');
+  signinButton.addEventListener('click', function() {
+    gapi.auth.signIn(additionalParams); // Will use page level configuration
+  });
+}
+</script>
+
+<!-- Google Plus JavaScript Sign In -->
+<button id="signinButton">Sign in with Google</button>
+<br/>
+<br/>
+
+
+
+
+<!-- This should be in authhelper.js or so -->
+<script>
+function quizas_update_auth_cookies(site, authId, authToken) {
+    // site e.g. "quizlet", "twitter", "facebook", "googleplus"
+
+    // Check what other cookies Quizas has,
+    // if they clash (has this site, but different authId), remove the others.
+    if ($.cookie(site + "_user_id") != authId) {
+        var auth_sites = ["quizlet", "twitter", "facebook"]; // BAD MAGIC
+        for (var i in auth_sites) {
+            var s = auth_sites[i];
+
+            // No great harm in removing a cookie which isn't there.
+            $.removeCookie(s + "_user_id", { path: "/" });
+            $.removeCookie(s + "_access_token", { path: "/" });
+        }
+    }
+
+    // Set the cookie
+    $.cookie(site + "_user_id",
+             authId,
+             { expires: 365, path: '/' });
+    $.cookie(site + "_access_token",
+             authToken,
+             { expires: 365, path: '/' });
+
+    // Notify Quizas app about the new auth.
+    //$.post("/api/facebookauthnotify");
+}
+</script>
+
+<script>
+
+function afterGooglePlusLogin(authResult) {
+  gapi.client.load('plus','v1');
+  if (authResult['status']['signed_in']) {
+    // Update the app to reflect a signed in user
+    // Hide the sign-in button now that the user is authorized, for example:
+    //document.getElementById('signinButton').setAttribute('style', 'display: none');
+
+    console.log("Google+ Signin callback");
+    // console.log(JSON.stringify(authResult));
+    // id_token, access_token are the droids we're looking for?
+    // id_token is 700 characters long! WTF!
+    console.log(authResult);
+  } else {
+    // Update the app to reflect a signed out user
+    // Possible error values:
+    //   "user_signed_out" - User is signed-out
+    //   "access_denied" - User denied access to your app
+    //   "immediate_failed" - Could not automatically log in the user
+    console.log('Sign-in state: ' + authResult['error']);
+  }
+}
+
+</script>
+
+
+<!-- List Friends demo -->
+<b>Friends:</b><br/>
+<div id="friendlist"></div>
+<br/>
+
+<input value="List Friends" type="button" onclick="listGooglePlusFriends(outputFriends);" />
+<br/>
+<br/>
+<br/>
+
+
+<script>
+// Example of listing friends.
+function outputFriends(friends) {
+    friends.forEach(function (f) {
+        $("#friendlist").append(f.name + ", " + f.userid + "<br/>");
+    });
+}
+
+function outputProfile(profile) {
+   $("#profile").html("<b>" + profile.name + "</b><br/><img src='" + profile.picture + "' />");
+}
+
+// see https://developers.google.com/+/api/latest/people/list
+function listGooglePlusFriends(friendsCallback) {
+    var request = gapi.client.plus.people.list({
+      'userId' : 'me',
+      // 'visible' or 'connected'; should be the latter for those who use the app.
+      'collection' : 'visible'
+    });
+
+    request.execute(function(resp) {
+      function toQuizasRep(p) {
+          return { name: p.displayName,
+                   userid: "googleplus:" + p.id }
+      }
+
+      friendsCallback(resp.items.map(toQuizasRep));
+    });
+}
+
+
+// n.b. gpid != Quizas' userid.
+// We want {name, picture}
+// https://developers.google.com/+/api/latest/people/get
+function getGooglePlusProfile(gpid, profileCallback) {
+    var request = gapi.client.plus.people.get({
+      'userId' : gpid
+    });
+
+    request.execute(function(resp) {
+      console.log('ID: ' + resp.id);
+      console.log('Display Name: ' + resp.displayName);
+      console.log('Image URL: ' + resp.image.url);
+      console.log('Profile URL: ' + resp.url);
+
+      profileCallback({name: resp.displayName,
+                       picture: resp.image.url});
+    });
+}
+
+</script>
+
+<b>Profile:</b><br/>
+<div id="profile"></div>
+<br/>
+<!-- 111329237648672286620 -->
+<input value="Get Profile" type="button" onclick="getGooglePlusProfile('me', outputProfile);" />
+<br/>
+
+
+</body>
+</html>
