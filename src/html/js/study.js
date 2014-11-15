@@ -105,8 +105,10 @@ $(document).ready(function() {
 //$('.list_option ul li').on("click", function() {
 $('.set_info').on("click", '.simple_set', function() {
     $('.add_set').hide();
-    $('.notification').hide();
+    $('.add_sign').text('+');
     $('.search_set').hide();
+    $('.search_set').removeClass("slideLeft");
+    $('.notification').hide();
     $('.button_container').show();
     $('.grey_cover').show();
 
@@ -117,27 +119,34 @@ $('.set_info').on("click", '.simple_set', function() {
 
 $('.add_set').on("click", function() {
     if ($('.search_set').is(':visible')) {
+        $('.add_sign').text('+');
+        $('.search_set').removeClass("slideLeft");
         $('.search_set').hide();
+        $('.search_result').hide();
         $('.notification').show();
+        $('.set_info').show();
     } else {
+        $('.add_sign').text('x');
         $('.search_set').show();
+        $('.search_set').addClass("slideLeft");
         $('.notification').hide();
+        $('#search_set_box').focus();
     }
 });
 
 $('#search_set_box').keypress(function( event ) {
     if ( event.which == 13 ) {
         var search_txt = $(this).val();
-
         console.log(search_txt);
+
+        $('.search_result').empty();
 
         if (search_txt || search_txt != "") {
             $('.set_info').hide();
             $('.search_result').show();
             getSearchResult(search_txt);
         } else {
-            $('.set_info').show();
-            $('.search_result').hide();
+            $('.search_result').empty();
         }
     }
 });
@@ -145,6 +154,7 @@ $('#search_set_box').keypress(function( event ) {
 $('.grey_cover').on("click", function() {
     if ($('.friend_window').is(':visible')) {
         $('.friend_window').hide();
+        $('.friend_window').removeClass('fadeIn');
     } else {
         $('.grey_cover').hide(); 
         $('.button_container').hide();
@@ -156,6 +166,7 @@ $('.grey_cover').on("click", function() {
 $('#quiz').on("tap", function(){
     next_page = "q";
     $('.friend_window').show();
+    $('.friend_window').addClass('fadeIn');
 });
 
 $('#flashcard').on("tap", function(){
@@ -167,6 +178,7 @@ $('#challenge').on("tap", function(){
     //window.location.href="challenge.html";
     next_page = "c";
     $('.friend_window').show();
+    $('.friend_window').addClass('fadeIn');
 });
 
 $('.friend_list').on("click", '.simple_friend', function () {
@@ -257,13 +269,13 @@ function getSearchResult(txt) {
         var sets = $('.search_result');
         for (var i = 0; i < result.length; i++) {
             sets.append(
-                "<div class='simple_set " +
+                "<div class='simple_set search " +
                 ("" + result[i].id).replace(":", "_") +
                 "' id='" +
                 result[i].id +
-                "'><div class='set_content title'><p>" +
+                "'><div class='set_content title search'><p>" +
                 result[i].name + ' [' + result[i].size + ']' +
-                "</div><div class='set_content description'><p>" +
+                "</div><div class='set_content description search'><p>" +
                 result[i].description +
                 "</div></div>"
             );
