@@ -102,8 +102,7 @@ $(document).ready(function() {
     });
 });
 
-//$('.list_option ul li').on("click", function() {
-$('.set_info').on("click", '.simple_set', function() {
+$('.set_info').on("click", '.content_container', function() {
     $('.add_set').hide();
     $('.add_sign').text('+');
     $('.search_set').hide();
@@ -112,9 +111,36 @@ $('.set_info').on("click", '.simple_set', function() {
     $('.button_container').show();
     $('.grey_cover').show();
 
-    selected_set_id = this.id;
+    selected_set_id = $(this).parent().attr('id');
 
     console.log("selected_set_id is " + selected_set_id);
+});
+
+$('.set_info').on("click", '.favorite', function() {
+    var id = $(this).parent().attr('id');
+    var flag = true;
+
+    if($(this).children().hasClass('fa-star-o')) {
+        $(this).empty();
+        $(this).append("<i class='fa fa-star'></i>");
+    } else {
+        flag = false;
+        $(this).empty();
+        $(this).append("<i class='fa fa-star-o'></i>");    
+    }
+
+    var result = favoriteSet(id,flag);
+});
+
+$('.set_info').on("click", '.delete', function() {
+    var id = $(this).parent().attr('id');
+
+    deleteSet(id);
+});
+
+$('.search_result').on("click", '.add', function() {
+    var id = $(this).parent().attr('id');
+    addSet(id);
 });
 
 $('.add_set').on("click", function() {
@@ -137,7 +163,6 @@ $('.add_set').on("click", function() {
 $('#search_set_box').keypress(function( event ) {
     if ( event.which == 13 ) {
         var search_txt = $(this).val();
-        console.log(search_txt);
 
         $('.search_result').empty();
 
@@ -247,8 +272,13 @@ function getSetContent() {
                     ("" + set_content.id).replace(":", "_") +
                     "' id='" +
                     set_content.id +
-                    "'><div class='set_content title'><p>" +
+                    "'><div class='content_container'>" +
+                    "<div class='set_content title'><p>" +
                     set_content.name +
+                    "</div></div>" +
+                    "<div class='action_container'>" +
+                    "<div class='action favorite'><i class='fa fa-star-o'></i></div>" +
+                    "<div class='action delete'><i class='fa fa-trash-o'></i></div>" +
                     "</div></div>"
                 );
             });
@@ -262,7 +292,6 @@ function getSetContent() {
 function getSearchResult(txt) {
     $.get("/api/sets/search/" + txt, function(data) {
         var result = JSON.parse(data);
-        console.log(result);
 
         var sets = $('.search_result');
         for (var i = 0; i < result.length; i++) {
@@ -271,17 +300,58 @@ function getSearchResult(txt) {
                 ("" + result[i].id).replace(":", "_") +
                 "' id='" +
                 result[i].id +
-                "'><div class='set_content title search'><p>" +
+                "'><div class='content_container'>" +
+                "<div class='set_content title search'><p>" +
                 result[i].name + ' [' + result[i].size + ']' +
                 "</div><div class='set_content description search'><p>" +
                 result[i].description +
+                "</div></div>" +
+                "<div class='action_container'>" +
+                "<div class='action add'><i class='fa fa-plus'></i></div>" +
                 "</div></div>"
             );
         }
+
+        $('.simple_set.search').each(function() {
+            var containerHeight = $(this).height();
+            var plusButton = $(this).find('.action_container');
+            
+            plusButton.css('height', containerHeight);
+        });
     })
     .fail(function() {
         console.log("error in getSearchResult call back function");
     });
+}
+
+function addSet(id) {
+    var userId = quizas_user_id();
+
+    $.ajax({
+        url: '/api/user/' + userId + '/sets/' + id,
+        type: 'PUT',
+        success: function() {
+            var thisClass = ("" + id).replace(":", "_");
+            $('.' + thisClass).remove();
+        }
+    });
+}
+
+function deleteSet(id) {
+    var userId = quizas_user_id();
+
+    $.ajax({
+        url: '/api/user/' + userId + '/sets/' + id,
+        type: 'DELETE',
+        success: function() {
+            var thisClass = ("" + id).replace(":", "_");
+            $('.' + thisClass).remove();
+        }
+    });
+}
+
+function favoriteSet(id, flag) {
+    
 }
 
 function outputFriends(friends) {

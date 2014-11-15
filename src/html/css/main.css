@@ -478,6 +478,10 @@ img {
 /*** Start of study.html ***/
 
 @media screen and (max-width: 500px) {
+    .space {
+        height: 13vw;
+    }
+
     .simple_set {
         left: 0;
         right: 0;
@@ -528,6 +532,10 @@ img {
 }
 
 @media screen and (min-width: 501px) {
+    .space {
+        height: 0;
+    }
+
     .simple_set {
         margin-left: auto;
         margin-right: auto;
@@ -634,18 +642,8 @@ img {
     top: 0;
     right: 0;
     position: fixed;
-    /*margin-right: auto;
-    margin-left: auto;*/
     margin-top: -8px;
     display: none;
-    /*position: absolute;
-    display: block;
-    margin-right: 100px;
-    transition: margin 0.2s ease;
-    -o-transition: margin 0.2s ease;
-    -ms-transition: margin 0.2s ease;
-    -moz-transition: margin 0.2s ease;
-    -webkit-transition: margin 0.2s ease;*/
 }
 
 #search_set_box {
@@ -701,8 +699,60 @@ img {
 .simple_set.search {
     display: inline-block;
     height: auto;
-    margin-right: auto;
-    margin-left: auto;
+}
+
+.content_container {
+    display: inline-block;
+    width: 90%;
+    height: 100%;
+    float: left;
+}
+
+.action_container {
+    position: absolute;
+    right: 0;
+    width: 10%;
+    height: inherit;
+    float: right;
+    color: white;
+}
+
+.action {
+    height: 50%;
+    width: 100%;
+    text-align: center;
+    border-left-width: 1px;
+    border-left-style: solid;
+    border-left-color: #FFF;
+    display: table;
+}
+
+.action:active {
+    background-color: #668E66;
+}
+
+.action span {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.action i {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.action.delete{
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: #FFF;
+}
+
+.action.favorite{
+    
+}
+
+.action.add{
+    height: 100%;
 }
 
 .set_content {
@@ -721,7 +771,7 @@ img {
 
 .set_content.title {
     height: 100%;
-    max-width: 88%;
+    max-width: 96%;
     font-weight: 800;
     font-size: 16pt;
     text-align: center;
@@ -730,9 +780,10 @@ img {
 
 .set_content.title.search {
     height: 36%;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 15pt;
-    max-width: 96%;
+    max-width: 90%;
+    margin-top: 10px;
 }
 
 .set_content.description {
@@ -745,9 +796,10 @@ img {
     height: 50%;
     font-style: italic;
     font-size: 11pt;
-    font-weight: 300;
-    width: 98%;
-    text-align: center;
+    font-weight: 200;
+    width: 94%;
+    text-align: justify;
+    margin: 6px auto;
 }
 
 .list_option {
@@ -1006,6 +1058,7 @@ img {
     width: 100%;
     height: 100%;
     margin-top: 50px;
+    text-align: center;
 }
 
 @media screen and (max-width: 500px) {
@@ -1079,7 +1132,7 @@ img {
     display: table;
 }
 
-.card_content p{
+.card_content span{
     display: table-cell;
     vertical-align: middle;
 }
