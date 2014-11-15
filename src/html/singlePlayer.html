@@ -5,9 +5,23 @@
   <title></title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <script src='http://cdn.html5quintus.com/v0.2.0/quintus-all.js'></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <!-- <script src='example1.js'></script> -->
   <link rel="stylesheet" type="text/css" href="css/singlePlayer.css">
+ </head>
+ 
+ <body>
   <script>
+
+    // Read session storage
+    var friend_id = JSON.parse(sessionStorage.getItem("friend_id"));
+    var set_id = JSON.parse(sessionStorage.getItem("set_id"));
+    var user_id = JSON.parse(sessionStorage.getItem("user_id"));
+
+    var quesDeck = [];
+    var answersDeck = [];
+    var answersChosen = [];       
+
     // helper functions
   
     function parseBool(param) {
@@ -128,240 +142,285 @@
     var FLASH_SET = TestFlashSet;
     var DECK_SIZE = getDeckSize(FLASH_SET);
     var TOTAL_QUESTIONS = TestTotalQuestions;
-  </script>
- </head>
- 
- <body>
-  <script>
+
+
+
   window.addEventListener("load",function() {
- 
-  var Q = window.Q = Quintus()
-    .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
-    .setup({
-    width: 320,
-	height: 568,
-	scaleToFit: true
-	//maximize: "touch"
-  }).touch();
-  
-  Q.state.set({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
-  var deck = shuffleDeck(Q.state.get("totalQuestions"), DECK_SIZE);
-  
-  Q.UI.Score = Q.UI.Text.extend("UI.Score", { 
-    init: function(p) {
-      this._super({
-        label: "[score: " + Q.state.get('score') + "]",
-        x: 90,
-        y: 20
-      });
-      Q.state.on("change.score",this,"score");
-    },
-
-    score: function(score) {
-      this.p.label = "[score: " + score + "]";
-    }
-  });
-  
-  Q.UI.QuestionCounter = Q.UI.Text.extend("UI.QuestionCounter", { 
-    init: function(p) {
-      this._super({
-        label: "[Q: 1/" + Q.state.get("totalQuestions") + "]",
-        x: 240,
-        y: 20
-      });
-      Q.state.on("change.currentQuestion",this,"qc");
-    },
-
-    qc: function(score) {
-      this.p.label = "[Q: " + Q.state.get("currentQuestion") + "/" + Q.state.get("totalQuestions") + "]";
-    }
-  });
-
-    
-  // Flash Card
-  Q.UI.FlashCard = Q.UI.Text.extend('UI.FlashCard', {
-    // default position is question
-    init: function(p) {
-      this._super(p, {
-        color: "white",
-        x:  0,
-        y:  0,
-        id: 'fc-null',
-        question: 'q-null',
-        answer: 'a-null',
-        isQuestion: true
-      });
-    },
-  
-  // load flashcard properties
-    generate: function(param) {
-      parsedArgument = JSON.parse(param);     
-      this.p.id = parsedArgument.id;
-      this.p.question = parsedArgument.question;
-      this.p.answer = parsedArgument.answer;
-      if (this.p.isQuestion) {
-        this.p.label = this.p.question;
-      } else {
-        this.p.label = this.p.answer;
+    // Get questions and answers for the chosen set id.
+    setQuestions = $.get("/api/sets/"+ set_id + "/shuffle/10", function (data) {
+      console.log("In jQuery GET callback:");
+      var obj = JSON.parse(data);
+      for (eachObj in obj){console.log(eachObj);}
+      for (i = 0; i < obj.questions.length; i++) {
+        quesDeck.push( obj.questions[i].question );
+        answersDeck.push( obj.questions[i].answers );
+        console.log(obj.questions[i])
       }
-    },
-  });
-  
-  //answer button
-    Q.UI.AnswButton = Q.UI.Button.extend('UI.AnswButton', {
-    init: function(p) {
-      this._super(Q._defaults(p, {
-        fill: "#FFFFFF",
-        //highlight: "#FFFFFF",
-        fontColor: "white",
+
+ 
+    var Q = window.Q = Quintus()
+      .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
+      .setup({
+      width: 320,
+  	height: 568,
+  	scaleToFit: true
+  	//maximize: "touch"
+    }).touch();
+    
+    Q.state.set({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
+    var deck = shuffleDeck(Q.state.get("totalQuestions"), DECK_SIZE);
+    
+    Q.UI.Score = Q.UI.Text.extend("UI.Score", { 
+      init: function(p) {
+        this._super({
+          label: "[score: " + Q.state.get('score') + "]",
+          x: 90,
+          y: 20
+        });
+        Q.state.on("change.score",this,"score");
+      },
+
+      score: function(score) {
+        this.p.label = "[score: " + score + "]";
+      }
+    });
+    
+    Q.UI.QuestionCounter = Q.UI.Text.extend("UI.QuestionCounter", { 
+      init: function(p) {
+        this._super({
+          label: "[Q: 1/" + Q.state.get("totalQuestions") + "]",
+          x: 240,
+          y: 20
+        });
+        Q.state.on("change.currentQuestion",this,"qc");
+      },
+
+      qc: function(score) {
+        this.p.label = "[Q: " + Q.state.get("currentQuestion") + "/" + Q.state.get("totalQuestions") + "]";
+      }
+    });
+
+      
+    // Flash Card
+    Q.UI.FlashCard = Q.UI.Text.extend('UI.FlashCard', {
+      // default position is question
+      init: function(p) {
+        this._super(p, {
+          color: "white",
+          x:  0,
+          y:  0,
+          id: 'fc-null',
+          question: 'q-null',
+          answer: 'a-null',
+          isQuestion: true
+        });
+      },
+    
+    // load flashcard properties
+    generate: function(index) {
+        questionCard = quesDeck[index];   
+        this.p.id = questionCard.id;
+        this.p.question = questionCard.question;
+        this.p.answer = questionCard.answer;
+        if (this.p.isQuestion) {
+          this.p.label = this.p.question;
+        } else {
+          this.p.label = this.p.answer;
+        }
+      },
+    })
+    
+    //answer button
+      Q.UI.AnswButton = Q.UI.Button.extend('UI.AnswButton', {
+      init: function(p) {
+        this._super(Q._defaults(p, {
+          fill: "#FFFFFF",
+          //highlight: "#FFFFFF",
+          fontColor: "white",
+          border: 2,
+          shadow: 3,
+          shadowColor: "rgba(0,0,0,0.5)",
+          w: 40,
+          h: 40
+        }),                     
+        function() {
+            
+        });
+      },
+      
+      testfunc: function() {
+        alert('test');
+      },
+      });    
+
+    Q.scene("scene1",function(stage) {
+    
+      Q.state.reset({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
+    
+      var leScore = stage.insert(new Q.UI.Score());
+      var leQC = stage.insert(new Q.UI.QuestionCounter());
+      var ansDeck ;
+      
+      function generateAnswers() {
+        ansDeck = answersDeck[Q.state.get("currentQuestion") - 1];
+
+        var aBtns = [];
+        var k = 0;
+        for (i=0;i<2;i++) {
+          for (j=0;j<2;j++) {
+            var fcAns = ansDeck[k].answer;
+            var ansColor = "red";
+            if (quesDeck[Q.state.get("currentQuestion") - 1].id == ansDeck[k].id) {
+              ansColor = "green";
+            }
+            aBtns[k] = stage.insert(new Q.UI.Button({
+              fill: "gray",
+              highlight: ansColor,
+              fontColor: "white",
+              x: 90 + (140*j),
+              y: 290 + (110*i),
+              border: 2,
+              shadow: 3,
+              shadowColor: "rgba(0,0,0,0.5)",
+              w: 110,
+              h: 100,
+              label: fcAns,
+              name: k
+              }, function() {
+                // do something
+                answersChosen.push( ansDeck[this.p.name].id );
+                if (quesDeck[Q.state.get("currentQuestion") - 1].id == ansDeck[this.p.name].id) {
+                  console.log("Placeholder Trigger: Correct");
+                  Q.state.inc("score", 1);
+                } else {
+                  console.log("Placeholder Trigger: Wrong");
+                }
+                
+                if (Q.state.get("currentQuestion") <= Q.state.get("totalQuestions")) {
+                  Q.state.inc("currentQuestion", 1);
+                }
+            }));
+            k = k + 1;
+          }
+        }
+        return aBtns;
+      }
+      
+      function destroyAnswers(aBtns) {
+        for (i=0;i<aBtns.length;i++) {
+          aBtns[i].destroy();
+        }
+      }
+    
+      //current question
+      var qContainer = stage.insert(new Q.UI.Container({
+        fill: "gray",
+        x: 160,
+        y: 140,
         border: 2,
         shadow: 3,
         shadowColor: "rgba(0,0,0,0.5)",
-        w: 40,
-        h: 40
-      }),                     
-      function() {
-          
+        w: 250,
+        h: 180
+      }));
+
+      
+      var aBtns = generateAnswers();
+      
+      var qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
+      qCard.generate(Q.state.get("currentQuestion") - 1);
+      
+      Q.state.on("change.currentQuestion", function() {
+        if (Q.state.get("currentQuestion") > TOTAL_QUESTIONS) {
+          Q.stageScene("scene2");
+        } 
+        qCard.generate(Q.state.get("currentQuestion") - 1);
+        destroyAnswers(aBtns);
+        aBtns = generateAnswers();
       });
-    },
-    
-    testfunc: function() {
-      alert('test');
-    },
+      
     });
-  
-  // set scene
-  Q.scene("scene1",function(stage) {
-  
-    Q.state.reset({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
-  
-    var leScore = stage.insert(new Q.UI.Score());
-    var leQC = stage.insert(new Q.UI.QuestionCounter());
-    var ansDeck;
-    
-    function generateAnswers() {
-      ansDeck = dealAnswers(deck[Q.state.get("currentQuestion") - 1], DECK_SIZE);
-    
-      var aBtns = [];
-      var k = 0;
-      for (i=0;i<2;i++) {
-        for (j=0;j<2;j++) {
-          var fcAns = JSON.parse(getFlashCard(FLASH_SET, ansDeck[k])).answer;
-          var ansColor = "red";
-          if (deck[Q.state.get("currentQuestion") - 1] == ansDeck[k]) {
-            ansColor = "green";
-          }
-          aBtns[k] = stage.insert(new Q.UI.Button({
-            fill: "gray",
-            highlight: ansColor,
-            fontColor: "white",
-            x: 90 + (140*j),
-            y: 290 + (110*i),
-            border: 2,
-            shadow: 3,
-            shadowColor: "rgba(0,0,0,0.5)",
-            w: 110,
-            h: 100,
-            label: fcAns,
-            name: k
-            }, function() {
-              // do something
-              if (deck[Q.state.get("currentQuestion") - 1] == ansDeck[this.p.name]) {
-                console.log("Placeholder Trigger: Correct");
-                Q.state.inc("score", 1);
-              } else {
-                console.log("Placeholder Trigger: Wrong");
-              }
-              
-              if (Q.state.get("currentQuestion") != Q.state.get("totalQuestions")) {
-                Q.state.inc("currentQuestion", 1);
-              }
-          }));
-          k = k + 1;
-        }
-      }
-      return aBtns;
-    }
-    
-    function destroyAnswers(aBtns) {
-      for (i=0;i<aBtns.length;i++) {
-        aBtns[i].destroy();
-      }
-    }
-  
-    //current question
-    var qContainer = stage.insert(new Q.UI.Container({
-      fill: "gray",
-      x: 160,
-      y: 140,
-      border: 2,
-      shadow: 3,
-      shadowColor: "rgba(0,0,0,0.5)",
-      w: 250,
-      h: 180
-    }));
+
 
     
-    var aBtns = generateAnswers();
+    // set scene
+    // Game completed
+    // Post results
+    Q.scene("scene2",function(stage) {
+
+      // POST DATA
+      var jsonData = {};
+      var cardsArray = [];
+      jsonData["flashset"] = set_id;
+
+      for (i = 0; i < answersChosen.length; i++) {
+        var objectQues = {};
+        objectQues['flashcard'] = quesDeck[i].id;
+        objectQues['result'] = answersChosen[i];
+        objectQues['time'] = 1000;
+        cardsArray.push(objectQues);
+      }
+      jsonData["cards"] = cardsArray;
+
+      postData = JSON.stringify(jsonData);
+
+      $.ajax({
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        url: "/api/user/" + user_id + "/challenges/" + friend_id + "/" + set_id,
+        data: postData,
+        success: function (data) {
+          console.log(data);
+        },
+        dataType: "json"
+      });
+      
     
-    var qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
-    qCard.generate(getFlashCard(FLASH_SET, deck[Q.state.get("currentQuestion") - 1]));
+      var leScore = stage.insert(new Q.UI.Score());
+      // Results page!
     
-    Q.state.on("change.currentQuestion", function() {
-      if (Q.state.get("currentQuestion") == TOTAL_QUESTIONS) {
-        Q.stageScene("scene2");
-      } 
-      qCard.generate(getFlashCard(FLASH_SET, deck[Q.state.get("currentQuestion") - 1]));
-      destroyAnswers(aBtns);
-      aBtns = generateAnswers();
+      var ReplayBtn = stage.insert(new Q.UI.Button({
+        fill: "gray",
+        fontColor: "white",
+        x: 160,
+        y: 160,
+        border: 2,
+        shadow: 3,
+        shadowColor: "rgba(0,0,0,0.5)",
+        w: 110,
+        h: 100,
+        label: 'Replay',
+      }, function() {
+        Q.stageScene("scene1");
+      }));
+      
+      var BackBtn = stage.insert(new Q.UI.Button({
+        fill: "gray",
+        fontColor: "white",
+        x: 160,
+        y: 320,
+        border: 2,
+        shadow: 3,
+        shadowColor: "rgba(0,0,0,0.5)",
+        w: 110,
+        h: 100,
+        label: 'Back',
+      }, function() {
+        window.location.href="study.html";
+      }));
+      
+      
     });
     
-  });
-  
-  // set scene
-  Q.scene("scene2",function(stage) {
-  
-    var leScore = stage.insert(new Q.UI.Score());
-  
-    var ReplayBtn = stage.insert(new Q.UI.Button({
-      fill: "gray",
-      fontColor: "white",
-      x: 160,
-      y: 160,
-      border: 2,
-      shadow: 3,
-      shadowColor: "rgba(0,0,0,0.5)",
-      w: 110,
-      h: 100,
-      label: 'Replay',
-    }, function() {
-      Q.stageScene("scene1");
-    }));
-    
-    var BackBtn = stage.insert(new Q.UI.Button({
-      fill: "gray",
-      fontColor: "white",
-      x: 160,
-      y: 320,
-      border: 2,
-      shadow: 3,
-      shadowColor: "rgba(0,0,0,0.5)",
-      w: 110,
-      h: 100,
-      label: 'Back',
-    }, function() {
-      window.location.href="study.html";
-    }));
-    
-    
-  });
-  
-  // stage scene
-  Q.stageScene("scene1");
-  
-  
-     
-});
+    // stage scene
+    Q.stageScene("scene1");
+        
+       
+  }); // End of the callback for get
+
+
+
+}); 
   </script>
 
   <script src="js/quizas_auth_helper.js"></script>

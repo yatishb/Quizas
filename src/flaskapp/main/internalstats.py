@@ -190,6 +190,11 @@ def getCommonGamesStats(userid, opponentUserId):
 # results page can be replicated without any problem
 def getGameStats(userid, gameidForStats):
 	game = FG.query.filter(FG.gameId == gameidForStats, FG.user != userid).first()
+
+	if game == None:
+		request = make_response('Game not found', 401)
+		return request
+
 	questionsInGame = FC.query.filter(FC.gameId == gameidForStats).all()
 	gameResult = ""
 

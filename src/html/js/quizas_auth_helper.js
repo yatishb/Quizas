@@ -36,17 +36,12 @@ function quizas_user_id() {
 function quizas_update_auth_cookies(site, authId, authToken, redirectUrl) {
     // site e.g. "quizlet", "twitter", "facebook"
 
-    // Check what other cookies Quizas has,
-    // if they clash (has this site, but different authId), remove the others.
-    if ($.cookie(site + "_user_id") != authId) {
-        var auth_sites = ["quizlet", "twitter", "facebook"]; // BAD MAGIC
-        for (var i in auth_sites) {
-            var s = auth_sites[i];
-
-            // No great harm in removing a cookie which isn't there.
-            $.removeCookie(s + "_user_id", { path: "/" });
-            $.removeCookie(s + "_access_token", { path: "/" });
-        }
+    // site is only for "facebook", btw.
+    // if already logged in w/ a different Facebook acct.
+    if (quizas_is_authorized_for("facebook") &&
+        $.cookie("facebook_user_id") !== authId) {
+        // CLASH! So, logout from current one.
+        quizas_logout();
     }
 
     // Set the cookie
