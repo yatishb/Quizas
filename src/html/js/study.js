@@ -196,8 +196,6 @@ $('.list_bottom').on("click", function () {
         return;
     }
 
-    console.log("The next page is " + next_page);
-
     if (next_page=="q") {
         console.log("namespace: "+namespace);
         console.log("socket: "+socket);
@@ -206,16 +204,16 @@ $('.list_bottom').on("click", function () {
             'set': selected_set_id,
             'user': quizas_user_id()
         });
+    } else if (next_page=="c") {
+        initializeGame(selected_friend_id, selected_set_id, quizas_user_id());
     }
 
-    // else if (next_page=="c") window.location.href="#";
-    // else alert("error in starting game");
 });
 
-function initializeGame(content) {
-    //win
-    //encounter
-    //total
+function initializeGame(friend_id, set_id, user_id) {
+    sessionStorage.setItem("friend_id", JSON.stringify(friend_id));
+    sessionStorage.setItem("set_id", JSON.stringify(set_id));
+    sessionStorage.setItem("user_id", JSON.stringify(user_id));
     window.location.href="singlePlayer.html";
 }
 
