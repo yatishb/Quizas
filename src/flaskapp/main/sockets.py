@@ -22,7 +22,8 @@ def socketConnect():
 @socketio.on('disconnect', namespace='/test')
 def socketDisconnect():
     print('Client disconnected')
-    clients.remove(request.namespace)
+    if clients.count(request.namespace) != 0:
+    	clients.remove(request.namespace)
 
 @socketio.on('print connected', namespace='/test')
 def printSocketsConnected():
