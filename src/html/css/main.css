@@ -111,18 +111,22 @@ img {
     text-decoration: none;
 }
 
+.group_2 div,
 .group_2 li {
-    width: 50%;
+    width: 49.5%;
 }
 
+.group_3 div,
 .group_3 li {
     width: 33.333%;
 }
 
+.group_4 div,
 .group-4 li {
     width: 25%;
 }
 
+.group_5 div,
 .group_5 li {
     width: 20%;
 }
@@ -1216,6 +1220,69 @@ i.rotate {
     -ms-transform: rotateY(180deg);
     -moz-transform: rotateY(180deg);
     -webkit-transform: rotateY(180deg);
+}
+
+/*** Start of stats.html ***/
+@media screen and (max-width: 500px) {
+    .stats_tab {
+        height: 10vw;
+        max-height: 35px;
+        line-height: 35px;
+    }
+
+    .page_me, .page_friend {
+        margin-top: 35px;
+    }
+}
+
+@media screen and (min-width: 501px) {
+    .stats_tab {
+        height: 40px;
+        line-height: 40px;
+    }
+
+    .page_me, .page_friend {
+        margin-top: 40px;
+    }
+}
+
+.stats_tab {
+    height: inherit;
+    float: left;
+    border-left: solid 1px #FFF;
+    /*border-right: solid 1px #FFF;*/
+    cursor: pointer;
+}
+
+.stats_tab:active {
+    background-color: #4B4B4B;
+}
+
+.stats_tab.current_tab {
+    background-color: #A6A6A6;
+}
+
+.page_me, .page_friend {
+    z-index: 1;
+    width: 100vw;
+    height: auto;
+    position: relative;
+    margin-left: -8px;
+    text-align: center;
+}
+
+.page_friend {
+    display: none;
+}
+
+.myChart {
+    width: 400px;
+    height: 400px;
+    margin: 30px auto;
+}
+
+.chartTable {
+    margin: 20px auto;
 }
 
 /*** Start of settings.html ***/

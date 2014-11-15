@@ -20,28 +20,66 @@
     
     <link rel="stylesheet" type="text/css" href="css/main.css"></link>
     <link rel="stylesheet" type="text/css" href="css/font-awesome.css"></link>
+
+    <script src="js/quizas_auth_helper.js"></script>
+    <script src="js/quizas_facebook.js"></script>
+    <script src="js/Chart.js"></script>
+
+    <!-- Load the FB JS SDK -->
+    <script>
+    window.fbAsyncInit = function() {
+        FB.init({
+            appId      : quizas_fbappid,
+            xfbml      : true,
+            version    : 'v2.1'
+        });
+    };
+
+    (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+    function outputProfile (profile) {
+        $('.profile_photo img').attr('src', profile.picture);
+        $('.name_content').text(profile.name);
+    }
+    </script>
 </head>
 <body>
-    <div data-role="content">
-        <div class="content-primary list_option">   
-        <ul data-role="listview">
-            <li>
-                <h3>Quiz History</h3>
-            </li>
-            <li>
-                <h3>Study History</h3>
-            </li>
-            <li>
-                <h3>Active Learning Days</h3>
-            </li>
-            <li>
-                <h3>Sets Learned</h3>
-            </li>
-            <li>
-                <h3>Achievements</h3>
-            </li>
-        </ul>
-        </div>
+    <div id="fb-root"></div>
+
+    <div class="header group_2 stats">
+        <div class="stats_tab current_tab">Myself</div>
+        <div class="stats_tab">My Friends</div>
+    </div>
+
+    <div class="page_me">
+        <canvas class="myChart"></canvas>
+        <table class="chartTable">
+            <tr>
+                <td>Total</td>
+                <td>6</td> 
+            </tr>
+            <tr>
+                <td>Win</td> 
+                <td>3</td>
+            </tr>
+            <tr>
+                <td>Draw</td> 
+                <td>2</td>
+            </tr>
+            <tr>
+                <td>Lose</td> 
+                <td>1</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="page_friend">
     </div>
 
     <div class="footer">
@@ -52,14 +90,13 @@
         </ul>
     </div>
 
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,300,400' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,300,400' rel='stylesheet' type='text/css'></link>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
     <script src="js/jquery.mobile.js"></script>
 
     <script src="js/stats.js"></script>
-    <script src="js/quizas_auth_helper.js"></script>
 
     <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

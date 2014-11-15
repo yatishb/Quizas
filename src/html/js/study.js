@@ -321,14 +321,14 @@ function getSearchResult(txt) {
 }
 
 function addSet(id) {
-    var userId = quizas_user_id();
+    var userid = quizas_user_id();
 
     // NOTE: For this to work, (i.e. to find the Set ID which should be added),
     // it's assumed that the add button is grandchild of the
     // <div id="quizlet:.." /> div.
 
     $.ajax({
-        url: '/api/user/' + userId + '/sets/' + id,
+        url: '/api/user/' + userid + '/sets/' + id,
         type: 'PUT',
         success: function() {
             var thisClass = ("" + id).replace(":", "_");
