@@ -351,6 +351,10 @@ def ensure_some_flashsets(userid):
 	if len(current) == 0:
 		assign_initial_flashsets(internal_id)
 
+		# If not a Quizlet userid, return
+		if authhelper.site_of(userid) != "quizlet":
+			return
+
 		# For better integration with quizlet,
 		# we could get the user, and add their
 		quizlet_user_info = quizlet_user(userid)

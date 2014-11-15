@@ -19,14 +19,6 @@ def facebook_notify_auth():
 
 	resp = make_response(json.dumps({"status": "ok"}));
 
-	if authhelper.userids_clash_userid(new_userid):
-		# A different user was previously logged in on this
-		# browser (i.e. different w/ different quizlet acct).
-		# Delete their cookies.
-		for site in authhelper.auth_sites:
-			if request.cookies.get(site + "_user_id") != None:
-				resp.set_cookie(site + "_user_id", '', expires = 0)
-	
 	authhelper.register(new_userid)
 	quizletsets.ensure_some_flashsets(new_userid)
 
