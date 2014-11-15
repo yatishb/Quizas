@@ -30,8 +30,12 @@ $("#user_id").text(user_id);
 <br/><br/>
 
 <script>
-$.get("/api/user/" + user_id + "/stats", function (data) {
-    $("#stats_result").text(data);
+$(function() {
+    $.get("/api/user/" + user_id + "/stats", function (data) {
+        $("#stats_result").text(data);
+
+        outputWinLossDrawPieChart(JSON.parse(data));
+    });
 });
 </script>
 
@@ -242,8 +246,6 @@ function outputWinLossDrawPieChart(statsObj) {
 
     var pie = new d3pie("overallStatsPieChart", pieChartData);
 }
-
-outputWinLossDrawPieChart({wins: 3, draws: 2, losses: 1});
 </script>
 
 
