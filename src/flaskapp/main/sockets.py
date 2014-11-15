@@ -110,27 +110,16 @@ def assignRoom(message):
 		# Deal with shuffled flashcards
 		# Store all the flashcards json in redis as a string
 		flashcardsJson = shuffledFlashcards['questions']
+		usersInRoom = str(user1) + ", " + str(user2)
 		redis.hset("ROOMS_CARDS", room, json.dumps(flashcardsJson))
+		redis.hset("ROOMS", room, usersInRoom)
 		redis.save()
 
 		for client in clients:
 			if (client.session['id'] == user1) or (client.session['id'] == user2):
 				if client.session['room'] == defaultRoom:
 					client.session['room'] = room
-					# print "Assigned: user:%r room:%r" % (client.session['id'], client.session['room'])
-					
-					# Check redis if room exists
-					# Add client to room and create room if not found
-					if redis.hexists("ROOMS", room) == True :
-						usersInRoom = redis.hget("ROOMS", room)
-						usersInRoom += ", %r" % client.session['id']
-						redis.hset("ROOMS", room, usersInRoom)
-						redis.save()
-						print "User: %r room: %r" % (client.session['id'], client.session['room'])
-					else:
-						redis.hset("ROOMS", room, client.session['id'])
-						redis.save()
-						print "User: %r room: %r" % (client.session['id'], client.session['room'])
+					print "Assigned: user:%r room:%r" % (client.session['id'], client.session['room'])
 					client.base_emit('my response', {'data': 'GAME BEGINS...'})
 				
 				else:
