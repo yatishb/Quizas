@@ -19,7 +19,8 @@
     var user_id = JSON.parse(sessionStorage.getItem("user_id"));
 
     var quesDeck = [];
-    var answersDeck = [];          
+    var answersDeck = [];
+    var answersChosen = [];       
 
     // helper functions
   
@@ -253,8 +254,6 @@
       });    
 
     Q.scene("scene1",function(stage) {
-
-      var answersChosen = [];
     
       Q.state.reset({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
     
@@ -297,7 +296,7 @@
                   console.log("Placeholder Trigger: Wrong");
                 }
                 
-                if (Q.state.get("currentQuestion") != Q.state.get("totalQuestions")) {
+                if (Q.state.get("currentQuestion") <= Q.state.get("totalQuestions")) {
                   Q.state.inc("currentQuestion", 1);
                 }
             }));
@@ -329,17 +328,15 @@
       var aBtns = generateAnswers();
       
       var qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
-      //qCard.generate(getFlashCard(FLASH_SET, deck[Q.state.get("currentQuestion") - 1]));
       qCard.generate(Q.state.get("currentQuestion") - 1);
       
       Q.state.on("change.currentQuestion", function() {
-        if (Q.state.get("currentQuestion") == TOTAL_QUESTIONS) {
+        if (Q.state.get("currentQuestion") > TOTAL_QUESTIONS) {
           Q.stageScene("scene2");
         } 
         qCard.generate(Q.state.get("currentQuestion") - 1);
         destroyAnswers(aBtns);
         aBtns = generateAnswers();
-        console.log(answersChosen);
       });
       
     });
@@ -347,9 +344,31 @@
 
     
     // set scene
+    // Game completed
+    // Post results
     Q.scene("scene2",function(stage) {
+      console.log(answersChosen);
+
+      var jsonData = {};
+      var cardsArray = [];
+      jsonData["flashset"] = set_id;
+
+      for (i = 0; i < answersChosen.length; i++) {
+        var objectQues = {};
+        objectQues['flashcard'] = quesDeck[i].id;
+        objectQues['result'] = answersChosen[i];
+        objectQues['time'] = 1000;
+        cardsArray.push(objectQues);
+      }
+      jsonData["cards"] = cardsArray;
+
+      console.log(jsonData);
+      $.post( "/api/user/" + user_id + "/challenges/" + friend_id + "/" + set_id, jsonData,function( data ) {
+        alert("posted");
+      });
     
       var leScore = stage.insert(new Q.UI.Score());
+      // Results page!
     
       var ReplayBtn = stage.insert(new Q.UI.Button({
         fill: "gray",
@@ -386,8 +405,7 @@
     
     // stage scene
     Q.stageScene("scene1");
-    
-    
+        
        
   }); // End of the callback for get
 
