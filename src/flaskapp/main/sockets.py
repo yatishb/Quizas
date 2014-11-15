@@ -217,7 +217,7 @@ def gameInitialisedByClient(message):
 			redis.hdel(HASH_INIT, room)
 			redis.save()
 			# And send very first question to the room to kick-start the entire game
-			sendFirstQuestionInfoToClient(room)
+			sendFirstQuestionInfoToClient(room, usersInRoom)
 	else:
 		# This is the first beacon received.
 		# Only one client is ready to play and so record it
@@ -354,7 +354,7 @@ def sendNextQuesInfoToClient(hashSend, room, done):
 # This function send the clients the details of the first question
 # Called only one "immediately" after the creation of the game
 # This function is important to kick start the game
-def sendFirstQuestionInfoToClient(room):
+def sendFirstQuestionInfoToClient(room, usersInRoom):
 	done = 0
 
 	# Retrieve the details of the very first ques for the given room
@@ -363,9 +363,10 @@ def sendFirstQuestionInfoToClient(room):
 	# There is no customized message for the first question
 	# Hence broadcast across room can be used to send the details of the next question
 	print "Start game: %r" % commonDataToSend
-	# for client in clients:
-	# 	print "client found id:%r random:%r room:%r" % (client.session['id'], client.session['random'], client.session['room'])
-	emit('nextQuestion', {'data': json.dumps(commonDataToSend)}, room= room)
+	for client in clients:
+		if (client.session['id'] == int(usersInRoom[0])) or (client.session['id'] == int(usersInRoom[1])):
+			print "client found id:%r random:%r room:%r" % (client.session['id'], client.session['random'], client.session['room'])
+			client.base_emit('nextQuestion', {'data': json.dumps(commonDataToSend)})
 
 
 # For a given room, retrieve and return the next question to be asked
