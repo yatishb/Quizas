@@ -254,7 +254,7 @@ function outputWinLossDrawPieChart(statsObj) {
 <b>Line Chart of a Game</b><br/>
 This could be useful for post-game stats.
 
-<div id="gameLineGraphs" class="aGraph" />
+<div id="gameLineGraphs" class="aGraph"> </div>
 
 <!-- Move to some graph .css or whatever? -->
 
@@ -330,13 +330,11 @@ function outputGameResultsLineChart(lineGraphId, gameResults) {
     // assign the X function to plot our line as we wish
     .x(function(d,i) {
         // verbose logging to show what's actually being done
-        console.log('Plotting X value for data point: ' + d + ' using index: ' + i + ' to be at: ' + x(i) + ' using our xScale.');
         // return the X coordinate where we want to plot this datapoint
         return x(i);
     })
     .y(function(d) {
         // verbose logging to show what's actually being done
-        console.log('Plotting Y value for data point: ' + d + ' to be at: ' + y(d) + " using our yScale.");
         // return the Y coordinate where we want to plot this datapoint
         return y(d);
     })
@@ -382,6 +380,120 @@ function outputGameResultsLineChart(lineGraphId, gameResults) {
 </script>
 
 
-</body>
 
-</html>
+
+
+
+<b>Stacked Bar Charts for Flash Sets</b><br/>
+This could be useful for post-game stats.
+
+<div id="flashsetBarGraphs" class="aGraph" />
+
+<style>
+
+#flashsetBarGraphs .axis {
+  font: 10px sans-serif;
+}
+
+#flashsetBarGraphs .axis path,
+#flashsetBarGraphs .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+</style>
+
+<script>
+$(function() {
+    var fsid = "quizlet:57054880"
+
+    var fsGraphId = "stackedBarGraph_" + fsid.replace(":", "")
+    $("<div/>", { id: fsGraphId }).appendTo("#flashsetBarGraphs");
+
+    $.get("/api/user/" + user_id + "/stats/sets/" + fsid, function (data) {
+        outputFlashsetBarGraph(fsGraphId, JSON.parse(data));
+    });
+});
+
+function outputFlashsetBarGraph (graphId, flashsetResults) {
+
+    // draws
+    // played
+    // fcids: []
+    // wins
+    // losses
+    // flashcards: fcid -> {correct: #, total: #}
+    // gameids: []
+
+    var data = flashsetResults.fcids.map(function (fcid) {
+        var result = flashsetResults.flashcards[fcid];
+
+        return { fcid: fcid,
+                 correct: result.correct }
+    });
+
+    var margin = {top: 20, right: 20, bottom: 70, left: 40};
+    var width = 600 - margin.left - margin.right;
+    var height = 300 - margin.top - margin.bottom;
+
+    // Parse the date / time</html>
+    var x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
+
+    var y = d3.scale.linear().range([height, 0]);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom")
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .ticks(10);
+
+    var svg = d3.select("#" + graphId).append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", 
+              "translate(" + margin.left + "," + margin.top + ")");
+
+
+    // Construct data from results
+
+
+    x.domain(data.map(function(d) { return d.fcid; }));
+    y.domain([0, d3.max(data, function(d) { return d.correct; })]);
+
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+      .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", "-.55em")
+        .attr("transform", "rotate(-90)" );
+
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+      .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Value ($)");
+
+    svg.selectAll("bar")
+        .data(data)
+      .enter().append("rect")
+        .style("fill", "steelblue")
+        .attr("x", function(d) { return x(d.fcid); })
+        .attr("width", x.rangeBand())
+        .attr("y", function(d) { return y(d.correct); })
+        .attr("height", function(d) { return height - y(d.correct); });
+
+}
+
+</script>
