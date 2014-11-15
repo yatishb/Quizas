@@ -9,6 +9,7 @@ import requests
 import authhelper
 import secrets
 import quizletsets
+import internalstats
 
 from flask import request, redirect, make_response
 from models import UserChallenge
@@ -48,7 +49,7 @@ def create_new_challenge(challengerId, recipientId, setid):
 		                                              receivedData)
 
 		# Add new row to UserChallenge
-		uc = UserChallenge(chgr_id, rcpt_id, gameId, setid)
+		uc = UserChallenge(chgr_id, rcpt_id, gameId, STATUS_NEW)
 		db.session.add(uc)
 		db.session.commit()
 

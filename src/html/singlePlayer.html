@@ -347,8 +347,8 @@
     // Game completed
     // Post results
     Q.scene("scene2",function(stage) {
-      console.log(answersChosen);
 
+      // POST DATA
       var jsonData = {};
       var cardsArray = [];
       jsonData["flashset"] = set_id;
@@ -362,10 +362,19 @@
       }
       jsonData["cards"] = cardsArray;
 
-      console.log(jsonData);
-      $.post( "/api/user/" + user_id + "/challenges/" + friend_id + "/" + set_id, jsonData,function( data ) {
-        alert("posted");
+      postData = JSON.stringify(jsonData);
+
+      $.ajax({
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        url: "/api/user/" + user_id + "/challenges/" + friend_id + "/" + set_id,
+        data: postData,
+        success: function (data) {
+          console.log(data);
+        },
+        dataType: "json"
       });
+      
     
       var leScore = stage.insert(new Q.UI.Score());
       // Results page!
