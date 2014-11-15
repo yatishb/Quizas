@@ -39,7 +39,7 @@ function quizas_update_auth_cookies(site, authId, authToken, redirectUrl) {
     // site is only for "facebook", btw.
     // if already logged in w/ a different Facebook acct.
     if (quizas_is_authorized_for("facebook") &&
-        $.cookie("facebook_user_id") !== "facebook:" + authId) {
+        $.cookie("facebook_user_id") !== authId) {
         // CLASH! So, logout from current one.
         quizas_logout();
     }
