@@ -66,7 +66,7 @@ img {
 /*** Start of footer ***/
 @media screen and (max-width: 500px) {
     .footer_container li {
-        line-height: 45px;
+        line-height: 36px;
     }
 }
 
@@ -482,8 +482,8 @@ img {
     #search_set_box {
         height: 29px;
         margin-top: 0.5px;
-        line-height: 30px;
-        font-size: 12pt;
+        line-height: 28px;
+        font-size: 10pt;
     }
 
     .notification {
@@ -725,7 +725,7 @@ i.rotate {
 
 .set_info {
     z-index: 1;
-    margin-bottom: 40px;
+    margin-bottom: 45px;
     right: 0;
     left: 0;
     position: absolute;
@@ -945,7 +945,7 @@ i.rotate {
     }
 
     .friend_window {
-        height: 50vh;
+        height: 40vh;
         top: 27%;
         left: 50%;
         margin-left: -30vw;
@@ -967,6 +967,7 @@ i.rotate {
     .list_search input[type="text"] {
         font-size: 12pt;
         height: 25px;
+        width: 90%;
     }
 }
 
@@ -1004,6 +1005,7 @@ i.rotate {
     .list_search input[type="text"] {
         font-size: 13pt;
         height: 28px;
+        width: 96%;
     }
 }
 
@@ -1019,14 +1021,14 @@ i.rotate {
     background: white;
     margin: -4px 0;
     text-align: center;
-    border-bottom: solid 1px #c9c9c9;
+    width: 100%;
+    /*border-bottom: solid 1px #c9c9c9;*/
 }
 
 .list_search input[type="text"] {
     font-family: 'open_sans', sans-serif;
     border: 0;
     outline: none;
-    width: 98%;
     left: 3;
     border-bottom: solid 2px #c9c9c9;
     border-radius: 0;
@@ -1247,6 +1249,15 @@ i.rotate {
     .page_me, .page_friend {
         margin-top: 35px;
     }
+
+    .simple_friend.stats {
+        left: 0;
+        right: 0;
+    }
+
+    .friend_profile.stats {
+        margin-right: 10px;
+    }
 }
 
 @media screen and (min-width: 501px) {
@@ -1257,6 +1268,24 @@ i.rotate {
 
     .page_me, .page_friend {
         margin-top: 40px;
+    }
+
+    .simple_friend.stats {
+        margin: 2px auto;
+        width: 60vw;
+        max-width: 600px;
+    }
+
+    .simple_friend.stats span {
+        
+    }
+
+    .friend_profile.stats {
+
+    }
+
+    .friend_profile.stats img {
+
     }
 }
 
@@ -1297,6 +1326,22 @@ i.rotate {
 
 .chartTable {
     margin: 20px auto;
+}
+
+.simple_friend.stats:hover {
+    background-color: #4DB8DB;
+}
+
+.simple_friend.stats span {
+    
+}
+
+.friend_profile.stats {
+
+}
+
+.friend_profile.stats img {
+
 }
 
 /*** Start of settings.html ***/

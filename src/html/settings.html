@@ -20,6 +20,9 @@
     
     <link rel="stylesheet" type="text/css" href="css/main.css"></link>
     <link rel="stylesheet" type="text/css" href="css/font-awesome.css"></link>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
     
     <script src="js/quizas_auth_helper.js"></script>
     <script src="js/quizas_facebook.js"></script>
@@ -100,10 +103,7 @@
         </ul>
     </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
     <script src="js/jquery.mobile.js"></script>
-
     <script src="js/settings.js"></script>
 
     <script>
@@ -116,5 +116,30 @@
         ga('send', 'pageview');
     </script>
 
+    <script>
+    function doFacebookLogin() {
+      // We want the 'user_friends' permission so that we can access /{user}/friends
+      // See: https://developers.facebook.com/docs/graph-api/reference/v2.2/user/friends
+      FB.login(afterFacebookLogin, {scope: 'public_profile,user_friends'});
+    }
+
+    function afterFacebookLogin(response) {
+        if (response.authResponse) {
+            console.log('Welcome!  Fetching your information.... ');
+            console.log(JSON.stringify(response));
+
+            // e.g. response
+            // {"authResponse":{"accessToken":"...","userID":"10204898258962045","expiresIn":6855,"signedRequest":"...."},"status":"connected"}
+            // So, we're interested in
+            // authResponse.userID, authResponse.accessToken, authResponse.expiresIn
+            quizas_update_auth_cookies("facebook",
+                                       response.authResponse.userID,
+                                       response.authResponse.accessToken,
+                                       "settings.html");
+        } else {
+            console.log('User cancelled login or did not fully authorize.');
+        }
+    }
+    </script>
 </body>
 </html>
