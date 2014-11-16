@@ -56,7 +56,7 @@ $('.stats_tab').on('click', function() {
 function getUserStats() {
     var userid = quizas_user_id();
 
-    $.get("/api/" + userid + "/stats", function(data) {
+    $.get("/api/user/" + userid + "/stats", function(data) {
         var result = JSON.parse(data);
         console.log(result);
     })

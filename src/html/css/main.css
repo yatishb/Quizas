@@ -1,5 +1,5 @@
 body {
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'open_sans', sans-serif;
 }
 
 body, html {
@@ -32,7 +32,21 @@ img {
 }
 
 @font-face {
+    font-family: open_sans;
+    src: url(font/OpenSans-Regular.ttf) format("truetype"),
+         url(font/OpenSans-Regular.woff) format('woff');
+}
 
+@font-face {
+    font-family: open_sans_light;
+    src: url(font/OpenSans-Light.ttf) format("truetype"),
+         url(font/OpenSans-Light.eot) format('woff');
+}
+
+@font-face {
+    font-family: open_sans_bold;
+    src: url(font/OpenSans-Bold.ttf) format("truetype"),
+         url(font/OpenSans-Bold.woff) format('woff');
 }
 
 #fb-root {
@@ -219,7 +233,7 @@ img {
 .fb-bg:after,
 .twi-bg:after,
 .g-bg:after {
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'open_sans', sans-serif;
 }
 
 /* Quizlet */
@@ -461,8 +475,8 @@ img {
     }
 
     .search_set {
-        width: 80vw;
-        margin-left: -41vw;
+        width: 70vw;
+        margin-left: -36vw;
     }
 
     #search_set_box {
@@ -595,7 +609,7 @@ img {
 .header_title {
     margin-left: auto;
     margin-right: auto;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'open_sans', sans-serif;
 }
 
 .add_set {
@@ -706,7 +720,7 @@ i.rotate {
     margin-right: auto;
     max-width: 600px;
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
 }
 
 .set_info {
@@ -728,7 +742,7 @@ i.rotate {
     border-bottom-width: 1px;
     border-bottom-color: #47A347;
     cursor: pointer;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'open_sans', sans-serif;
     font-weight: light;
     /*border-top-style: solid;
     border-top-width: 1px;
@@ -800,7 +814,7 @@ i.rotate {
     margin-left: auto;
     margin-right: auto;
     color: white;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'open_sans', sans-serif;
 }
 
 .set_content p{
@@ -851,7 +865,7 @@ i.rotate {
     background-color: #000;
     background-color: rgba(255, 255, 255, 0.4);
     width: 110vw;
-    height: 110vh;
+    height: 2000px;
     margin-top: -10px;
     margin-left: -10px;
     position: fixed;
@@ -868,7 +882,7 @@ i.rotate {
 }
 
 .round_button {
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'open_sans', sans-serif;
     width: 25vw;
     height: 25vw;
     max-width: 200px;
@@ -1009,7 +1023,7 @@ i.rotate {
 }
 
 .list_search input[type="text"] {
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'open_sans', sans-serif;
     border: 0;
     outline: none;
     width: 98%;
@@ -1036,7 +1050,7 @@ i.rotate {
 }
 
 .list_bottom {
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'open_sans', sans-serif;
     background-color: #1E8BC3;
     background: #1E8BC3;
     position: relative;
@@ -1067,7 +1081,7 @@ i.rotate {
     height: 100%;
     line-height: 50px;
     margin-left: 15px;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'open_sans', sans-serif;
 }
 
 .friend_profile {
@@ -1290,7 +1304,7 @@ i.rotate {
     width: 100%;
     height: 100%;
     overflow-y: auto;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'open_sans', sans-serif;
 }
 
 .profile_container {
