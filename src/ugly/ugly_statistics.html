@@ -426,6 +426,10 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
     // flashcards: fcid -> {correct: #, total: #}
     // gameids: []
 
+    // TODO: Height should be fn of # props in `flashcards`
+    var graphWidth = 600;
+    var graphHeight = 500;
+
     var data = flashsetResults.fcids.map(function (fcid) {
         var result = flashsetResults.flashcards[fcid];
 
@@ -433,23 +437,24 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
                  correct: result.correct }
     });
 
-    var margin = {top: 20, right: 20, bottom: 70, left: 40};
-    var width = 600 - margin.left - margin.right;
-    var height = 300 - margin.top - margin.bottom;
+    // TODO: `left` margin, where we show the words should be wide enough?
+    // .... or should we display the word within the progress bar? Hmm.
+    var margin = {top: 20, right: 20, bottom: 70, left: 160};
+    var width = graphWidth - margin.left - margin.right;
+    var height = graphHeight - margin.top - margin.bottom;
 
-    // Parse the date / time</html>
-    var x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
-
-    var y = d3.scale.linear().range([height, 0]);
+    var pGapBetweenBars = 0.05; // padding, proportion of bar thickness.
+    var x = d3.scale.linear().range([0, width]);
+    var y = d3.scale.ordinal().rangeRoundBands([height, 0], pGapBetweenBars);
 
     var xAxis = d3.svg.axis()
         .scale(x)
         .orient("bottom")
+        .ticks(6); // TODO: # ticks should be max # total for any of the fcids!
 
     var yAxis = d3.svg.axis()
         .scale(y)
         .orient("left")
-        .ticks(10);
 
     var svg = d3.select("#" + graphId).append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -458,12 +463,8 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
         .attr("transform", 
               "translate(" + margin.left + "," + margin.top + ")");
 
-
-    // Construct data from results
-
-
-    x.domain(data.map(function(d) { return d.fcid; }));
-    y.domain([0, d3.max(data, function(d) { return d.correct; })]);
+    x.domain([0, d3.max(data, function(d) { return d.correct; })]);
+    y.domain(data.map(function(d) { return d.fcid; }));
 
     svg.append("g")
         .attr("class", "x axis")
@@ -478,21 +479,25 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
     svg.append("g")
         .attr("class", "y axis")
         .call(yAxis)
-      .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("Value ($)");
+      // .append("text")
+      //   .attr("transform", "rotate(-90)")
+      //   .attr("y", 6)
+      //   .attr("dy", ".71em")
+      //   .style("text-anchor", "end")
+      //   .text("Value ($)");
 
     svg.selectAll("bar")
         .data(data)
       .enter().append("rect")
-        .style("fill", "steelblue")
-        .attr("x", function(d) { return x(d.fcid); })
-        .attr("width", x.rangeBand())
-        .attr("y", function(d) { return y(d.correct); })
-        .attr("height", function(d) { return height - y(d.correct); });
+        .style("fill", "green")
+        .attr("x", function(d) { return 0; })
+        .attr("width", function(d) { return x(d.correct); })
+        .attr("y", function(d) { return y(d.fcid); })
+        .attr("height", y.rangeBand());
+        // .attr("x", function(d) { return y(d.fcid); })
+        // .attr("width", y.rangeBand())
+        // .attr("y", function(d) { return x(d.correct); })
+        // .attr("height", function(d) { return height - x(d.correct); });
 
 }
 
