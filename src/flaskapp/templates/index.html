@@ -30,11 +30,14 @@
             socket.on('nextQuestion', function(msg) {
                 $('#log').append('<br>Received : ' + msg.data);
             });
+            socket.on('online', function(msg) {
+                $('#log').append('<br>Received #' + msg.count + ': ' + msg.data);
+            });
 
             // handlers for the different forms in the page
             // these send data to the server in a variety of ways
             $('form#clientid').submit(function(event) {
-                socket.emit('print connected');
+                socket.emit('online users');
                 return false;
             });
             $('form#broadcast').submit(function(event) {

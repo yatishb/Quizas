@@ -44,6 +44,20 @@ def lookupInternal(internalid):
 		return u.user_id
 
 
+# From internal id to user_id `facebook:auth_id`
+# Get only their facebook ids if they are available
+# or None if the given userid isn't in the table
+def lookupInternalFacebook(internalid):
+	u = InternalUserAuth.query.\
+			filter(InternalUserAuth.id == internalid, InternalUserAuth.user_id.startswith('facebook:')).\
+			first()
+	
+	if u == None:
+		return None
+	else:
+		return u.user_id
+
+
 auth_sites = ["quizlet", "twitter", "facebook"]
 
 
