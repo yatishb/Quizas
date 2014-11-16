@@ -162,7 +162,7 @@ def seen_challenge_result(challengerId, gameId):
 		return "Invalid request"
 
 
-# POST /user/<userid>/challenges/questions/<gameid>
+# GET /user/<userid>/challenges/questions/<gameid>
 # Retrieve the list of questions that were part of a challenge.
 @main.route('/user/<challengerId>/challenges/questions/<gameId>')
 def get_questions_challenge(challengerId, gameId):
