@@ -461,8 +461,8 @@ img {
     }
 
     .search_set {
-        width: 80vw;
-        margin-left: -41vw;
+        width: 70vw;
+        margin-left: -36vw;
     }
 
     #search_set_box {
@@ -851,7 +851,7 @@ i.rotate {
     background-color: #000;
     background-color: rgba(255, 255, 255, 0.4);
     width: 110vw;
-    height: 110vh;
+    height: 2000px;
     margin-top: -10px;
     margin-left: -10px;
     position: fixed;
