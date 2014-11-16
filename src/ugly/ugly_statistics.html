@@ -476,13 +476,8 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
     svg.append("g")
         .attr("class", "y axis")
         .call(yAxis)
-      // .append("text")
-      //   .attr("transform", "rotate(-90)")
-      //   .attr("y", 6)
-      //   .attr("dy", ".71em")
-      //   .style("text-anchor", "end")
-      //   .text("Value ($)");
 
+    // Green, "Correct" bar
     svg.selectAll("bar")
         .data(data)
       .enter().append("rect")
@@ -490,8 +485,9 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
         .attr("x", function(d) { return x(0); })
         .attr("width", function(d) { return x(d.correct / d.total); })
         .attr("y", function(d) { return y(d.fcid); })
-        .attr("height", y.rangeBand());
+        .attr("height", y.rangeBand())
 
+    // Red, "Incorrect" bar
     svg.selectAll("bar")
         .data(data)
       .enter().append("rect")
@@ -500,6 +496,18 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
         .attr("width", function(d) { return x((d.total - d.correct) / d.total); })
         .attr("y", function(d) { return y(d.fcid); })
         .attr("height", y.rangeBand());
+
+    // Text for # correct answers
+    svg.selectAll("bar")
+        .data(data)
+      .enter().append("text")
+        .attr("x", 10)
+        .attr("y", function(d) { return y(d.fcid); })
+        .attr("dy", y.rangeBand() * 3 / 5) // Fiddly. Really, this will depend on font size.
+        .style("text-anchor", "start")
+        .style("font-size", (y.rangeBand() / 2) + "px")
+        .attr("fill", "black")
+        .text(function(d) { return d.correct; })
 }
 
 </script>
