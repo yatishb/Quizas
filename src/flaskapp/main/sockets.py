@@ -1,4 +1,4 @@
-import uuid, json
+import uuid, json,time
 from flask import Flask, render_template, session, request
 from flask.ext.socketio import emit, join_room, leave_room
 from .. import socketio, redis
@@ -22,7 +22,8 @@ def socketConnect():
 @socketio.on('disconnect', namespace='/test')
 def socketDisconnect():
     print('Client disconnected')
-    clients.remove(request.namespace)
+    if clients.count(request.namespace) != 0:
+    	clients.remove(request.namespace)
 
 @socketio.on('print connected', namespace='/test')
 def printSocketsConnected():
@@ -109,27 +110,16 @@ def assignRoom(message):
 		# Deal with shuffled flashcards
 		# Store all the flashcards json in redis as a string
 		flashcardsJson = shuffledFlashcards['questions']
+		usersInRoom = str(user1) + ", " + str(user2)
 		redis.hset("ROOMS_CARDS", room, json.dumps(flashcardsJson))
+		redis.hset("ROOMS", room, usersInRoom)
 		redis.save()
 
 		for client in clients:
 			if (client.session['id'] == user1) or (client.session['id'] == user2):
 				if client.session['room'] == defaultRoom:
 					client.session['room'] = room
-					# print "Assigned: user:%r room:%r" % (client.session['id'], client.session['room'])
-					
-					# Check redis if room exists
-					# Add client to room and create room if not found
-					if redis.hexists("ROOMS", room) == True :
-						usersInRoom = redis.hget("ROOMS", room)
-						usersInRoom += ", %r" % client.session['id']
-						redis.hset("ROOMS", room, usersInRoom)
-						redis.save()
-						print "User: %r room: %r" % (client.session['id'], client.session['room'])
-					else:
-						redis.hset("ROOMS", room, client.session['id'])
-						redis.save()
-						print "User: %r room: %r" % (client.session['id'], client.session['room'])
+					print "Assigned: user:%r room:%r" % (client.session['id'], client.session['room'])
 					client.base_emit('my response', {'data': 'GAME BEGINS...'})
 				
 				else:
@@ -202,10 +192,11 @@ def gameInitialisedByClient(message):
 		emit('error', {'data' : 'INTRUDER!'})
 		return
 
-	print "the client now belongs to room %r" % session['room']
 	room = session['room']
 	userid = session['id']
-	join_room(session['room'])
+	join_room(room)
+	time.sleep(1)
+	print "the client %r now belongs to room %r" % (session['id'], session['room'])
 
 	HASH_INIT = "ROOM_INIT"
 
@@ -216,7 +207,7 @@ def gameInitialisedByClient(message):
 			redis.hdel(HASH_INIT, room)
 			redis.save()
 			# And send very first question to the room to kick-start the entire game
-			sendFirstQuestionInfoToClient(room)
+			sendFirstQuestionInfoToClient(room, usersInRoom)
 	else:
 		# This is the first beacon received.
 		# Only one client is ready to play and so record it
@@ -348,12 +339,15 @@ def sendNextQuesInfoToClient(hashSend, room, done):
 
 	redis.save()
 
+	if done == NUMQUES:
+		clearRoom()
+
 
 
 # This function send the clients the details of the first question
 # Called only one "immediately" after the creation of the game
 # This function is important to kick start the game
-def sendFirstQuestionInfoToClient(room):
+def sendFirstQuestionInfoToClient(room, usersInRoom):
 	done = 0
 
 	# Retrieve the details of the very first ques for the given room
@@ -363,8 +357,11 @@ def sendFirstQuestionInfoToClient(room):
 	# Hence broadcast across room can be used to send the details of the next question
 	print "Start game: %r" % commonDataToSend
 	# for client in clients:
-	# 	print "client found id:%r random:%r room:%r" % (client.session['id'], client.session['random'], client.session['room'])
-	emit('nextQuestion', {'data': json.dumps(commonDataToSend)}, room= room)
+	# 	if (client.session['id'] == int(usersInRoom[0])) or (client.session['id'] == int(usersInRoom[1])):
+	# 		print "client found id:%r random:%r room:%r" % (client.session['id'], client.session['random'], client.session['room'])
+	# 		client.emit('nextQuestion', {'data': json.dumps(commonDataToSend)})
+	emit('nextQuestion', {'data': json.dumps(commonDataToSend)}, room = room)
+
 
 
 # For a given room, retrieve and return the next question to be asked
@@ -373,7 +370,6 @@ def getNextQuestionForRoom(room, done):
 	# Handle situation when we have reached the last question
 	# If this happens then we have to clear the room and record the game into the db
 	if done == NUMQUES:
-		clearRoom()
 		return {}
 
 	# When there are questions left in the game, retrieve the next game and send

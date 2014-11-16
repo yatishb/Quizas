@@ -98,25 +98,86 @@ $(document).ready(function() {
         console.log("Accepted by ");
         console.log(content);
 
+        socket.emit('disconnect');
         initializeMultiplayerGame(content);
     });
 });
 
-//$('.list_option ul li').on("click", function() {
-$('.set_info').on("click", '.simple_set', function() {
-    $('.add_set').hide();
-    $('.notification').hide();
+$('.set_info').on("click", '.content_container', function() {
+    $('.search_set').hide();
+    $('.search_result').hide();
+    $('.add_set i').removeClass('rotate');
     $('.button_container').show();
     $('.grey_cover').show();
 
-    selected_set_id = this.id;
+    selected_set_id = $(this).parent().attr('id');
 
     console.log("selected_set_id is " + selected_set_id);
+});
+
+$('.set_info').on("click", '.favorite', function() {
+    var id = $(this).parent().attr('id');
+    var flag = true;
+
+    if($(this).children().hasClass('fa-star-o')) {
+        $(this).empty();
+        $(this).append("<i class='fa fa-star'></i>");
+    } else {
+        flag = false;
+        $(this).empty();
+        $(this).append("<i class='fa fa-star-o'></i>");    
+    }
+
+    var result = favoriteSet(id,flag);
+});
+
+$('.set_info').on("click", '.delete', function() {
+    var id = $(this).parent().parent().attr('id');
+
+    deleteSet(id);
+});
+
+$('.search_result').on("click", '.add', function() {
+    var id = $(this).parent().parent().attr('id');
+    addSet(id);
+});
+
+$('.add_set').on("click", function() {
+    if ($('.search_set').is(':visible')) {
+        $(this).find('i').removeClass('rotate');
+        $('.search_set').removeClass("slideLeft");
+        $('.search_set').hide();
+        $('.search_result').hide();
+        $('.set_info').show();
+    } else {
+        $(this).find('i').addClass('rotate');
+        $('.set_info').hide();
+        $('.search_set').show();
+        $('.search_set').addClass("slideLeft");
+        $('#search_set_box').focus();
+    }
+});
+
+$('#search_set_box').keypress(function( event ) {
+    if ( event.which == 13 ) {
+        var search_txt = $(this).val();
+
+        $('.search_result').empty();
+
+        if (search_txt || search_txt != "") {
+            $('.set_info').hide();
+            $('.search_result').show();
+            getSearchResult(search_txt);
+        } else {
+            $('.search_result').empty();
+        }
+    }
 });
 
 $('.grey_cover').on("click", function() {
     if ($('.friend_window').is(':visible')) {
         $('.friend_window').hide();
+        $('.friend_window').removeClass('fadeIn');
     } else {
         $('.grey_cover').hide(); 
         $('.button_container').hide();
@@ -128,21 +189,25 @@ $('.grey_cover').on("click", function() {
 $('#quiz').on("tap", function(){
     next_page = "q";
     $('.friend_window').show();
+    $('.friend_window').addClass('fadeIn');
 });
 
 $('#flashcard').on("tap", function(){
-    window.location.href="flashcard.html";
+    link = 'flashcard.html?setid=' + selected_set_id;
+    window.location.href = link;
 });
 
 $('#challenge').on("tap", function(){
     //window.location.href="challenge.html";
     next_page = "c";
     $('.friend_window').show();
+    $('.friend_window').addClass('fadeIn');
 });
 
 $('.friend_list').on("click", '.simple_friend', function () {
     $('.selected').removeClass('selected');
-    $(this).find('.friend_profile').addClass('selected');
+    $(this).addClass('selected');
+    // $(this).find('.friend_profile').addClass('selected');
 
     selected_friend_id = this.id;
 
@@ -155,8 +220,6 @@ $('.list_bottom').on("click", function () {
         return;
     }
 
-    console.log("The next page is " + next_page);
-
     if (next_page=="q") {
         console.log("namespace: "+namespace);
         console.log("socket: "+socket);
@@ -165,16 +228,16 @@ $('.list_bottom').on("click", function () {
             'set': selected_set_id,
             'user': quizas_user_id()
         });
+    } else if (next_page=="c") {
+        initializeGame(selected_friend_id, selected_set_id, quizas_user_id());
     }
 
-    // else if (next_page=="c") window.location.href="#";
-    // else alert("error in starting game");
 });
 
-function initializeGame(content) {
-    //win
-    //encounter
-    //total
+function initializeGame(friend_id, set_id, user_id) {
+    sessionStorage.setItem("friend_id", JSON.stringify(friend_id));
+    sessionStorage.setItem("set_id", JSON.stringify(set_id));
+    sessionStorage.setItem("user_id", JSON.stringify(user_id));
     window.location.href="singlePlayer.html";
 }
 
@@ -184,7 +247,6 @@ function initializeMultiplayerGame(content) {
     //encounterwin
     //total
     sessionStorage.setItem("initialization", JSON.stringify(content));
-    socket.emit('disconnect');
     window.location.href="example3.html";
 }
 
@@ -208,8 +270,13 @@ function getSetContent() {
                     ("" + set_content.id).replace(":", "_") +
                     "' id='" +
                     set_content.id +
-                    "'><div class='set_content title'><p>" +
+                    "'><div class='content_container'>" +
+                    "<div class='set_content title'><p>" +
                     set_content.name +
+                    "</div></div>" +
+                    "<div class='action_container'>" +
+                    "<div class='action favorite'><i class='fa fa-star-o'></i></div>" +
+                    "<div class='action delete'><i class='fa fa-trash-o'></i></div>" +
                     "</div></div>"
                 );
             });
@@ -218,6 +285,75 @@ function getSetContent() {
     .fail(function() {
         console.log("error in getSetContent call back function");
     });
+}
+
+function getSearchResult(txt) {
+    $.get("/api/sets/search/" + txt, function(data) {
+        var result = JSON.parse(data);
+
+        var sets = $('.search_result');
+        for (var i = 0; i < result.length; i++) {
+            sets.append(
+                "<div class='simple_set search " +
+                ("" + result[i].id).replace(":", "_") +
+                "' id='" +
+                result[i].id +
+                "'><div class='content_container'>" +
+                "<div class='set_content title search'><p>" +
+                result[i].name + ' [' + result[i].size + ']' +
+                "</div><div class='set_content description search'><p>" +
+                result[i].description +
+                "</div></div>" +
+                "<div class='action_container'>" +
+                "<div class='action add'><i class='fa fa-plus'></i></div>" +
+                "</div></div>"
+            );
+        }
+
+        $('.simple_set.search').each(function() {
+            var containerHeight = $(this).height();
+            var plusButton = $(this).find('.action_container');
+            
+            plusButton.css('height', containerHeight);
+        });
+    })
+    .fail(function() {
+        console.log("error in getSearchResult call back function");
+    });
+}
+
+function addSet(id) {
+    var userid = quizas_user_id();
+
+    // NOTE: For this to work, (i.e. to find the Set ID which should be added),
+    // it's assumed that the add button is grandchild of the
+    // <div id="quizlet:.." /> div.
+
+    $.ajax({
+        url: '/api/user/' + userid + '/sets/' + id,
+        type: 'PUT',
+        success: function() {
+            var thisClass = ("" + id).replace(":", "_");
+            $('.' + thisClass).remove();
+        }
+    });
+}
+
+function deleteSet(id) {
+    var userId = quizas_user_id();
+
+    $.ajax({
+        url: '/api/user/' + userId + '/sets/' + id,
+        type: 'DELETE',
+        success: function() {
+            var thisClass = ("" + id).replace(":", "_");
+            $('.' + thisClass).remove();
+        }
+    });
+}
+
+function favoriteSet(id, flag) {
+    
 }
 
 function outputFriends(friends) {

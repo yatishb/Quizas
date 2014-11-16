@@ -43,7 +43,7 @@
     </script>
 
 </head>
-<body>
+<body class="background_index">
     <div id="fb-root"></div>
 
     <div class="logo">
@@ -60,7 +60,7 @@
             <div class="fb-icon-bg" onclick="doFacebookLogin()"></div>
             <div class="fb-bg" onclick="doFacebookLogin()"></div>
         </div>
-        <div class="login_button">
+        <div class="login_button" onclick="location.href='/api/twitterauth';">
             <div class="twi-icon-bg"></div>
             <div class="twi-bg"></div>
         </div>
@@ -102,10 +102,17 @@
     }
     </script>
 
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,300,400' rel='stylesheet' type='text/css'>
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+    <!-- This can't happen until the cookie plugin script is loaded. -->
+    <script>
+        // Naive; redirect to study if the user is logged in with something.
+        if (quizas_authorized_sites().length > 0) {
+            window.location.href = "study.html";
+        }
+    </script>
+
     <script src="js/jquery.mobile.js"></script>
 
     <script>

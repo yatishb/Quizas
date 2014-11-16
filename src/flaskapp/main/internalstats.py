@@ -40,10 +40,10 @@ def documentGame(room, user1, user2, userAns1, userAns2, flashsetId, timeTaken1,
 	db.session.commit()
 
 
-def soloGameResultsWriteDb(userid, receivedData) :
+# Used for Single Player, and Challenges.
+def soloGameResultsWriteDbWithGameId(userid, gameId, receivedData) :
 	flashsetId = receivedData['flashset']
 	cards = receivedData['cards']
-	gameId = str(uuid.uuid1())
 
 	gameUser = FG(gameId, flashsetId, userid)
 	db.session.add(gameUser)
@@ -56,6 +56,14 @@ def soloGameResultsWriteDb(userid, receivedData) :
 		db.session.add(cardUser)
 
 	db.session.commit()
+
+	# Return gameId so challenges can make use of it.
+	return gameId
+
+
+def soloGameResultsWriteDb(userid, receivedData) :
+	gameId = str(uuid.uuid1())
+	return soloGameResultsWriteDbWithGameId(userid, gameId, receivedData)
 
 
 # Given num of questions got correct by user and opponent, update win/draw/loss
@@ -182,6 +190,11 @@ def getCommonGamesStats(userid, opponentUserId):
 # results page can be replicated without any problem
 def getGameStats(userid, gameidForStats):
 	game = FG.query.filter(FG.gameId == gameidForStats, FG.user != userid).first()
+
+	if game == None:
+		request = make_response('Game not found', 401)
+		return request
+
 	questionsInGame = FC.query.filter(FC.gameId == gameidForStats).all()
 	gameResult = ""
 
