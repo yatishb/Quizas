@@ -263,13 +263,20 @@
 		var enemyName, enemySprite, enemyWinRate, enemyEncounter, totalQuestions;
 		
 		var battleLibrary = []
-		function addBattle(fcQ, playerA, enemyA, playerTime) { // all are flashcard objects
-			battleLibrary[battleLibrary.length] = {
+		function createBattle(fcQ, fcA, playerA, enemyA, playerTime) {
+			var battlePage = {
 				question: fcQ,
+				answers: fcA,
 				player: playerA,
 				enemy: enemyA,
 				time: playerTime,
 			};
+			return battlePage;
+		}
+		
+		function convertPoints(timeMils, maxTime) { // all in milliseconds
+			var resultPoints = ((maxTime - timeMils) / maxTime) * 1000;
+			return Math.round(resultPoints);
 		}
 		
 //HERE********************************************************************************************
@@ -300,11 +307,19 @@
 	  var gameroom = initiatingJSON.room;
 	  // encounterwin
 	  
-	  PLAYER_NAME = "John Smith", ENEMY_NAME = "Darth Vader";
+	  
+	  
+	PLAYER_NAME = "John Smith", ENEMY_NAME = "Darth Vader";
+	
+	// initialize Battle Library
+	battleLibrary[0] = {
+		totalQuestions: totalQuestions,
+		enemyName: ENEMY_NAME,
+	};
 	
 	Q.state.set({playerScore: 0, enemyScore: 0, currentIndex: 0, currentQuestion: "", waiting: true});
 	var deck = shuffleDeck(totalQuestions, DECK_SIZE);
-	
+	var isBombMoving = false;
 	
 	Q.UI.PlayerScore = Q.UI.Text.extend("UI.PlayerScore", { 
 		init: function(p) {
@@ -317,7 +332,8 @@
 		},
 		
 		score: function() {
-			this.p.label = Q.state.get("playerScore") + "";
+			points = Math.floor(Q.state.get("playerScore") / 1000);
+			this.p.label = points + "";
 		}
 	});
 	
@@ -332,7 +348,8 @@
 		},
 		
 		score: function() {
-			this.p.label = Q.state.get("enemyScore") + "";
+			points = Math.floor(Q.state.get("enemyScore") / 1000);
+			this.p.label = points + "";
 		}
 	});
 
@@ -391,9 +408,20 @@
 				x: 160 * qx,
 				y: 530 * qy,
 				scale: 0.03,
+				distance: 0,
 				asset: BOMB_SPRITE
 			});
 		},
+		
+		step: function(dt) {
+			if (isBombMoving) {
+				this.p.vx = distance/60;
+				this.p.x += this.p.vx;
+			}
+		
+			//this.p.vx += dt * 100;
+			//this.p.x += this.p.vx * dt;
+		}
 	});
 
     
@@ -474,14 +502,14 @@
 		var playerPortrait = stage.insert(new Q.PlayerPortrait({
 			x: qx * 80, 
 			y: qy * 142, 
-			scale: 0.05, 
+			scale: 1, 
 			asset: PLAYER_SPRITE
 		}));
 		
 		var enemyPortrait = stage.insert(new Q.EnemyPortrait({
 			x: qx * 260, 
 			y: qy * 426, 
-			scale: 0.05, 
+			scale: 1, 
 			asset: ENEMY_SPRITE
 		}));
 		
@@ -509,7 +537,7 @@
 	// set scene
 	Q.scene("scene1",function(stage) {
 	
-		Q.state.reset({playerScore: 0, enemyScore: 0, currentIndex: 0, currentQuestion: "", waiting: true});
+		Q.state.reset({playerScore: 0, enemyScore: 0, currentIndex: 0, currentQuestion: "", waiting: true, isGameOver: false});
 	
 		var playerScore = stage.insert(new Q.UI.PlayerScore());
 		var enemyScore = stage.insert(new Q.UI.EnemyScore());
@@ -520,8 +548,8 @@
 		var timeTakenCurrent = 0;
 		
 		// start receive serverForm
-		var serverJSON, fcQuestion, fcAnswers, questionNumber = "0", maxTimeAllowed, prevPlayerAns, prevEnemyAns;
-		var timeOutTimer;
+		var serverJSON, fcQuestion, fcAnswers, questionNumber = "0", maxTimeAllowed, prevPlayerAns, prevEnemyAns, prevPlayerTime, prevEnemyTime;
+		var timeOutTimer, gameOverTimer;
 		/*var serverJSON = JSON.parse(TestServerForm[0]);
 		var fcQuestion = serverJSON.question,
 		  fcAnswers = serverJSON.answers,
@@ -563,7 +591,7 @@
 						}, function() {
 							// do something
 							if (!Q.state.get("waiting")) {
-								timeTakenCurrent = TIMER.getTime() + "";
+								timeTakenCurrent = TIMER.getTime();
 								Q.state.set("waiting", true);
 							
 								var k = this.p.counter;
@@ -571,7 +599,7 @@
 									console.log("Placeholder Trigger: Correct");
 									playerCounters[Q.state.get("currentIndex") - 1].p.fill = "green";
 									this.p.fill = "green";
-									Q.state.inc("playerScore", 1);
+									Q.state.inc("playerScore", convertPoints(timeTakenCurrent));
 								} else {
 									console.log("Placeholder Trigger: Wrong");
 									playerCounters[Q.state.get("currentIndex") - 1].p.fill = "red";
@@ -601,7 +629,7 @@
 		function outOfTime() {
 			if (!Q.state.get("waiting")) {
 			Q.state.set("waiting", true);
-			timeTakenCurrent = maxTimeAllowed;
+			timeTakenCurrent = maxTimeAllowed * 1000;
 			currentFcAnswer = "null";
 			clientJSON = createClientToServerJSON(fcQuestion.id, currentFcAnswer, timeTakenCurrent, Q.state.get("currentIndex") + "");
 			console.log("Post to Server: " + clientJSON);
@@ -675,34 +703,29 @@
 			h: 3 * qy
 		}));
 		
-		/*Q.state.on("change.currentIndex", function() {
-			if (Q.state.get("currentIndex") > TOTAL_QUESTIONS) {
-				//Q.stageScene("scene2");
-			}
-			
-			
-			
-			//qCard.generate(getFlashCard(FLASH_SET, deck[Q.state.get("currentIndex") - 1]));
-			//destroyAnswers(aBtns);
-			//aBtns = generateAnswers();
-			
-			
-		});*/
-		
 	// include an event handler, when receive from server, set variables, then set "received" to true.
 	
 		socket.on('nextQuestion', function(msg) {
             //$('#log').append('<br>Received #' + msg.count + ': ' + msg.data);
 			//Q.state.set("received", true);
+			var sqn = fcQuestion,
+			  sans = fcAnswers,
+			  sqnN = questionNumber;
+			
 			if (Q.state.get("currentIndex") > 0) {prevFcQuestion = fcQuestion};
 			serverJSON = JSON.parse(msg.data);
 			fcQuestion = serverJSON.question,
 			  fcAnswers = serverJSON.answers,
 			  questionNumber = parseInt(serverJSON.index),
-			  maxTimeAllowed = parseInt(serverJSON.time),
+			  maxTimeAllowed = serverJSON.time,
 			  prevPlayerAns = serverJSON.player,
-			  prevEnemyAns = serverJSON.enemy;
+			  prevEnemyAns = serverJSON.enemy,
+			  prevPlayerTime = serverJSON.playerTime,
+			  prevEnemyTime = serverJSON.enemyTime;
 			clearTimeout(timeOutTimer);
+	
+			battleLibrary[sqnN] = createBattle(sqn, sans, prevPlayerAns, prevEnemyAns, prevPlayerTime, prevEnemyTime);
+			
 			if (isNaN(questionNumber)) {questionNumber = -1;}
 			Q.state.inc("currentIndex", 1);
 			console.log("yatish socket received: " + msg.data);
@@ -710,13 +733,16 @@
 		
 		socket.on('gameOver', function(msg) {
 			console.log(msg.data);
-			/*if (prevFcQuestion.id == prevEnemyAns) {
-				enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "green";
-				Q.state.inc("enemyScore", 1);
-			} else {
-				enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "red";
-			}*/
+			Q.state.set("isGameOver", true);
 			socket.emit('disconnect');
+		});
+		
+		Q.state.on("change.isGameOver", function() {
+			if (Q.state.get("isGameOver")) {
+				clearInterval(gameOverTimer);
+			}
+			
+			alert("Game Over");
 		});
 			
 	
@@ -753,7 +779,7 @@
 			console.log("END");
 				if (prevFcQuestion.id == prevEnemyAns) {
 					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "green";
-					Q.state.inc("enemyScore", 1);
+					Q.state.inc("enemyScore", convertPoints(prevEnemyTime));
 				} else {
 					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "red";
 				}
@@ -778,43 +804,28 @@
 						}
 					}
 				} else {
-					// game over
-					alert("game over");
+					// no more qns = game essentially end
 				}
-				
-				
-				
-				// game over
-				//if (Q.state.get("currentIndex") > totalQuestions) {
-				//	alert("GAME OVER");
-				//	//Q.stageScene("scene2");
-				//}
 			
-			// start next question
-			if (Q.state.get("currentIndex") == 1) {
-				qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
-			}
+				// start next question
+				if (Q.state.get("currentIndex") == 1) {
+					qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
+				}
 				qCard.generate(fcQuestion);
-				
-			
-
-			if (Q.state.get("currentIndex") > 1) destroyAnswers(aBtns);
+				if (Q.state.get("currentIndex") > 1) {destroyAnswers(aBtns)};
 				aBtns = generateAnswers();
+				if (Q.state.get("currentIndex") > 1) {TIMER.stop();}
+				if (Q.state.get("currentIndex") > 0 && Q.state.get("currentIndex") <= totalQuestions) {
+					TIMER = new Countdown({
+						seconds: maxTimeAllowed,
+						onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
+						onCounterEnd: function() {outOfTime();}
+					});
+					TIMER.start();
+				}
 
 								
 			}
-			if (Q.state.get("currentIndex") > 1) {TIMER.stop();}
-			if (Q.state.get("currentIndex") > 0 && Q.state.get("currentIndex") <= totalQuestions) {
-				
-				TIMER = new Countdown({
-					seconds: maxTimeAllowed,
-					onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
-					onCounterEnd: function() {outOfTime();}
-				});
-				TIMER.start();
-			}
-
-			
 			
 		});
 
@@ -825,7 +836,7 @@
 	
 		var leScore = stage.insert(new Q.UI.PlayerScore());
 	
-		var ReplayBtn = stage.insert(new Q.UI.Button({
+		var ReviewBtn = stage.insert(new Q.UI.Button({
 			fill: "gray",
 			fontColor: "white",
 			x: 160,
