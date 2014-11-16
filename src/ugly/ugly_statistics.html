@@ -470,18 +470,8 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
         .attr("transform", 
               "translate(" + margin.left + "," + margin.top + ")");
 
-    x.domain([0, maxTotal]);
+    x.domain([0, 1]);
     y.domain(data.map(function(d) { return d.fcid; }));
-
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis)
-      .selectAll("text")
-        .style("text-anchor", "end")
-        .attr("dx", "-.8em")
-        .attr("dy", "-.55em")
-        .attr("transform", "rotate(-90)" );
 
     svg.append("g")
         .attr("class", "y axis")
@@ -498,7 +488,7 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
       .enter().append("rect")
         .style("fill", "green")
         .attr("x", function(d) { return x(0); })
-        .attr("width", function(d) { return x(d.correct); })
+        .attr("width", function(d) { return x(d.correct / d.total); })
         .attr("y", function(d) { return y(d.fcid); })
         .attr("height", y.rangeBand());
 
@@ -506,8 +496,8 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
         .data(data)
       .enter().append("rect")
         .style("fill", "red")
-        .attr("x", function(d) { return x(d.correct); }) // wait.. shit. the `total` for each FCID will be different
-        .attr("width", function(d) { return x(d.total - d.correct); })
+        .attr("x", function(d) { return x(d.correct / d.total); })
+        .attr("width", function(d) { return x((d.total - d.correct) / d.total); })
         .attr("y", function(d) { return y(d.fcid); })
         .attr("height", y.rangeBand());
 }
