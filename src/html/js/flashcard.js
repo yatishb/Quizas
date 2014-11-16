@@ -88,7 +88,7 @@ function getStudySetContent(setid) {
     });
 }
 
-$('.flashcards').on('tap', '.simple_card', function() {
+$('.flashcards').on('click', '.simple_card', function() {
     // var cardID= this.id;
     // var card = $('#'+cardID).find('.flipper');
     //this.classList.toggle('hover');
@@ -100,6 +100,6 @@ $('.flashcards').on('tap', '.simple_card', function() {
     }
 });
 
-$('.back_button').on("tap", function(){
+$('.back_button').on("click", function(){
     window.location.href="study.html";
 });

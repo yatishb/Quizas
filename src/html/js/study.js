@@ -186,22 +186,24 @@ $('.grey_cover').on("click", function() {
     }
 });
 
-$('#quiz').on("tap", function(){
+$('#quiz').on("click", function(){
     next_page = "q";
     $('.friend_window').show();
     $('.friend_window').addClass('fadeIn');
+    $('.list_search').focus();
 });
 
-$('#flashcard').on("tap", function(){
+$('#flashcard').on("click", function(){
     link = 'flashcard.html?setid=' + selected_set_id;
     window.location.href = link;
 });
 
-$('#challenge').on("tap", function(){
+$('#challenge').on("click", function(){
     //window.location.href="challenge.html";
     next_page = "c";
     $('.friend_window').show();
     $('.friend_window').addClass('fadeIn');
+    $('.list_search').focus();
 });
 
 $('.friend_list').on("click", '.simple_friend', function () {

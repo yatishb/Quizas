@@ -3,6 +3,24 @@ $(document).ready(function() {
     if(result.length == 0)
         this.location.href='/index.html';
 
+    $('.list_search input').on('input', function() {
+        var search_txt = $(this).val();
+        console.log(search_txt);
+
+        $('.simple_friend.invite').each(function() {
+            var this_friend = $(this);
+            if(search_txt == "") {
+                this_friend.show();
+            } else {
+                if (this_friend.find('span').text().toUpperCase().indexOf(search_txt.toUpperCase()) == -1) {
+                    this_friend.hide();
+                } else {
+                    this_friend.show();
+                }
+            }
+        });
+    });
+
     getUserStats();
 });
 
@@ -20,6 +38,8 @@ $('.stats_tab').on('click', function() {
         $('.chartContainer').empty();
         $('.friendTable').empty();
         $('.friend_stats').hide();
+        $('.grey_cover').hide();
+        $('.friend_window').hide();
     } else {
         $('.page_me').hide();
         $('.page_friend').show();
@@ -45,6 +65,19 @@ $(document).on('click', '.button_close', function() {
     $('.chartContainer').empty();
     $('.friendTable').empty();
     $('.friend_stats').hide();
+});
+
+$(document).on('click', '.invite_friend', function() {
+    $('.grey_cover').show();
+    $('.friend_window').show();
+    $('.friend_window').addClass('fadeIn');
+    $('.list_search').focus();
+    // get all friends
+});
+
+$('.grey_cover').on('click', function() {
+    $(this).hide();
+    $('.friend_window').hide();
 });
 
 function getUserStats() {
@@ -219,4 +252,6 @@ function outputFriends(friends) {
             $(newname).find('.friend_profile img').attr('src', address);
         });
     });
+
+    $('.page_friend').append("<div class='invite_friend'>Invite Friends</div>");
 }

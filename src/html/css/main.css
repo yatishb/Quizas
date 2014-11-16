@@ -49,6 +49,18 @@ img {
          url(font/OpenSans-Bold.woff) format('woff');
 }
 
+* {
+    -webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+
+.ui-focus {
+    box-shadow: none !important;
+    -o-box-shadow: none !important;
+    -ms-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+}
+
 #fb-root {
     display: none;
 }
@@ -876,7 +888,7 @@ i.rotate {
 
 .grey_cover {
     background-color: #000;
-    background-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(255, 255, 255, 0.6);
     width: 110vw;
     height: 2000px;
     margin-top: -10px;
@@ -1292,7 +1304,7 @@ i.rotate {
         height: 40vh;
         max-height: 400px;
         margin-left: -35vw;
-        margin-top: -5vh;
+        margin-top: -20vh;
     }
 
     .friendChart {
@@ -1303,6 +1315,12 @@ i.rotate {
         margin: 30px auto 20px auto;
         width: 70%;
         font-weight: 700;
+    }
+
+    .invite_friend {
+        width: 90%;
+        height: 30px;
+        font-size: 14pt;
     }
 }
 
@@ -1333,7 +1351,7 @@ i.rotate {
         height: 60vh;
         max-height: 500px;
         margin-left: -250px;
-        margin-top: -10vh;
+        margin-top: -30vh;
     }
 
     .friendChart {
@@ -1343,6 +1361,13 @@ i.rotate {
     .friendTitle {
         margin: 30px auto;
         font-weight: 900;
+    }
+
+    .invite_friend {
+        width: 60vw;
+        max-width: 600px;
+        height: 35px;
+        font-size: 17pt;
     }
 }
 
@@ -1442,6 +1467,30 @@ i.rotate {
 
 .button_close:active {
     color: #000;
+}
+
+.invite_friend {
+    margin: 50px auto;
+    background-color: #4183D7;
+    border-radius: 3px;
+    -o-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border: solid 1px #2E5C96;
+    color: white;
+    cursor: pointer;
+}
+
+.invite_friend:active {
+    background-color: #2E5C96;
+}
+
+.list_search.stats,
+.list_search.stats input,
+.friend_list.stats {
+    background-color: #EEEEEE;
+    background: #EEEEEE;
 }
 
 /*** Start of settings.html ***/
