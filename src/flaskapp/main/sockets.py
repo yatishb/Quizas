@@ -345,10 +345,10 @@ def sendNextQuesInfoToClient(hashSend, hashSendTime, room, done):
 
 	commonDataToSend = getNextQuestionForRoom(room, done)
 
-	dataToSend1 = {"player":answersForQuestion.get(clientsList[0]), "playerTime":timeTakenByUsers.get(clientsList[0]), 
-				"enemy":answersForQuestion.get(clientsList[1]), "enemyTime":timeTakenByUsers.get(clientsList[1])}
-	dataToSend2 = {"player":answersForQuestion.get(clientsList[1]), "playerTime":timeTakenByUsers.get(clientsList[1]),
-				"enemy":answersForQuestion.get(clientsList[0]), "enemyTime":timeTakenByUsers.get(clientsList[0])}
+	dataToSend1 = {"player":answersForQuestion.get(clientsList[0]), "playerTime":int(timeTakenByUsers.get(clientsList[0])), 
+				"enemy":answersForQuestion.get(clientsList[1]), "enemyTime":int(timeTakenByUsers.get(clientsList[1]))}
+	dataToSend2 = {"player":answersForQuestion.get(clientsList[1]), "playerTime":int(timeTakenByUsers.get(clientsList[1])),
+				"enemy":answersForQuestion.get(clientsList[0]), "enemyTime":int(timeTakenByUsers.get(clientsList[0]))}
 	dataToSend1.update(commonDataToSend)
 	dataToSend2.update(commonDataToSend)
 	dataToSend = {clientsList[0]:dataToSend1, clientsList[1]:dataToSend2}
