@@ -31,6 +31,26 @@ def printSocketsConnected():
 		emit('my response', {'data': "session id: %r random: %r" % (client.session['id'], client.session['random'])})
 
 
+# Return the list of the users who are online
+# Checks the sockets connected and stores all the unique ids
+# These unique internal ids are matched and their actual ids are returned
+@socketio.on('online users', namespace='/test')
+def printSocketsConnected():
+	onlineUsers = []
+	onlineIDs = []
+	for client in clients:
+		if onlineUsers.count(client.session['id']) == 0:
+			onlineUsers.append(client.session['id'])
+
+	for eachOnlineUser in onlineUsers:
+		facebookId = authhelper.lookupInternalFacebook(eachOnlineUser)
+		if facebookId != None:
+			onlineIDs.append( str(facebookId) )
+
+	emit('online', {'data': onlineIDs})
+
+
+
 # This is to send the notification of a game request to another client C2
 # Read this notification and forward this request to the client C2
 @socketio.on('send notification', namespace='/test')
@@ -237,7 +257,9 @@ def clearRoom():
 		redis.hdel("ROOMS", room)
 
 		HASH_SEND = "ROOM_" + room + "_SEND"
+		HASH_SENDTIME = "ROOM_" + room + "_SEND_TIME"
 		redis.pexpire(HASH_SEND, 1)
+		redis.pexpire(HASH_SENDTIME, 1)
 
 
 		# Write all answers to db first
@@ -295,6 +317,7 @@ def readAnswerByClient(message):
 
 	HASH_USER = "ROOM_" + room + "_" + str(idClient)
 	HASH_SEND = "ROOM_" + room + "_SEND"
+	HASH_SENDTIME = "ROOM_" + room + "_SEND_TIME"
 	HASH_TIME = "ROOM_" + room + "_" + str(idClient) + "_TIME"
 
 	# Store result in 2 separate tables in redis
@@ -302,11 +325,12 @@ def readAnswerByClient(message):
 	# Other table is for sending information abt other client's answer
 	redis.hset(HASH_USER, idQuestion, clientAnswer)
 	redis.hset(HASH_SEND, idClient, clientAnswer)
+	redis.hset(HASH_SENDTIME, idClient, time)
 	redis.hset(HASH_TIME, idQuestion, time)
 	redis.save()
 
 	if redis.hlen(HASH_SEND) == 2:
-		sendNextQuesInfoToClient(HASH_SEND, room, done)
+		sendNextQuesInfoToClient(HASH_SEND, HASH_SENDTIME, room, done)
 
 
 
@@ -314,14 +338,17 @@ def readAnswerByClient(message):
 # Is called only when the server has received a response 
 # from both clients for the same question
 # This function also sends the clients the details of the next question
-def sendNextQuesInfoToClient(hashSend, room, done):
+def sendNextQuesInfoToClient(hashSend, hashSendTime, room, done):
 	answersForQuestion = redis.hgetall(hashSend)
+	timeTakenByUsers = redis.hgetall(hashSendTime)
 	clientsList = answersForQuestion.keys()
 
 	commonDataToSend = getNextQuestionForRoom(room, done)
 
-	dataToSend1 = {"player":answersForQuestion.get(clientsList[0]), "enemy":answersForQuestion.get(clientsList[1])}
-	dataToSend2 = {"player":answersForQuestion.get(clientsList[1]), "enemy":answersForQuestion.get(clientsList[0])}
+	dataToSend1 = {"player":answersForQuestion.get(clientsList[0]), "playerTime":int(timeTakenByUsers.get(clientsList[0])), 
+				"enemy":answersForQuestion.get(clientsList[1]), "enemyTime":int(timeTakenByUsers.get(clientsList[1]))}
+	dataToSend2 = {"player":answersForQuestion.get(clientsList[1]), "playerTime":int(timeTakenByUsers.get(clientsList[1])),
+				"enemy":answersForQuestion.get(clientsList[0]), "enemyTime":int(timeTakenByUsers.get(clientsList[0]))}
 	dataToSend1.update(commonDataToSend)
 	dataToSend2.update(commonDataToSend)
 	dataToSend = {clientsList[0]:dataToSend1, clientsList[1]:dataToSend2}
@@ -336,6 +363,7 @@ def sendNextQuesInfoToClient(hashSend, room, done):
 		# If messages have been sent to the client in the room
 		# Remove the redis key-value pair for message to be sent to a client
 		redis.hdel(hashSend, eachClient)
+		redis.hdel(hashSendTime, eachClient)
 
 	redis.save()
 

@@ -198,8 +198,6 @@ def quizlet_search(query):
 
 	# Get ACCESS TOKEN from Cookies
 	qzlt_access_token = request.cookies.get("quizlet_access_token")
-	if qzlt_access_token == None:
-		abort(401)
 
 	# Params for the search
 	qzlt_search_url = "https://api.quizlet.com/2.0/search/sets"

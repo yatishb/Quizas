@@ -82,7 +82,7 @@ def get_verification():
 	db['access_token_secret'] = auth.access_token.secret
 
 	# Now Go to a page where we make use of the Twitter API.
-	resp = redirect("http://dev.localhost:8080/twitter_done.html")
+	resp = redirect(secrets.auth["login_success_url"])
 
 	new_userid = "twitter:" + auth.access_token.key
 	if authhelper.userids_clash_userid(new_userid):

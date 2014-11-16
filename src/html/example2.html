@@ -266,14 +266,15 @@
 		*/
 		
 		var battleLibrary = []
-		function addBattle(fcQ, fcA, playerA, enemyA, playerTime) { // all are flashcard objects
-			battleLibrary[battleLibrary.length] = {
+		function createBattle(fcQ, fcA, playerA, enemyA, playerTime) {
+			var battlePage = {
 				question: fcQ,
 				answers: fcA,
 				player: playerA,
 				enemy: enemyA,
 				time: playerTime,
 			}
+			return battlePage;
 		}
 		
 	</script>
@@ -304,6 +305,8 @@
 	  enemyWinRate = initiatingJSON.win,
 	  enemyEncounter = initiatingJSON.encounter,
 	  totalQuestions = initiatingJSON.total;
+	  
+	 battleLibrary[0] = totalQuestions;
 
 	PLAYER_NAME = "John Smith", ENEMY_NAME = "Darth Vader";
 	PLAYER_SPRITE = "smiley.png", ENEMY_SPRITE = "smiley.png";
@@ -481,7 +484,7 @@
 			x: qx * 80, 
 			y: qy * 142, 
 			scale: 0.05, 
-			asset: PLAYER_SPRITE
+			asset: PLAYER_SPRITE,
 		}));
 		
 		var enemyPortrait = stage.insert(new Q.EnemyPortrait({
@@ -858,32 +861,58 @@
 	// set scene
 	Q.scene("scene2",function(stage) {
 	
-		var leScore = stage.insert(new Q.UI.PlayerScore());
+		//var leScore = stage.insert(new Q.UI.PlayerScore());
+		
+		var ResultsBanner = stage.insert(new Q.UI.Button({
+			fill: "white",
+			fontColor: "black",
+			border: 2,
+			shadow: 3,
+			x: (320/2) * qx,
+			y: 48 * qy,
+			w: 290 * qx,
+			h: 60 * qy,
+			label: 'Glorious Victory/Defeat',
+		}));
+		
+		var ResultsBox = stage.insert(new Q.UI.Container({
+			fill: "white",
+			fontColor: "black",
+			border: 2,
+			shadow: 3,
+			x: (320/2) * qx,
+			y: (((450-78)/2)+78) * qy,
+			w: 290 * qx,
+			h: 350 * qy,
+		}));
 	
-		var ReplayBtn = stage.insert(new Q.UI.Button({
-			fill: "gray",
-			fontColor: "white",
-			x: 160,
-			y: 160,
+		var ReviewBtn = stage.insert(new Q.UI.Button({
+			fill: "white",
+			fontColor: "black",
+			highlight: "gray",
+			x: (320/4) * qx,
+			y: 500 * qy,
 			border: 2,
 			shadow: 3,
 			shadowColor: "rgba(0,0,0,0.5)",
-			w: 110,
+			w: 130 * qx,
 			h: 100,
-			label: 'Replay',
+			label: 'Review',
 		}, function() {
-			Q.stageScene("scene1");
+			//Q.stageScene("scene3");
+			alert("Battle Library still under construction.");
 		}));
 		
 		var BackBtn = stage.insert(new Q.UI.Button({
-			fill: "gray",
-			fontColor: "white",
-			x: 160,
-			y: 320,
+			fill: "white",
+			fontColor: "black",
+			highlight: "gray",
+			x: (3/4) * 320 * qx,
+			y: 500 * qy,
 			border: 2,
 			shadow: 3,
 			shadowColor: "rgba(0,0,0,0.5)",
-			w: 110,
+			w: 130 * qx,
 			h: 100,
 			label: 'Back',
 		}, function() {
@@ -897,13 +926,13 @@
 	
 	// stage scene
 	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE], function() {
-		Q.stageScene("scene0");
+		Q.stageScene("scene2");
 	});
      
 	 //setTimeout(function(){Q.state.inc("currentIndex", 1);}, 5000);
 });
 	  </script>
-	  <script>
+	  <!-- <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
         (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
         m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -911,6 +940,6 @@
 
         ga('create', 'UA-46324526-3', 'auto');
         ga('send', 'pageview');
-    </script>
+    </script> -->
  </body>
 </html>

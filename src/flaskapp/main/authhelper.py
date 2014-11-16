@@ -4,7 +4,7 @@ import json
 
 import secrets
 
-from models import InternalUserAuth
+from models import InternalUserAuth, PointsTable
 from flask import request, redirect, abort
 from . import main
 from .. import db
@@ -37,6 +37,20 @@ def lookup(userid):
 # or None if the given userid isn't in the table
 def lookupInternal(internalid):
 	u = InternalUserAuth.query.filter_by(id = internalid).first()
+	
+	if u == None:
+		return None
+	else:
+		return u.user_id
+
+
+# From internal id to user_id `facebook:auth_id`
+# Get only their facebook ids if they are available
+# or None if the given userid isn't in the table
+def lookupInternalFacebook(internalid):
+	u = InternalUserAuth.query.\
+			filter(InternalUserAuth.id == internalid, InternalUserAuth.user_id.startswith('facebook:')).\
+			first()
 	
 	if u == None:
 		return None
@@ -95,6 +109,11 @@ def insert_new_id(new_userid):
 
 	newUserAuth = InternalUserAuth(new_userid)
 	db.session.add(newUserAuth)
+	db.session.commit()
+
+	uid = lookup(new_userid)
+	pointsRow = PointsTable(uid, 0)
+	db.session.add(pointsRow)
 	db.session.commit()
 
 
