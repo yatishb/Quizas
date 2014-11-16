@@ -146,7 +146,7 @@ $('.add_set').on("click", function() {
     if ($('.search_set').is(':visible')) {
         $(this).find('i').removeClass('rotate');
         $('.search_set').removeClass("slideLeft");
-        $('.search_set').hide();
+        $('.search_set').show();
         $('.search_result').hide();
     } else {
         $(this).find('i').addClass('rotate');
