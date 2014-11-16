@@ -1,4 +1,4 @@
-import uuid, json
+import uuid, json,time
 from flask import Flask, render_template, session, request
 from flask.ext.socketio import emit, join_room, leave_room
 from .. import socketio, redis
@@ -192,10 +192,11 @@ def gameInitialisedByClient(message):
 		emit('error', {'data' : 'INTRUDER!'})
 		return
 
-	print "the client now belongs to room %r" % session['room']
 	room = session['room']
 	userid = session['id']
-	join_room(session['room'])
+	join_room(room)
+	time.sleep(1)
+	print "the client %r now belongs to room %r" % (session['id'], session['room'])
 
 	HASH_INIT = "ROOM_INIT"
 
@@ -338,6 +339,9 @@ def sendNextQuesInfoToClient(hashSend, room, done):
 
 	redis.save()
 
+	if done == NUMQUES:
+		clearRoom()
+
 
 
 # This function send the clients the details of the first question
@@ -352,10 +356,12 @@ def sendFirstQuestionInfoToClient(room, usersInRoom):
 	# There is no customized message for the first question
 	# Hence broadcast across room can be used to send the details of the next question
 	print "Start game: %r" % commonDataToSend
-	for client in clients:
-		if (client.session['id'] == int(usersInRoom[0])) or (client.session['id'] == int(usersInRoom[1])):
-			print "client found id:%r random:%r room:%r" % (client.session['id'], client.session['random'], client.session['room'])
-			client.base_emit('nextQuestion', {'data': json.dumps(commonDataToSend)})
+	# for client in clients:
+	# 	if (client.session['id'] == int(usersInRoom[0])) or (client.session['id'] == int(usersInRoom[1])):
+	# 		print "client found id:%r random:%r room:%r" % (client.session['id'], client.session['random'], client.session['room'])
+	# 		client.emit('nextQuestion', {'data': json.dumps(commonDataToSend)})
+	emit('nextQuestion', {'data': json.dumps(commonDataToSend)}, room = room)
+
 
 
 # For a given room, retrieve and return the next question to be asked
@@ -364,7 +370,6 @@ def getNextQuestionForRoom(room, done):
 	# Handle situation when we have reached the last question
 	# If this happens then we have to clear the room and record the game into the db
 	if done == NUMQUES:
-		clearRoom()
 		return {}
 
 	# When there are questions left in the game, retrieve the next game and send

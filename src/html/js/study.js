@@ -98,6 +98,7 @@ $(document).ready(function() {
         console.log("Accepted by ");
         console.log(content);
 
+        socket.emit('disconnect');
         initializeMultiplayerGame(content);
     });
 });
@@ -248,7 +249,6 @@ function initializeMultiplayerGame(content) {
     //encounterwin
     //total
     sessionStorage.setItem("initialization", JSON.stringify(content));
-    socket.emit('disconnect');
     window.location.href="example3.html";
 }
 
