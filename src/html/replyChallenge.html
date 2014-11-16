@@ -25,10 +25,9 @@
     var TOTAL_QUESTIONS ;
 
 
-
   window.addEventListener("load",function() {
     // Get questions and answers for the chosen set id.
-    setQuestions = $.get("/api/sets/"+ set_id + "/shuffle/10", function (data) {
+    setQuestions = $.get("/api/user/"+ user_id + "/challenges/questions/" + game_id, function (data) {
       console.log("In jQuery GET callback:");
       var obj = JSON.parse(data);
       for (eachObj in obj){console.log(eachObj);}
