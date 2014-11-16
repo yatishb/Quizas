@@ -160,3 +160,20 @@ def seen_challenge_result(challengerId, gameId):
 		return "Successfully updated"
 	else:
 		return "Invalid request"
+
+
+# POST /user/<userid>/challenges/questions/<gameid>
+# Retrieve the list of questions that were part of a challenge.
+@main.route('/user/<challengerId>/challenges/questions/<gameId>')
+def get_questions_challenge(challengerId, gameId):
+	current_id = authhelper.get_current_id()
+	chgr_id = authhelper.lookup(challengerId)
+
+	if current_id != chgr_id:
+		return "Challenger must be logged in"
+
+	# Get the challenge with the game ID,
+	# and set the status to be "DONE"
+	result = QuestionsChallenge.query.get(gameId)
+	
+	return result.questions
