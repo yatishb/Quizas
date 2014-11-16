@@ -300,7 +300,7 @@
 	  var gameroom = initiatingJSON.room;
 	  // encounterwin
 	  
-	  
+	  PLAYER_NAME = "John Smith", ENEMY_NAME = "Darth Vader";
 	
 	Q.state.set({playerScore: 0, enemyScore: 0, currentIndex: 0, currentQuestion: "", waiting: true});
 	var deck = shuffleDeck(totalQuestions, DECK_SIZE);
@@ -447,11 +447,63 @@
 		
 	// versus screen with countdown
 	Q.scene("scene0", function(stage) {
+		var cdText = stage.insert(new Q.UI.TimeCounter({x: qx*160, y: qy*284}));
+		
+		var playerContainer = stage.insert(new Q.UI.Container({
+			fill: "white",
+			x: 220 * qx,
+			y: 142 * qy,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			w: 160 * qx,
+			h: 150 * qy
+		}));
+		
+		var enemyContainer = stage.insert(new Q.UI.Container({
+			fill: "white",
+			x: 100 * qx,
+			y: 426 * qy,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			w: 160 * qx,
+			h: 150 * qy
+		}));
+		
+		var playerPortrait = stage.insert(new Q.PlayerPortrait({
+			x: qx * 80, 
+			y: qy * 142, 
+			scale: 0.05, 
+			asset: PLAYER_SPRITE
+		}));
+		
+		var enemyPortrait = stage.insert(new Q.EnemyPortrait({
+			x: qx * 260, 
+			y: qy * 426, 
+			scale: 0.05, 
+			asset: ENEMY_SPRITE
+		}));
+		
+		var playerName = stage.insert(new Q.UI.Text({
+			x: qx * 80,
+			y: qy * 200,
+			label: PLAYER_NAME
+		}));
+		
+		var enemyName = stage.insert(new Q.UI.Text({
+			x: qx * 260,
+			y: qy * 484,
+			label: ENEMY_NAME
+		}));
+	
 		var cdTimer = new Countdown({
-			seconds: 5,
-			onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
-			onCounterEnd: function() {/*alert("Out of time");*/}
+			seconds: 10,
+			onUpdateStatus: function(sec) {cdText.p.label = "Game starting in " + (Math.ceil(sec)) + " seconds."},
+			onCounterEnd: function() {Q.stageScene("scene1");}
 		});
+		
+		cdTimer.start();
 	});
 	
 	// set scene

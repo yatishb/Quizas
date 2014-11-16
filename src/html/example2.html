@@ -266,13 +266,14 @@
 		*/
 		
 		var battleLibrary = []
-		function addBattle(fcQ, playerA, enemyA, playerTime) { // all are flashcard objects
+		function addBattle(fcQ, fcA, playerA, enemyA, playerTime) { // all are flashcard objects
 			battleLibrary[battleLibrary.length] = {
 				question: fcQ,
+				answers: fcA,
 				player: playerA,
 				enemy: enemyA,
 				time: playerTime,
-			};
+			}
 		}
 		
 	</script>
@@ -302,7 +303,10 @@
 	  enemySprite = initiatingJSON.sprite,
 	  enemyWinRate = initiatingJSON.win,
 	  enemyEncounter = initiatingJSON.encounter,
-	  totalQuestions = initiatingJSON.total;	
+	  totalQuestions = initiatingJSON.total;
+
+	PLAYER_NAME = "John Smith", ENEMY_NAME = "Darth Vader";
+	PLAYER_SPRITE = "smiley.png", ENEMY_SPRITE = "smiley.png";
 	
 	Q.state.set({playerScore: 0, enemyScore: 0, currentIndex: 0, currentQuestion: "", waiting: true});
 	var deck = shuffleDeck(totalQuestions, DECK_SIZE);
@@ -490,7 +494,13 @@
 		var playerName = stage.insert(new Q.UI.Text({
 			x: qx * 80,
 			y: qy * 200,
-			label: "John Smith"
+			label: PLAYER_NAME
+		}));
+		
+		var enemyName = stage.insert(new Q.UI.Text({
+			x: qx * 260,
+			y: qy * 484,
+			label: ENEMY_NAME
 		}));
 	
 		var cdTimer = new Countdown({
