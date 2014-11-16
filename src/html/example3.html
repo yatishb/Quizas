@@ -599,7 +599,7 @@
 									console.log("Placeholder Trigger: Correct");
 									playerCounters[Q.state.get("currentIndex") - 1].p.fill = "green";
 									this.p.fill = "green";
-									Q.state.inc("playerScore", convertPoints(timeTakenCurrent));
+									Q.state.inc("playerScore", convertPoints(timeTakenCurrent, maxTimeAllowed * 1000));
 								} else {
 									console.log("Placeholder Trigger: Wrong");
 									playerCounters[Q.state.get("currentIndex") - 1].p.fill = "red";
@@ -779,7 +779,7 @@
 			console.log("END");
 				if (prevFcQuestion.id == prevEnemyAns) {
 					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "green";
-					Q.state.inc("enemyScore", convertPoints(prevEnemyTime));
+					Q.state.inc("enemyScore", convertPoints(prevEnemyTime, maxTimeAllowed * 1000));
 				} else {
 					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "red";
 				}

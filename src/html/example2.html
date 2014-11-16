@@ -870,20 +870,24 @@
 			shadow: 3,
 			x: (320/2) * qx,
 			y: 48 * qy,
-			w: 280 * qx,
+			w: 290 * qx,
 			h: 60 * qy,
 			label: 'Glorious Victory/Defeat',
 		}));
+		
+		var ResultsBox = stage.insert(new Q.UI.Container({
+			
+		}));
 	
 		var ReviewBtn = stage.insert(new Q.UI.Button({
-			fill: "gray",
-			fontColor: "white",
+			fill: "white",
+			fontColor: "black",
 			x: (320/4) * qx,
 			y: 500 * qy,
 			border: 2,
 			shadow: 3,
 			shadowColor: "rgba(0,0,0,0.5)",
-			w: 120 * qx,
+			w: 130 * qx,
 			h: 100,
 			label: 'Review',
 		}, function() {
@@ -891,14 +895,14 @@
 		}));
 		
 		var BackBtn = stage.insert(new Q.UI.Button({
-			fill: "gray",
-			fontColor: "white",
+			fill: "white",
+			fontColor: "black",
 			x: (3/4) * 320 * qx,
 			y: 500 * qy,
 			border: 2,
 			shadow: 3,
 			shadowColor: "rgba(0,0,0,0.5)",
-			w: 120 * qx,
+			w: 130 * qx,
 			h: 100,
 			label: 'Back',
 		}, function() {
