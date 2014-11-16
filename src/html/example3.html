@@ -790,7 +790,7 @@
 			
 				
 			// result in bomb movement
-				var remainingQ = totalQuestions - Q.state.get("currentIndex") + 1;
+				var remainingQ = (totalQuestions - Q.state.get("currentIndex") + 1) * 1000;
 				var scoreDiff = Q.state.get("playerScore") - Q.state.get("enemyScore");
 				if (remainingQ > 0) {
 					if (scoreDiff <= remainingQ) {
@@ -834,32 +834,66 @@
 	// set scene
 	Q.scene("scene2",function(stage) {
 	
-		var leScore = stage.insert(new Q.UI.PlayerScore());
+		//var leScore = stage.insert(new Q.UI.PlayerScore());
+	
+		var ResultsBanner = stage.insert(new Q.UI.Button({
+			fill: "white",
+			fontColor: "black",
+			border: 2,
+			shadow: 3,
+			x: (320/2) * qx,
+			y: 48 * qy,
+			w: 290 * qx,
+			h: 60 * qy,
+			//label: 'Glorious Victory/Defeat',
+		}));
+		
+		if (Q.state.get("playerScore") > Q.state.get("enemyScore")) {
+			ResultsBanner.p.label = "Glorious Victory :)";
+		} else if (Q.state.get("playerScore") < Q.state.get("enemyScore")) {
+			ResultsBanner.p.label = "You Lose :(";
+		} else {
+			ResultsBanner.p.label = "Draw :O";
+		}
+		
+		var ResultsBox = stage.insert(new Q.UI.Container({
+			fill: "white",
+			fontColor: "black",
+			border: 2,
+			shadow: 3,
+			x: (320/2) * qx,
+			y: (((450-78)/2)+78) * qy,
+			w: 290 * qx,
+			h: 350 * qy,
+		}));
 	
 		var ReviewBtn = stage.insert(new Q.UI.Button({
-			fill: "gray",
-			fontColor: "white",
-			x: 160,
-			y: 160,
+			fill: "white",
+			fontColor: "black",
+			highlight: "gray",
+			x: (320/4) * qx,
+			y: 500 * qy,
 			border: 2,
 			shadow: 3,
 			shadowColor: "rgba(0,0,0,0.5)",
-			w: 110,
+			w: 130 * qx,
 			h: 100,
-			label: 'Replay',
+			label: 'Review',
 		}, function() {
-			Q.stageScene("scene1");
+			//Q.stageScene("scene3");
+			alert("Battle Library still under construction.");
 		}));
 		
 		var BackBtn = stage.insert(new Q.UI.Button({
-			fill: "gray",
-			fontColor: "white",
-			x: 160,
-			y: 320,
+			fill: "white",
+			fontColor: "black",
+			highlight: "gray",
+			x: (3/4) * 320 * qx,
+			y: 500 * qy,
 			border: 2,
 			shadow: 3,
 			shadowColor: "rgba(0,0,0,0.5)",
-			w: 110,
+			w: 130 * qx,
 			h: 100,
 			label: 'Back',
 		}, function() {
