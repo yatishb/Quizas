@@ -17,6 +17,7 @@
     var friend_id = JSON.parse(sessionStorage.getItem("friend_id"));
     var set_id = JSON.parse(sessionStorage.getItem("set_id"));
     var user_id = JSON.parse(sessionStorage.getItem("user_id"));
+    var game_id = JSON.parse(sessionStorage.getItem("game_id"));
 
     var quesDeck = [];
     var answersDeck = [];
@@ -233,7 +234,6 @@
       var jsonData = {};
       var cardsArray = [];
       jsonData["flashset"] = set_id;
-      jsonData['questions'] = obj;
 
       for (i = 0; i < answersChosen.length; i++) {
         var objectQues = {};
@@ -249,7 +249,7 @@
       $.ajax({
         type: "POST",
         contentType: "application/json; charset=utf-8",
-        url: "/api/user/" + user_id + "/challenges/" + friend_id + "/" + set_id,
+        url: "/api/user/" + user_id + "/challenges/complete/" + game_id,
         data: postData,
         success: function (data) {
           console.log(data);
