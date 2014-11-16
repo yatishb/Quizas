@@ -38,8 +38,7 @@ $(document).ready(function() {
 $(document).ajaxComplete(function() {
     cardIndex = 0;
 
-    var top_bar = $('.top_bar');
-    top_bar.html(content.name);
+    $('.top_bar div').html(content.name);
 
     var flashcards = $('.flashcards');
     for (var i = 0; i < content.cards.length && i < cardPerPage; i++) {

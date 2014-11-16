@@ -762,10 +762,8 @@ i.rotate {
     margin-bottom: 10px;
     z-index: 10;
     position: relative;
-    background-color: #80B280;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
-    border-bottom-color: #47A347;
+    background-color: #019875;
+    border-bottom: solid 1px #049372;
     cursor: pointer;
     font-family: 'open_sans', sans-serif;
     font-weight: light;
@@ -888,7 +886,9 @@ i.rotate {
 
 .grey_cover {
     background-color: #000;
-    background-color: rgba(255, 255, 255, 0.6);
+    /*background-color: rgba(255, 255, 255, 0.75);*/
+    background-color: rgba(0, 0, 0, 0.6);
+    opacity: 0.6;
     width: 110vw;
     height: 2000px;
     margin-top: -10px;
@@ -960,7 +960,7 @@ i.rotate {
     background-color: BC5152;
 }
 
-/*** The Friend List ***/
+/** The Friend List **/
 @media screen and (max-width: 500px) {
     .friend_window,
     .friend_list,
@@ -1142,7 +1142,170 @@ i.rotate {
     vertical-align: middle;
 }
 
+/** The Challenge Notification **/
+@media screen and (max-width: 500px) {
+    .challenge_info {
+        width: 80vw;
+        height: 80vh;
+        margin-left: -40vw;
+        margin-top: 50px;
+    }
+}
+
+@media screen and (min-width: 501px) {
+    .challenge_info {
+        width: 500px;
+        height: 400px;
+        margin-left: -250px;
+        margin-top: 80px;
+    }
+}
+
+.challenge_info {
+    position: fixed;
+    z-index: 500;
+    left: 50%;
+    background-color: white;
+    border-radius: 5px;
+    -o-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    background-color: #F5F5F5;
+    display: none;
+}
+
+.challenge_title {
+    width: 100%;
+    left: 0;
+    right: 0;
+    height: 40px;
+    display: table;
+    position: relative;
+    text-align: center;
+}
+
+.challenge_title span {
+    display: table-cell;
+    vertical-align: middle;
+    font-size: 14pt;
+    font-weight: 700;
+}
+
+.simple_info {
+    width: 100%;
+    left: 0;
+    right: 0;
+    height: 60px;
+    border-top: solid 1px #6b6b6b;
+    /*border-bottom: solid 1px #6b6b6b;*/
+    position: relative;
+    margin: 3px 0;
+    display: inline-block;
+}
+
+.info_profile {
+    left: 0;
+    height: 60px;
+    width: 60px;
+    display: table;
+    float: left;
+}
+
+.info_profile img {
+    margin: 3px 2px 3px 2px;
+    width: 90%;
+    height: 90%;
+    border-radius: 10%;
+    -o-border-radius: 10%;
+    -ms-border-radius: 10%;
+    -moz-border-radius: 10%;
+    -webkit-border-radius: 10%;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.info_content {
+    top: 0;
+    right: 0;
+    width: 78%;
+    word-wrap: break-word;
+    float: left;
+    margin: 1px;
+}
+
+.action_set {
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    height: 27px;
+    width: 110px;
+    overflow: hidden;
+    margin-bottom: 2px;
+}
+
+.button_reject,
+.button_accept {
+    width: 24px;
+    height: 24px;
+    margin: 1px 13px;
+    text-align: center;
+    float: right;
+    display: table;
+    font-weight: 300;
+    border-radius: 50%;
+    -o-border-radius: 50%;
+    -ms-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+}
+
+.button_reject {
+    bottom: 0;
+    right: 0;
+    border: solid 1px #EE4D4D;
+    color: #EE4D4D;
+}
+
+.button_reject:active {
+    bottom: 0;
+    left: 0;
+    border: solid 1px #E60000;
+    color: #E60000;
+}
+
+.button_accept {
+    border: solid 1px #2ECC71;
+    color: #2ECC71;
+}
+
+.button_accept:active {
+    border: solid 1px #219351;
+    color: #219351;
+}
+
+.button_reject i,
+.button_accept i {
+    display: table-cell;
+    vertical-align: middle;
+}
+
 /*** Start of flashcard.html ***/
+@media screen and (max-width: 500px) {
+    .popup_title {
+        width: 80vw;
+        min-width: 300px;
+        margin-left: -40vw;
+    }
+}
+
+@media screen and (min-width: 501px) {
+    .simple_card {
+        max-width: 500px;
+        margin-left: -250px;
+    }
+}
+
 .top_bar {
     width: 100%;
     height: 40px;
@@ -1154,6 +1317,39 @@ i.rotate {
     color: white;
     text-align: center;
     line-height: 40px;
+}
+
+.top_bar .card_title {
+    width: 80%;
+    height: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 0 auto;
+}
+
+.popup_title {
+    /*visibility: hidden;*/
+    min-height: 40px;
+    display: table;
+    margin: 50px auto 0 auto;
+    position: fixed;
+    left: 50;
+    color: white;
+    z-index: 100;
+    word-wrap: break-word;
+    text-align: center;
+    background-color: #3e8871;
+    border-radius: 3px;
+    -o-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+}
+
+.popup_title span {
+    display: table-cell;
+    margin: 5px;
 }
 
 .back_button {
@@ -1463,6 +1659,7 @@ i.rotate {
     font-size: 20pt;
     cursor: pointer;
     color: #6b6b6b;
+    z-index: 1000;
 }
 
 .button_close:active {

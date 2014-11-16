@@ -103,6 +103,17 @@ $(document).ready(function() {
     });
 });
 
+$('.notification').on("click", function() {
+    $('.grey_cover').show();
+    $('.challenge_info').show();
+    $('.challenge_info').addClass('fadeIn');
+});
+
+$('.button_close').on("click", function() {
+    $('.grey_cover').hide();
+    $('.challenge_info').hide();
+});
+
 $('.set_info').on("click", '.content_container', function() {
     $('.search_set').hide();
     $('.search_result').hide();
@@ -175,11 +186,14 @@ $('#search_set_box').keypress(function( event ) {
 });
 
 $('.grey_cover').on("click", function() {
-    if ($('.friend_window').is(':visible')) {
+    if ($('.challenge_info').is(':visible')) {
+        $('.challenge_info').hide();
+        $(this).hide();
+    } else if ($('.friend_window').is(':visible')) {
         $('.friend_window').hide();
         $('.friend_window').removeClass('fadeIn');
     } else {
-        $('.grey_cover').hide(); 
+        $(this).hide(); 
         $('.button_container').hide();
         $('.add_set').show();
         $('.notification').show();
