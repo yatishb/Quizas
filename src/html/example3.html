@@ -275,7 +275,7 @@
 		}
 		
 		function convertPoints(timeMils, maxTime) { // all in milliseconds
-			var resultPoints = ((maxTime - timeMils) / maxTime) * 1000;
+			var resultPoints = ((maxTime - timeMils) / maxTime) * 10000;
 			return Math.round(resultPoints);
 		}
 		
