@@ -477,6 +477,18 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
         .attr("class", "y axis")
         .call(yAxis)
 
+    // "Correct" Clip Rects
+    function correctClipRectId(i) { return graphId + "_correctClip" + i; };
+    svg.append("defs").selectAll("bar") // why does it need selectAll here??
+        .data(data)
+      .enter().append("clipPath")
+        .attr("id", function(d, i) { return correctClipRectId(i); })
+      .append("rect")
+        .attr("x", function(d) { return x(0); })
+        .attr("width", function(d) { return x(d.correct / d.total); })
+        .attr("y", function(d) { return y(d.fcid); })
+        .attr("height", y.rangeBand())
+
     // Green, "Correct" bar
     svg.selectAll("bar")
         .data(data)
@@ -506,8 +518,21 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
         .attr("dy", y.rangeBand() * 3 / 5) // Fiddly. Really, this will depend on font size.
         .style("text-anchor", "start")
         .style("font-size", (y.rangeBand() / 2) + "px")
+        .style("clip-path", function(d, i) { return "url(#" + correctClipRectId(i) + ")"; })
         .attr("fill", "black")
         .text(function(d) { return d.correct; })
+
+    // Text for # incorrect answers
+    svg.selectAll("bar")
+        .data(data)
+      .enter().append("text")
+        .attr("x", function(d) { return x(1) - 10; })
+        .attr("y", function(d) { return y(d.fcid); })
+        .attr("dy", y.rangeBand() * 3 / 5) // Fiddly. Really, this will depend on font size.
+        .style("text-anchor", "end")
+        .style("font-size", (y.rangeBand() / 2) + "px")
+        .attr("fill", "black")
+        .text(function(d) { return d.total - d.correct; })
 }
 
 </script>
