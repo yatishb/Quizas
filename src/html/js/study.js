@@ -146,10 +146,12 @@ $('.add_set').on("click", function() {
     if ($('.search_set').is(':visible')) {
         $(this).find('i').removeClass('rotate');
         $('.search_set').removeClass("slideLeft");
-        $('.search_set').show();
+        $('.search_set').hide();
         $('.search_result').hide();
+        $('.set_info').show();
     } else {
         $(this).find('i').addClass('rotate');
+        $('.set_info').hide();
         $('.search_set').show();
         $('.search_set').addClass("slideLeft");
         $('#search_set_box').focus();
