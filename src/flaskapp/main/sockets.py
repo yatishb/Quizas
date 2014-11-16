@@ -31,6 +31,26 @@ def printSocketsConnected():
 		emit('my response', {'data': "session id: %r random: %r" % (client.session['id'], client.session['random'])})
 
 
+# Return the list of the users who are online
+# Checks the sockets connected and stores all the unique ids
+# These unique internal ids are matched and their actual ids are returned
+@socketio.on('online users', namespace='/test')
+def printSocketsConnected():
+	onlineUsers = []
+	onlineIDs = []
+	for client in clients:
+		if onlineUsers.count(client.session['id']) == 0:
+			onlineUsers.append(client.session['id'])
+
+	for eachOnlineUser in onlineUsers:
+		facebookId = authhelper.lookupInternalFacebook(eachOnlineUser)
+		if facebookId != None:
+			onlineIDs.append( str(facebookId) )
+
+	emit('online', {'data': onlineIDs})
+
+
+
 # This is to send the notification of a game request to another client C2
 # Read this notification and forward this request to the client C2
 @socketio.on('send notification', namespace='/test')
