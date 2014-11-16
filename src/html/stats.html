@@ -19,60 +19,84 @@
     <link rel="apple-touch-startup-image" href="images/Geet_App_Startup.png">
     
     <link rel="stylesheet" type="text/css" href="css/main.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.icons.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.inline-png.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.inline-svg.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.structure.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/jquery.mobile.theme.css"></link>
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.css"></link>
 
+    <script src="js/quizas_auth_helper.js"></script>
+    <script src="js/quizas_facebook.js"></script>
+    <script src="js/Chart.js"></script>
+
+    <!-- Load the FB JS SDK -->
+    <script>
+    window.fbAsyncInit = function() {
+        FB.init({
+            appId      : quizas_fbappid,
+            xfbml      : true,
+            version    : 'v2.1'
+        });
+    };
+
+    (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+    function outputProfile (profile) {
+        $('.profile_photo img').attr('src', profile.picture);
+        $('.name_content').text(profile.name);
+    }
+    </script>
 </head>
 <body>
+    <div id="fb-root"></div>
 
-    <div data-role="page" id="page1">
+    <div class="header group_2 stats">
+        <div class="stats_tab current_tab">Myself</div>
+        <div class="stats_tab">My Friends</div>
+    </div>
 
-    <div data-role="content">
-        <div class="content-primary list_option">   
-        <ul data-role="listview">
-            <li>
-                <h3>Quiz History</h3>
-            </li>
-            <li>
-                <h3>Study History</h3>
-            </li>
-            <li>
-                <h3>Active Learning Days</h3>
-            </li>
-            <li>
-                <h3>Sets Learned</h3>
-            </li>
-            <li>
-                <h3>Achievements</h3>
-            </li>
+    <div class="page_me">
+        <canvas class="myChart"></canvas>
+        <table class="chartTable">
+            <tr>
+                <td>Total</td>
+                <td>6</td> 
+            </tr>
+            <tr>
+                <td>Win</td> 
+                <td>3</td>
+            </tr>
+            <tr>
+                <td>Draw</td> 
+                <td>2</td>
+            </tr>
+            <tr>
+                <td>Lose</td> 
+                <td>1</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="page_friend">
+    </div>
+
+    <div class="footer">
+        <ul class="footer_container group_3">
+            <li onclick="window.open('study.html','_self');"><a><i class="fa fa-book"></i> Study</a></li>
+            <li class="current_tab" href="#"><a><i class="fa fa-line-chart"></i> Stats</a></li>
+            <li onclick="window.open('settings.html','_self');"><i class="fa fa-gears"></i> Settings</a></li>
         </ul>
-        </div>
     </div>
 
-    <div data-role="footer" data-id="foo1" data-position="fixed">
-        <div data-role="navbar" data-iconpos="top">
-            <ul>
-                <li><a onclick="window.open('study.html','_self');" data-icon="grid" data-prefetch="true" data-transition="none">Study</a></li>
-                <li><a href="#" data-icon="info" data-icon="grid" data-prefetch="true" data-transition="none" class="ui-btn-active ui-state-persist">Stats</a></li>
-                <li><a onclick="window.open('settings.html','_self');" data-icon="gear" data-prefetch="true" data-transition="none">Settings</a></li>
-            </ul>
-        </div><!-- /navbar -->
-    </div><!-- /footer -->
-
-    </div>
-
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,300,400' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,300,400' rel='stylesheet' type='text/css'></link>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
     <script src="js/jquery.mobile.js"></script>
 
     <script src="js/stats.js"></script>
-    <script src="js/quizas_auth_helper.js"></script>
 
     <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
