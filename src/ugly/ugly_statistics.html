@@ -426,16 +426,23 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
     // flashcards: fcid -> {correct: #, total: #}
     // gameids: []
 
-    // TODO: Height should be fn of # props in `flashcards`
+    // Computations we'll need for constructing the bar chart
+    var numFlashcardsWithResults = flashsetResults.fcids.filter(function (fcid) {
+        return flashsetResults.flashcards[fcid] !== undefined;
+    }).length;
+
     var graphWidth = 600;
-    var graphHeight = 500;
+    var graphHeight = 45 * numFlashcardsWithResults;
 
     var data = flashsetResults.fcids.map(function (fcid) {
         var result = flashsetResults.flashcards[fcid];
 
         return { fcid: fcid,
-                 correct: result.correct }
+                 correct: result.correct,
+                 total: result.total }
     });
+
+    var maxTotal = d3.max(data, function(d) { return d.total; });
 
     // TODO: `left` margin, where we show the words should be wide enough?
     // .... or should we display the word within the progress bar? Hmm.
@@ -450,7 +457,7 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
     var xAxis = d3.svg.axis()
         .scale(x)
         .orient("bottom")
-        .ticks(6); // TODO: # ticks should be max # total for any of the fcids!
+        .ticks(maxTotal);
 
     var yAxis = d3.svg.axis()
         .scale(y)
@@ -463,7 +470,7 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
         .attr("transform", 
               "translate(" + margin.left + "," + margin.top + ")");
 
-    x.domain([0, d3.max(data, function(d) { return d.correct; })]);
+    x.domain([0, maxTotal]);
     y.domain(data.map(function(d) { return d.fcid; }));
 
     svg.append("g")
@@ -490,15 +497,19 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
         .data(data)
       .enter().append("rect")
         .style("fill", "green")
-        .attr("x", function(d) { return 0; })
+        .attr("x", function(d) { return x(0); })
         .attr("width", function(d) { return x(d.correct); })
         .attr("y", function(d) { return y(d.fcid); })
         .attr("height", y.rangeBand());
-        // .attr("x", function(d) { return y(d.fcid); })
-        // .attr("width", y.rangeBand())
-        // .attr("y", function(d) { return x(d.correct); })
-        // .attr("height", function(d) { return height - x(d.correct); });
 
+    svg.selectAll("bar")
+        .data(data)
+      .enter().append("rect")
+        .style("fill", "red")
+        .attr("x", function(d) { return x(d.correct); }) // wait.. shit. the `total` for each FCID will be different
+        .attr("width", function(d) { return x(d.total - d.correct); })
+        .attr("y", function(d) { return y(d.fcid); })
+        .attr("height", y.rangeBand());
 }
 
 </script>
