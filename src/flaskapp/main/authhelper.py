@@ -4,7 +4,7 @@ import json
 
 import secrets
 
-from models import InternalUserAuth
+from models import InternalUserAuth, PointsTable
 from flask import request, redirect, abort
 from . import main
 from .. import db
@@ -109,6 +109,11 @@ def insert_new_id(new_userid):
 
 	newUserAuth = InternalUserAuth(new_userid)
 	db.session.add(newUserAuth)
+	db.session.commit()
+
+	uid = lookup(new_userid)
+	pointsRow = PointsTable(uid, 0)
+	db.session.add(pointsRow)
 	db.session.commit()
 
 

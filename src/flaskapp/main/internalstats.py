@@ -1,4 +1,4 @@
-from models import User, FlashGame as FG, FlashCardInGame as FC
+from models import User, FlashGame as FG, FlashCardInGame as FC, PointsTable as PT
 from sqlalchemy import func, and_
 from . import main
 from .. import db, redis
@@ -25,17 +25,28 @@ def documentGame(room, user1, user2, userAns1, userAns2, flashsetId, timeTaken1,
 
 	allQuestions = userAns1.keys()
 
+	points1 = 0
+	points2 = 0
+
 	for questionId in allQuestions:
 		user1AnsChosen = userAns1.get(questionId)
 		user2AnsChosen = userAns2.get(questionId)
 		time1 = int(timeTaken1.get(questionId))
 		time2 = int(timeTaken2.get(questionId))
+		points1 += 1.0*(10000 - time1) / 1000
+		points2 += 1.0*(10000 - time2) / 1000
 
 		# -1 refers to time taken by client for each answer
 		cardUser1 = FC(room, flashsetId, questionId, user1, user1AnsChosen, time1)
 		cardUser2 = FC(room, flashsetId, questionId, user2, user2AnsChosen, time2)
 		db.session.add(cardUser1)
 		db.session.add(cardUser2)
+
+	# Update points for both users
+	pointsRow1 = PT.query.filter(PT.id == user1).first()
+	pointsRow2 = PT.query.filter(PT.id == user2).first()
+	pointsRow1.points += int(points1)
+	pointsRow2.points += int(points2)
 
 	db.session.commit()
 
@@ -44,6 +55,7 @@ def documentGame(room, user1, user2, userAns1, userAns2, flashsetId, timeTaken1,
 def soloGameResultsWriteDbWithGameId(userid, gameId, receivedData) :
 	flashsetId = receivedData['flashset']
 	cards = receivedData['cards']
+	pointsScored = 0
 
 	gameUser = FG(gameId, flashsetId, userid)
 	db.session.add(gameUser)
@@ -52,9 +64,12 @@ def soloGameResultsWriteDbWithGameId(userid, gameId, receivedData) :
 		questionId = eachQues['flashcard']
 		userAns = eachQues['result']
 		time = eachQues['time']
+		pointsScored += 1.0*(10000 - time) / 1000
 		cardUser = FC(gameId, flashsetId, questionId, userid, userAns, time)
 		db.session.add(cardUser)
 
+	pointsRow = PT.query.filter(PT.id == userid).first()
+	pointsRow.points += int(pointsScored)
 	db.session.commit()
 
 	# Return gameId so challenges can make use of it.

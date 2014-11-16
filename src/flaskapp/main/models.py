@@ -112,6 +112,20 @@ class QuestionsChallenge(db.Model):
 		return '<QuestionsChallenge %r %r>' % (self.gameId, self.questions)
 
 
+class PointsTable(db.Model):
+	id = db.Column(db.Integer, primary_key = True)
+	points = db.Column(db.Integer)
+
+	__tablename__ = "PointsTable"
+	def __init__(self, uid, points):
+		self.id = uid
+		self.points = points
+
+	def __repr__(self):
+		return '<PointsTable %r %r>' % (self.id, self.points)
+
+
+
 class InternalUserAuth(db.Model):
 	# Because we need ID.
 	id = db.Column(db.Integer)
