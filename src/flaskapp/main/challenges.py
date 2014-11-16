@@ -12,7 +12,7 @@ import quizletsets
 import internalstats
 
 from flask import request, redirect, make_response
-from models import UserChallenge
+from models import UserChallenge, QuestionsChallenge
 from . import main
 from .. import db
 
@@ -47,6 +47,10 @@ def create_new_challenge(challengerId, recipientId, setid):
 		# (since it's FlashGame, FlashCardInGame)
 		gameId = internalstats.soloGameResultsWriteDb(chgr_id,
 		                                              receivedData)
+
+		# Add new row to QuestionsChallenge
+		qc = QuestionsChallenge(gameId, json.dumps(receivedData['questions']))
+		db.session.add(qc)
 
 		# Add new row to UserChallenge
 		uc = UserChallenge(chgr_id, rcpt_id, gameId, STATUS_NEW)

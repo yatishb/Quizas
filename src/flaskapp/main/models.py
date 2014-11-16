@@ -99,6 +99,19 @@ class UserChallenge(db.Model):
 		                                        self.status)
 
 
+class QuestionsChallenge(db.Model):
+	gameId = db.Column(db.String(40), primary_key = True)
+	questions = db.Column(db.String(5000))
+
+	__tablename__ = "QuestionsChallenge"
+	def __init__(self, gameId, questions):
+		self.gameId = gameId
+		self.questions = questions
+
+	def __repr__(self):
+		return '<QuestionsChallenge %r %r>' % (self.gameId, self.questions)
+
+
 class InternalUserAuth(db.Model):
 	# Because we need ID.
 	id = db.Column(db.Integer)
