@@ -3,33 +3,6 @@ $(document).ready(function() {
     if(result.length == 0)
         this.location.href='/index.html';
 
-    var data = [
-        {
-            value: 300,
-            color:"#F7464A",
-            highlight: "#FF5A5E",
-            label: "Win"
-        },
-        {
-            value: 50,
-            color: "#46BFBD",
-            highlight: "#5AD3D1",
-            label: "Draw"
-        },
-        {
-            value: 100,
-            color: "#FDB45C",
-            highlight: "#FFC870",
-            label: "Lose"
-        }
-    ];
-
-    // Get context with jQuery - using jQuery's .get() method.
-    var ctx = $(".myChart").get(0).getContext("2d");
-
-    // For a pie chart
-    window.myNewChart = new Chart(ctx).Pie(data);
-
     getUserStats();
 });
 
@@ -43,10 +16,35 @@ $('.stats_tab').on('click', function() {
     if($(this).text() == "Myself") {
         $('.page_me').show();
         $('.page_friend').hide();
+        $('.friendTitle').empty();
+        $('.chartContainer').empty();
+        $('.friendTable').empty();
+        $('.friend_stats').hide();
     } else {
         $('.page_me').hide();
         $('.page_friend').show();
     }
+});
+
+$('.page_friend').on('click', '.simple_friend', function() {
+    var friend_id = $(this).attr('id');
+
+    $('.friendTitle').empty();
+    $('.chartContainer').empty();
+    $('.friendTable').empty();
+    
+    $('.friend_stats').show();
+    $('.friend_stats').addClass('fadeIn');
+    $('.chartContainer').append('<canvas class="friendChart"></canvas>');
+    //getFriendStats(friend_id);
+    test();
+});
+
+$(document).on('click', '.button_close', function() {
+    $('.friendTitle').empty();
+    $('.chartContainer').empty();
+    $('.friendTable').empty();
+    $('.friend_stats').hide();
 });
 
 function getUserStats() {
@@ -55,9 +53,143 @@ function getUserStats() {
     $.get("/api/user/" + userid + "/stats", function(data) {
         var result = JSON.parse(data);
         console.log(result);
+
+        if(result.played == 0) {
+            $('.chartTitle').append("No statistics to show!<br><span style='color:red'>START PLAYING!</span>");
+        } else {
+            $('.myChart').show();
+
+            $('.chartTitle').append("Your statistics!<br><span style='color:red'>Play MORE!</span>");
+
+            var data = [
+                {
+                    value: result.wins,
+                    color:"#F7464A",
+                    highlight: "#FF5A5E",
+                    label: "Wins"
+                },
+                {
+                    value: result.draws,
+                    color: "#46BFBD",
+                    highlight: "#5AD3D1",
+                    label: "Draws"
+                },
+                {
+                    value: result.losses,
+                    color: "#FDB45C",
+                    highlight: "#FFC870",
+                    label: "Losses"
+                }
+            ];
+
+            // Get context with jQuery - using jQuery's .get() method.
+            var ctx = $(".myChart").get(0).getContext("2d");
+
+            // For a pie chart
+            window.myNewChart = new Chart(ctx).Pie(data);
+        }
+
+        $('.chartTable').append(
+            "<tr><td>Total</td><td>" +
+            result.played +
+            "</td></tr>" +
+            "<tr><td>Wins</td><td>" +
+            result.wins +
+            "</td></tr>" +
+            "<tr><td>Draws</td><td>" +
+            result.draws +
+            "</td></tr>" +
+            "<tr><td>Losses</td><td>" +
+            result.losses +
+            "</td></tr>"
+        );
     })
     .fail(function() {
         console.log("error in getUserStats function");
+    });
+}
+
+function test() {
+    $('.friendChart').show();
+
+    $('.friendTitle').append("Your statistics!<br><span style='color:red'>Play MORE!</span>");
+
+    var result = {wins: 5, draws: 3, losses: 2, total: 10};
+
+    var data = [
+        {
+            value: result.wins,
+            color:"#F7464A",
+            highlight: "#FF5A5E",
+            label: "Wins"
+        },
+        {
+            value: result.draws,
+            color: "#46BFBD",
+            highlight: "#5AD3D1",
+            label: "Draws"
+        },
+        {
+            value: result.losses,
+            color: "#FDB45C",
+            highlight: "#FFC870",
+            label: "Losses"
+        }
+    ];
+
+    // Get context with jQuery - using jQuery's .get() method.
+    var ctx = $(".friendChart").get(0).getContext("2d");
+
+    // For a pie chart
+    window.myNewChart = new Chart(ctx).Pie(data);
+}
+
+function getFriendStats(friend_id) {
+    var userid = quizas_user_id();
+
+    $.get("/api/user/" + userid + "/stats/vs/" + friend_id, function(data) {
+        var result = JSON.parse(data);
+        console.log(result);
+
+        // var result = {wins: 5, draws: 3, losses: 2, total: 10};
+
+        if(result.played == 0) {
+            $('.friendTitle').append("No statistics to show!<br><span style='color:red'>START PLAYING!</span>");
+        } else {
+            $('.friendChart').show();
+
+            $('.friendTitle').append("Your statistics!<br><span style='color:red'>Play MORE!</span>");
+
+            var data = [
+                {
+                    value: result.wins,
+                    color:"#F7464A",
+                    highlight: "#FF5A5E",
+                    label: "Wins"
+                },
+                {
+                    value: result.draws,
+                    color: "#46BFBD",
+                    highlight: "#5AD3D1",
+                    label: "Draws"
+                },
+                {
+                    value: result.losses,
+                    color: "#FDB45C",
+                    highlight: "#FFC870",
+                    label: "Losses"
+                }
+            ];
+
+            // Get context with jQuery - using jQuery's .get() method.
+            var ctx = $(".friendChart").get(0).getContext("2d");
+
+            // For a pie chart
+            window.myNewChart = new Chart(ctx).Pie(data);
+        }
+    })
+    .fail(function() {
+        console.log("error in getFriendStats function");
     });
 }
 

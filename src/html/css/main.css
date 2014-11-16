@@ -63,6 +63,15 @@ img {
     background-color: #E6FAF5;
 }
 
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 /*** Start of footer ***/
 @media screen and (max-width: 500px) {
     .footer_container li {
@@ -433,6 +442,10 @@ img {
     font-size: 18px;
     line-height: 1.33;
     border-radius: 6px;
+    -o-border-radius: 6px;
+    -ms-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
     padding: 10px 16px;
     cursor: pointer;
     border: 1px solid transparent;
@@ -1095,6 +1108,10 @@ i.rotate {
 
 .friend_profile.selected {
     border-radius: 3px;
+    -o-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
     border: coral solid;
 }
 
@@ -1105,6 +1122,10 @@ i.rotate {
     width: 90%;
     height: 90%;
     border-radius: 25%;
+    -o-border-radius: 25%;
+    -ms-border-radius: 25%;
+    -moz-border-radius: 25%;
+    -webkit-border-radius: 25%;
     display: table-cell;
     vertical-align: middle;
 }
@@ -1246,6 +1267,13 @@ i.rotate {
         line-height: 35px;
     }
 
+    .chartTitle {
+        font-size: 18pt;
+        font-weight: 800;
+        width: 90%;
+        margin: 20px auto;
+    }
+
     .page_me, .page_friend {
         margin-top: 35px;
     }
@@ -1258,12 +1286,35 @@ i.rotate {
     .friend_profile.stats {
         margin-right: 10px;
     }
+
+    .friend_stats {
+        width: 70vw;
+        height: 40vh;
+        max-height: 400px;
+        margin-left: -35vw;
+        margin-top: -5vh;
+    }
+
+    .friendChart {
+        margin-left: -20px;
+    }
+
+    .friendTitle {
+        margin: 30px auto 20px auto;
+        width: 70%;
+        font-weight: 700;
+    }
 }
 
 @media screen and (min-width: 501px) {
     .stats_tab {
         height: 40px;
         line-height: 40px;
+    }
+
+    .chartTitle {
+        font-size: 18pt;
+        font-weight: 900;
     }
 
     .page_me, .page_friend {
@@ -1274,18 +1325,24 @@ i.rotate {
         margin: 2px auto;
         width: 60vw;
         max-width: 600px;
+        cursor: pointer;
     }
 
-    .simple_friend.stats span {
-        
+    .friend_stats {
+        width: 500px;
+        height: 60vh;
+        max-height: 500px;
+        margin-left: -250px;
+        margin-top: -10vh;
     }
 
-    .friend_profile.stats {
-
+    .friendChart {
+        margin-left: 80px;
     }
 
-    .friend_profile.stats img {
-
+    .friendTitle {
+        margin: 30px auto;
+        font-weight: 900;
     }
 }
 
@@ -1312,6 +1369,7 @@ i.rotate {
     position: relative;
     margin-left: -8px;
     text-align: center;
+    overflow-x: hidden;
 }
 
 .page_friend {
@@ -1322,6 +1380,11 @@ i.rotate {
     width: 400px;
     height: 400px;
     margin: 30px auto;
+    display: none;
+}
+
+.chartTitle {
+    text-align: center;
 }
 
 .chartTable {
@@ -1332,16 +1395,53 @@ i.rotate {
     background-color: #4DB8DB;
 }
 
-.simple_friend.stats span {
-    
+.friend_stats {
+    position: fixed;
+    background-color: #EEEEEE;
+    border-radius: 5px;
+    -o-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border: solid 1px #6b6b6b;
+    left: 50%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 25;
+    display: none;
 }
 
-.friend_profile.stats {
-
+.chartContainer {
+    margin: 10px auto;
 }
 
-.friend_profile.stats img {
+.friendChart {
+    display: none;
+}
 
+.friendTitle {
+    font-weight: 1000;
+    text-align: center;
+    width: 80%;
+    word-wrap: break-word;
+}
+
+.friendTable {
+    margin: 20px auto;
+}
+
+.button_close {
+    top: 0;
+    right: 0;
+    position: absolute;
+    margin: 3px 10px;
+    font-size: 20pt;
+    cursor: pointer;
+    color: #6b6b6b;
+}
+
+.button_close:active {
+    color: #000;
 }
 
 /*** Start of settings.html ***/
@@ -1370,6 +1470,10 @@ i.rotate {
 .profile_photo img {
     margin: auto;
     border-radius: 8px;
+    -o-border-radius: 8px;
+    -ms-border-radius: 8px;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
     box-shadow: 3px 3px 10px #888888;
     width: 100%;
     height: auto;
