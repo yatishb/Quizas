@@ -1,0 +1,36 @@
+/* The correct & incorrect colors of the bar. */
+
+.bargraph .correct.bar {
+    fill: green;
+}
+
+.bargraph .incorrect.bar {
+    fill: red;
+}
+
+
+
+/* The 'score' is the number of times they've gotten it
+ * correct or incorrect */
+
+.bargraph .correct.score {
+    fill: blue;
+}
+
+.bargraph .incorrect.score {
+    fill: cyan;
+}
+
+
+
+/* The word which shows up over the bar. */
+
+/* Color in the correct half. */
+.bargraph .correct.word {
+    fill: red;
+}
+
+/* Color in the incorrect half */
+.bargraph .incorrect.word {
+    fill: green;
+}

@@ -140,6 +140,31 @@ function getUserStats() {
     .fail(function() {
         console.log("error in getUserStats function");
     });
+
+    // TODO: In order to add linegraphs / barcharts,, you should..
+    //  i) for each graph you want, have a div
+    //     (each with a unique ID. See `quizas_gamestats_linegraph.js`).
+    //  ii) call outputStatsForGame(userid, gameid, graphDivId)
+    //
+    //  The biggest problem you will face is that the SIZE of
+    //  the graph will be fucked up.
+    //  See the relevant `quizas_gamestats_*.js` files.
+    //  Might have to modify functions. NOTE that barchart
+    //  height should be dependent on # of words in the flashset.
+
+
+    // Line Graphs for Each Game the user has played.
+    // (A Combo Box to select a particular game would make
+    //  more sense).
+    // $.get("/api/user/" + user_id + "/stats/games", function (data) {
+    //     $("#stats_games").text(data);
+    //
+    //     // Call on for-each game.
+    //     var response = JSON.parse(data);
+    //     response.forEach(function (gameId) {
+    //         outputStatsForGame(???, gameId, ???);
+    //     });
+    // });
 }
 
 function test() {
