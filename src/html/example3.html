@@ -740,6 +740,7 @@
 		Q.state.on("change.isGameOver", function() {
 			if (Q.state.get("isGameOver")) {
 				clearInterval(gameOverTimer);
+				Q.stageScene("scene2");
 			}
 			
 			alert("Game Over");
