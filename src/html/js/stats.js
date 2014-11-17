@@ -56,8 +56,8 @@ $('.page_friend').on('click', '.simple_friend', function() {
     $('.friend_stats').show();
     $('.friend_stats').addClass('fadeIn');
     $('.chartContainer').append('<canvas class="friendChart"></canvas>');
-    //getFriendStats(friend_id);
-    test();
+    getFriendStats(friend_id);
+    // test();
 });
 
 $(document).on('click', '.button_close', function() {

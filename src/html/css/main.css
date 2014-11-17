@@ -239,6 +239,7 @@ img {
 .login_button {
     margin: 15px auto;
     cursor: pointer;
+    overflow: hidden;
 }
 
 .let-icon-bg, .let-bg,

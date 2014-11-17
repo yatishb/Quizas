@@ -162,7 +162,7 @@ $('.add_set').on("click", function() {
         $('.set_info').show();
     } else {
         $(this).find('i').addClass('rotate');
-        $('.set_info').hide();
+        // $('.set_info').hide();
         $('.search_set').show();
         $('.search_set').addClass("slideLeft");
         $('#search_set_box').focus();
