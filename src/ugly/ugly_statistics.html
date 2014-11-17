@@ -412,11 +412,26 @@ $(function() {
     $("<div/>", { id: fsGraphId }).appendTo("#flashsetBarGraphs");
 
     $.get("/api/user/" + user_id + "/stats/sets/" + fsid, function (data) {
-        outputFlashsetBarGraph(fsGraphId, JSON.parse(data));
+
+        // Yo dawg, I herd you liked AJAX
+        // (We need to get the *contents* of the FlashSet in order to
+        //  create a useful visualisation).
+        $.get("/api/sets/" + fsid, function (setData) {
+            var fs = JSON.parse(setData);
+
+            // Map fs.cards {id, question, answer} to {id -> {question, answer}}
+            var flashsetDict = {};
+            fs.cards.forEach(function (fc) {
+                flashsetDict[fc.id] = { question: fc.question,
+                                        answer  : fc.answer };
+            });
+
+            outputFlashsetBarGraph(fsGraphId, JSON.parse(data), flashsetDict);
+        });
     });
 });
 
-function outputFlashsetBarGraph (graphId, flashsetResults) {
+function outputFlashsetBarGraph (graphId, flashsetResults, flashsetDict) {
 
     // draws
     // played
@@ -438,6 +453,7 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
         var result = flashsetResults.flashcards[fcid];
 
         return { fcid: fcid,
+                 question: flashsetDict[fcid].question,
                  correct: result.correct,
                  total: result.total }
     });
@@ -545,7 +561,7 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
         .style("font-size", (y.rangeBand() * 3 / 4) + "px")
         .style("clip-path", refCorrectClipRectId)
         .attr("fill", "red")
-        .text("QUESTION WORD")
+        .text(function(d) { return d.question; })
 
     // Question text. (Incorrect half)
     svg.selectAll("bar")
@@ -558,7 +574,7 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
         .style("font-size", (y.rangeBand() * 3 / 4) + "px")
         .style("clip-path", refIncorrectClipRectId)
         .attr("fill", "green")
-        .text("QUESTION WORD")
+        .text(function(d) { return d.question; })
 }
 
 </script>
