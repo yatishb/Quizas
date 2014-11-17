@@ -1,0 +1,609 @@
+<html>
+
+<head>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+    <script src="js/quizas_auth_helper.js"></script>
+</head>
+
+<body>
+<h3>Statistics Dummy page</h3>
+
+
+
+<b>User ID: </b>
+<div id="user_id"></div>
+<br/><br/>
+
+<script>
+var user_id = quizas_user_id();
+$("#user_id").text(user_id);
+</script>
+
+
+
+<b>Stats of user</b>
+<em>/user/#user-id/stats</em><br>
+<div id="stats_result"></div>
+<br/><br/>
+
+<script>
+$(function() {
+    $.get("/api/user/" + user_id + "/stats", function (data) {
+        $("#stats_result").text(data);
+
+        outputWinLossDrawPieChart(JSON.parse(data));
+    });
+});
+</script>
+
+
+
+<b>Stats of user</b>
+<em>/user/#user-id/stats/games</em><br>
+<div id="stats_games"></div>
+<br/><br/>
+
+<script>
+$(document).ready(function() {
+    // Since we want to use outputStatsForGame,
+    // wait for the rest of the page to load.
+    $.get("/api/user/" + user_id + "/stats/games", function (data) {
+        $("#stats_games").text(data);
+
+        // Call on for-each game.
+        var response = JSON.parse(data);
+        response.forEach(function (gameId) {
+            outputStatsForGame(gameId);
+        });
+    });
+});
+</script>
+
+
+
+<b>Stats for each Game</b>
+<em>/user/#user-id/stats/game/#gameid</em><br>
+<div id="stats_for_games"></div>
+<br/><br/>
+
+<script>
+function outputStatsForGame(gameId) {
+    $.get("/api/user/" + user_id + "/stats/game/" + gameId, function (data) {
+        var gameDivId = gameId + "_stats";
+        
+        $("<div/>", {
+            "id": gameDivId
+        }).appendTo("#stats_for_games");
+
+        $("#" + gameDivId).text(data);
+
+        // Line chart!
+        // D3 doesn't like `-` in its IDs!
+        // D3 doesn't even fucking like .. numbers?
+        var lineGraphId = "ID" + gameId + "gameLineGraph";
+        $("<div/>", {
+                "id": lineGraphId,
+        }).appendTo("#gameLineGraphs");
+        outputGameResultsLineChart(lineGraphId, JSON.parse(data));
+    });
+}
+</script>
+
+
+
+<b>Stats for each Flashset</b>
+<em>/user/#user-id/stats/sets/#setid</em><br>
+<div id="stats_for_flashsets"></div>
+<br/><br/>
+
+<script>
+function quizasId(i) {
+    return i.replace(":", "_");
+}
+
+function outputStatsForSet(setId) {
+    $.get("/api/user/" + user_id + "/stats/sets/" + setId, function (data) {
+        // n.b. need to replace : with _
+        var setDivId = quizasId(setId) + "_stats";
+        
+        $("<div/>", {
+            "id": setDivId
+        }).appendTo("#stats_for_flashsets");
+
+        $("#" + setDivId).text(data);
+    });
+}
+
+// B/c I'm too lazy to filter through all games
+// to find unique flashsets
+// I guess best to get all sets; only visualise the ones
+// which have been studied.
+var flashsetId = "quizlet:57054880";
+outputStatsForSet(flashsetId);
+</script>
+
+<script>
+</script>
+
+
+
+<b>Stats for each Friend played against</b>
+<em>/user/#user-id/stats/sets/#setid</em><br>
+<div id="stats_for_flashsets">
+lol, no.
+</div>
+<br/><br/>
+
+
+
+<h2>Graphs</h2>
+
+<!-- Need D3, from CDN; and need d3pie.min.js in the js/ folder.
+
+GitHub is *not* a CDN. But in case you need to know where
+to download d3pie.min.js from:
+https://raw.githubusercontent.com/benkeen/d3pie/0.1.3/d3pie/d3pie.min.js
+-->
+<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.4/d3.min.js"></script>
+<script src="js/d3pie.min.js"></script>
+
+
+
+<div id="overallStatsPieChart"></div>
+<br/><br/>
+
+<script>
+function outputWinLossDrawPieChart(statsObj) {
+    // outputs to "#overallStatsPieChart"
+    var numWins = statsObj.wins;
+    var numLosses = statsObj.losses;
+    var numDraws = statsObj.draws;
+
+    // Yes, you need all these details. Even if you're
+    // not going to have subtitles, etc.
+    var pieChartData = {
+        "header": {
+            "title": {
+                "text": "Overall Results",
+                    "fontSize": 22,
+                    "font": "verdana"
+            },
+            "subtitle": {
+                "color": "#999999",
+                "fontSize": 10,
+                "font": "verdana"
+            },
+            "titleSubtitlePadding": 12
+        },
+        "footer": {
+            "color": "#999999",
+            "fontSize": 11,
+            "font": "open sans",
+            "location": "bottom-center"
+        },
+        "size": {
+            "canvasHeight": 400,
+            "canvasWidth": 590
+        },
+        "labels": {
+            "outer": {
+                "pieDistance": 32
+            },
+            "inner": {
+                "format": "value"
+            },
+            "mainLabel": {
+                "font": "verdana"
+            },
+            "percentage": {
+                "color": "#e1e1e1",
+                "font": "verdana",
+                "decimalPlaces": 0
+            },
+            "value": {
+                "color": "#e1e1e1",
+                "font": "verdana"
+            },
+            "lines": {
+                "enabled": true,
+                "color": "#cccccc"
+            }
+        },
+        "effects": {
+            "load": {
+                "effect": "none"
+            },
+            "pullOutSegmentOnClick": {
+                "effect": "none",
+                "speed": 400,
+                "size": 8
+            },
+            "highlightSegmentOnMouseover": false
+        }
+    };
+
+    pieChartData.data = {
+        "content": [
+        {
+            "label": "Wins",
+                "value": numWins,
+                "color": "#389e38"
+        },
+        {
+            "label": "Draws",
+            "value": numLosses,
+            "color": "#383838"
+        },
+        {
+            "label": "Losses",
+            "value": numDraws,
+            "color": "#7c3838"
+        }]
+    };
+
+    var pie = new d3pie("overallStatsPieChart", pieChartData);
+}
+</script>
+
+
+
+<!-- http://bl.ocks.org/benjchristensen/2579599 -->
+<b>Line Chart of a Game</b><br/>
+This could be useful for post-game stats.
+
+<div id="gameLineGraphs" class="aGraph"> </div>
+
+<!-- Move to some graph .css or whatever? -->
+
+<style>
+/* tell the SVG path to be a thin blue line without any area fill */
+.linegraph .axis {
+    shape-rendering: crispEdges;
+}
+
+.linegraph .x.axis line {
+    stroke: lightgrey;
+    stroke-width: 2;
+}
+
+.linegraph .x.axis .minor {
+    stroke-opacity: .5;
+}
+
+.linegraph .x.axis path {
+    display: none;
+}
+
+.linegraph .y.axis line, .y.axis path {
+    fill: none;
+    stroke: #000;
+}
+
+.linegraph .line {
+    stroke-width: 3;
+    fill: none;
+    stroke-opacity: .7;
+}
+
+.linegraph .line.user {
+    stroke: steelblue;
+}
+
+.linegraph .line.opponent {
+    stroke: red;
+}
+</style>
+
+<script>
+
+function outputGameResultsLineChart(lineGraphId, gameResults) {
+    // constraints: two opponents. (gameResults makes this constraint, also).
+    var graphWidth = 1000;
+    var graphHeight = 400;
+
+    // againstUser : userid
+    // result
+    // questions : #
+    // flashcards:[{ enemy: fcid
+    //               question: fcid
+    //               ans: fcid }]
+    var maxResult = gameResults.questions;
+
+    // implementation adapted from http://bl.ocks.org/benjchristensen/2579599
+    // implementation heavily influenced by http://bl.ocks.org/1166403
+
+    // define dimensions of graph
+    var m = [80, 80, 80, 80]; // margins
+    var w = graphWidth  - m[1] - m[3]; // width
+    var h = graphHeight - m[0] - m[2]; // height
+
+
+    // create a simple data array that we'll plot with a line
+    // (this array represents only the Y values,
+    //  X will just be the index location)
+    var userData = [0];
+    var oppoData = [0];
+
+    // Construct data from `gameResults`
+    for (var i = 0; i < gameResults.flashcards.length; i += 1) {
+        var fc = gameResults.flashcards[i];
+        userData.push(fc.question === fc.ans   ? userData[i] + 1 : userData[i]) ;
+        oppoData.push(fc.question === fc.enemy ? oppoData[i] + 1 : oppoData[i]) ;
+    }
+
+
+    // X scale will fit all values from data[] within pixels 0-w
+    var x = d3.scale.linear().domain([0, userData.length - 1]).range([0, w]);
+    // Y scale will fit values from 0-10 within pixels h-0
+    // (Note the inverted domain for the y-scale => bigger is up!)
+    var y = d3.scale.linear().domain([0, maxResult]).range([h, 0]);
+
+    // create a line function that can convert data[] into x and y points
+    var line = d3.svg.line()
+        .x(function(d,i) { // assign the X function to plot our line as we wish
+            return x(i);
+        })
+        .y(function(d) {
+            return y(d);
+        })
+
+    // Add an SVG element with the desired dimensions and margin.
+    var graph = d3.select("#" + lineGraphId).append("svg:svg")
+        .attr("class", "linegraph")
+        .attr("width", w + m[1] + m[3])
+        .attr("height", h + m[0] + m[2])
+        .append("svg:g")
+        .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+    // create axes
+    var xAxis = d3.svg.axis().scale(x)
+        .ticks(maxResult).tickSize(-h).tickSubdivide(true);
+    var yAxisLeft = d3.svg.axis().scale(y)
+        .ticks(maxResult / 2).orient("left");
+
+    // Add axes
+    graph.append("svg:g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + h + ")")
+        .call(xAxis);
+    graph.append("svg:g")
+        .attr("class", "y axis")
+        .attr("transform", "translate(-25,0)")
+        .call(yAxisLeft);
+
+    // Score Lines
+    graph.append("svg:path").attr("d", line(userData))
+        .attr("class", "line user")
+    graph.append("svg:path").attr("d", line(oppoData))
+        .attr("class", "line opponent")
+}
+
+</script>
+
+
+
+
+
+
+<b>Stacked Bar Charts for Flash Sets</b><br/>
+This could be useful for post-game stats.
+
+<div id="flashsetBarGraphs" class="aGraph" />
+
+<style>
+
+/* .bargraph .axis { */
+/*   font: 10px sans-serif; */
+/* } */
+/*  */
+/* .bargraph .axis path, */
+/* .bargraph .axis line { */
+/*   fill: none; */
+/*   stroke: #000; */
+/*   shape-rendering: crispEdges; */
+/* } */
+
+.bargraph .correct.bar {
+    fill: green;
+}
+
+.bargraph .incorrect.bar {
+    fill: red;
+}
+
+.bargraph .correct.score {
+    fill: blue;
+}
+
+.bargraph .incorrect.score {
+    fill: cyan;
+}
+
+.bargraph .correct.word {
+    fill: red;
+}
+
+.bargraph .incorrect.word {
+    fill: green;
+}
+
+</style>
+
+<script>
+$(function() {
+    var fsid = "quizlet:57054880"
+
+    var fsGraphId = "stackedBarGraph_" + fsid.replace(":", "")
+    $("<div/>", { id: fsGraphId }).appendTo("#flashsetBarGraphs");
+
+    $.get("/api/user/" + user_id + "/stats/sets/" + fsid, function (data) {
+
+        // Yo dawg, I herd you liked AJAX
+        // (We need to get the *contents* of the FlashSet in order to
+        //  create a useful visualisation).
+        $.get("/api/sets/" + fsid, function (setData) {
+            var fs = JSON.parse(setData);
+
+            // Map fs.cards {id, question, answer} to {id -> {question, answer}}
+            var flashsetDict = {};
+            fs.cards.forEach(function (fc) {
+                flashsetDict[fc.id] = { question: fc.question,
+                                        answer  : fc.answer };
+            });
+
+            outputFlashsetBarGraph(fsGraphId, JSON.parse(data), flashsetDict);
+        });
+    });
+});
+
+function outputFlashsetBarGraph (graphId, flashsetResults, flashsetDict) {
+
+    // draws
+    // played
+    // fcids: []
+    // wins
+    // losses
+    // flashcards: fcid -> {correct: #, total: #}
+    // gameids: []
+
+    // Computations we'll need for constructing the bar chart
+    var numFlashcardsWithResults = flashsetResults.fcids.filter(function (fcid) {
+        return flashsetResults.flashcards[fcid] !== undefined;
+    }).length;
+
+    var graphWidth = 600;
+    var graphHeight = 45 * numFlashcardsWithResults;
+
+    var data = flashsetResults.fcids.map(function (fcid) {
+        var result = flashsetResults.flashcards[fcid];
+
+        return { fcid: fcid,
+                 question: flashsetDict[fcid].question,
+                 correct: result.correct,
+                 total: result.total }
+    });
+
+    var maxTotal = d3.max(data, function(d) { return d.total; });
+
+    var margin = {top: 20, right: 20, bottom: 20, left: 20};
+    var width = graphWidth - margin.left - margin.right;
+    var height = graphHeight - margin.top - margin.bottom;
+
+    var pGapBetweenBars = 0.05; // padding, proportion of bar thickness.
+    var x = d3.scale.linear().range([0, width]);
+    var y = d3.scale.ordinal().rangeRoundBands([0, height], pGapBetweenBars);
+
+    var svg = d3.select("#" + graphId).append("svg")
+        .attr("class", "bargraph")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", 
+              "translate(" + margin.left + "," + margin.top + ")");
+
+    x.domain([0, 1]);
+    y.domain(data.map(function(d) { return d.fcid; }));
+
+    // "Correct" Clip Rects
+    function correctClipRectId(i) { return graphId + "_correctClip" + i; };
+    function refCorrectClipRectId(d, i) { return "url(#" + correctClipRectId(i) + ")"; }
+    svg.append("defs").selectAll("bar") // why does it need selectAll here??
+        .data(data)
+      .enter().append("clipPath")
+        .attr("id", function(d, i) { return correctClipRectId(i); })
+      .append("rect")
+        .attr("x", function(d) { return x(0); })
+        .attr("width", function(d) { return x(d.correct / d.total); })
+        .attr("y", function(d) { return y(d.fcid); })
+        .attr("height", y.rangeBand())
+
+    // "Incorrect" Clip Rects
+    function incorrectClipRectId(i) { return graphId + "_incorrectClip" + i; };
+    function refIncorrectClipRectId(d, i) { return "url(#" + incorrectClipRectId(i) + ")"; }
+    svg.append("defs").selectAll("bar") // why does it need selectAll here??
+        .data(data)
+      .enter().append("clipPath")
+        .attr("id", function(d, i) { return incorrectClipRectId(i); })
+      .append("rect")
+        .attr("x", function(d) { return x(d.correct / d.total); })
+        .attr("width", function(d) { return x((d.total - d.correct) / d.total); })
+        .attr("y", function(d) { return y(d.fcid); })
+        .attr("height", y.rangeBand())
+
+    // Green, "Correct" bar
+    svg.selectAll("bar")
+        .data(data)
+      .enter().append("rect")
+        .attr("class", "correct bar")
+        .attr("x", function(d) { return x(0); })
+        .attr("width", function(d) { return x(d.correct / d.total); })
+        .attr("y", function(d) { return y(d.fcid); })
+        .attr("height", y.rangeBand())
+
+    // Red, "Incorrect" bar
+    svg.selectAll("bar")
+        .data(data)
+      .enter().append("rect")
+        .attr("class", "incorrect bar")
+        .attr("x", function(d) { return x(d.correct / d.total); })
+        .attr("width", function(d) { return x((d.total - d.correct) / d.total); })
+        .attr("y", function(d) { return y(d.fcid); })
+        .attr("height", y.rangeBand());
+
+    // Text for # correct answers
+    svg.selectAll("bar")
+        .data(data)
+      .enter().append("text")
+        .attr("class", "correct score")
+        .attr("x", 10)
+        .attr("y", function(d) { return y(d.fcid); })
+        .attr("dy", y.rangeBand() * 3 / 5) // Fiddly. Really, this will depend on font size.
+        .style("text-anchor", "start")
+        .style("font-size", (y.rangeBand() / 2) + "px")
+        .style("clip-path", refCorrectClipRectId)
+        .text(function(d) { return d.correct; })
+
+    // Text for # incorrect answers
+    svg.selectAll("bar")
+        .data(data)
+      .enter().append("text")
+        .attr("class", "incorrect score")
+        .attr("x", function(d) { return x(1) - 10; })
+        .attr("y", function(d) { return y(d.fcid); })
+        .attr("dy", y.rangeBand() * 3 / 5) // Fiddly. Really, this will depend on font size.
+        .style("text-anchor", "end")
+        .style("font-size", (y.rangeBand() / 2) + "px")
+        .style("clip-path", refIncorrectClipRectId)
+        .text(function(d) { return d.total - d.correct; })
+
+    // Question text. (Correct half)
+    svg.selectAll("bar")
+        .data(data)
+      .enter().append("text")
+        .attr("class", "correct word")
+        .attr("x", function(d) { return x(0.5); })
+        .attr("y", function(d) { return y(d.fcid); })
+        .attr("dy", y.rangeBand() * 3 / 4) // Fiddly. Really, this will depend on font size.
+        .style("text-anchor", "middle")
+        .style("font-size", (y.rangeBand() * 3 / 4) + "px")
+        .style("clip-path", refCorrectClipRectId)
+        .text(function(d) { return d.question; })
+
+    // Question text. (Incorrect half)
+    svg.selectAll("bar")
+        .data(data)
+      .enter().append("text")
+        .attr("class", "incorrect word")
+        .attr("x", function(d) { return x(0.5); })
+        .attr("y", function(d) { return y(d.fcid); })
+        .attr("dy", y.rangeBand() * 3 / 4) // Fiddly. Really, this will depend on font size.
+        .style("text-anchor", "middle")
+        .style("font-size", (y.rangeBand() * 3 / 4) + "px")
+        .style("clip-path", refIncorrectClipRectId)
+        .text(function(d) { return d.question; })
+}
+
+</script>
