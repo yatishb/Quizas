@@ -160,6 +160,8 @@ $('.add_set').on("click", function() {
         $('.search_set').hide();
         $('.search_result').hide();
         $('.set_info').show();
+        $('.set_info').empty();
+        getSetContent();
     } else {
         $(this).find('i').addClass('rotate');
         // $('.set_info').hide();
@@ -276,10 +278,11 @@ function getSetContent() {
         //     console.log("Failed to fetch data.");
 
         var sets = $('.set_info');
+        sets.append("<div class='space'></div>");
         for (var i = 0; i < set_ids.length; i++) {
             $.get("/api/sets/" + set_ids[i], function(data) {
-                var set_content = JSON.parse(data);
                 // console.log(data);
+                var set_content = JSON.parse(data);
 
                 sets.append(
                     "<div class='simple_set " +

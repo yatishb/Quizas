@@ -16,9 +16,23 @@ $('.add_sns').on('click', function() {
         $('.login_container').show();
         $(this).addClass('clicked');
 
-        if(quizas_is_authorized_for("twitter")) $('.login_button.twitter').hide();
-        if(quizas_is_authorized_for("quizlet")) $('.login_button.quizlet').hide();
-        if(quizas_is_authorized_for("facebook")) $('.login_button.facebook').hide();
+        var existing_buttons = 3;
+        var height = ['0px', '50px', '95px', '140px'];
+
+        if(quizas_is_authorized_for("twitter")) {
+            $('.login_button.twitter').hide();
+            existing_buttons--;
+        }
+        if(quizas_is_authorized_for("quizlet")) {
+            $('.login_button.quizlet').hide();
+            existing_buttons--;
+        }
+        if(quizas_is_authorized_for("facebook")) {
+            $('.login_button.facebook').hide();
+            existing_buttons--;
+        }
+
+        $('.login_container').css('height', height[existing_buttons]);
     }
 });
 
