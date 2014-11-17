@@ -368,4 +368,36 @@ def ensure_some_flashsets(userid):
 
 
 
+# Favorite Sets
 
+@main.route('/user/<user_id>/sets/quizlet/favorites/<set_id>', methods=['PUT', 'DELETE'])
+def modify_quizlet_favorite_sets(user_id, set_id):
+	tokenUrl = "https://api.quizlet.com/oauth/token"
+	clientID = CONSUMER_TOKEN
+	keySecret = CONSUMER_SECRET
+
+	# "quizlet:1234" -> "1234"
+	qzlt_set_id = set_id[set_id.find(':')+1:]
+
+	# Get ACCESS TOKEN from Cookies
+	# Needs to have user id also.
+	# NOTE: ignores user_id
+	qzlt_user_id = request.cookies.get("quizlet_user_id")
+	qzlt_access_token = request.cookies.get("quizlet_access_token")
+	if qzlt_access_token == None or qzlt_user_id == None:
+		abort(401)
+
+	# FIXME: Not sure how to pass access token to `requests` properly
+	# n.b. username is `qzlt_user_id`
+	qzlt_favorites_url = "https://api.quizlet.com/2.0/users/" + user_id + "/favorites/" + qzlt_set_id
+	if request.method == 'PUT':
+		req = requests.put(qzlt_favorites_url,
+		                   headers = {"Authorization": "Bearer " + qzlt_access_token})
+	else:
+		req = requests.delete(qzlt_favorites_url,
+		                      headers = {"Authorization": "Bearer " + qzlt_access_token})
+
+	if req.status_code != 200 :
+		return "Bad Request: " + req.text
+	else :
+		return json.loads(req.text)
