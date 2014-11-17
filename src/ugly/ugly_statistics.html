@@ -479,6 +479,7 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
 
     // "Correct" Clip Rects
     function correctClipRectId(i) { return graphId + "_correctClip" + i; };
+    function refCorrectClipRectId(d, i) { return "url(#" + correctClipRectId(i) + ")"; }
     svg.append("defs").selectAll("bar") // why does it need selectAll here??
         .data(data)
       .enter().append("clipPath")
@@ -486,6 +487,19 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
       .append("rect")
         .attr("x", function(d) { return x(0); })
         .attr("width", function(d) { return x(d.correct / d.total); })
+        .attr("y", function(d) { return y(d.fcid); })
+        .attr("height", y.rangeBand())
+
+    // "Incorrect" Clip Rects
+    function incorrectClipRectId(i) { return graphId + "_incorrectClip" + i; };
+    function refIncorrectClipRectId(d, i) { return "url(#" + incorrectClipRectId(i) + ")"; }
+    svg.append("defs").selectAll("bar") // why does it need selectAll here??
+        .data(data)
+      .enter().append("clipPath")
+        .attr("id", function(d, i) { return incorrectClipRectId(i); })
+      .append("rect")
+        .attr("x", function(d) { return x(d.correct / d.total); })
+        .attr("width", function(d) { return x((d.total - d.correct) / d.total); })
         .attr("y", function(d) { return y(d.fcid); })
         .attr("height", y.rangeBand())
 
@@ -518,7 +532,7 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
         .attr("dy", y.rangeBand() * 3 / 5) // Fiddly. Really, this will depend on font size.
         .style("text-anchor", "start")
         .style("font-size", (y.rangeBand() / 2) + "px")
-        .style("clip-path", function(d, i) { return "url(#" + correctClipRectId(i) + ")"; })
+        .style("clip-path", refCorrectClipRectId)
         .attr("fill", "black")
         .text(function(d) { return d.correct; })
 
@@ -531,6 +545,7 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
         .attr("dy", y.rangeBand() * 3 / 5) // Fiddly. Really, this will depend on font size.
         .style("text-anchor", "end")
         .style("font-size", (y.rangeBand() / 2) + "px")
+        .style("clip-path", refIncorrectClipRectId)
         .attr("fill", "black")
         .text(function(d) { return d.total - d.correct; })
 }
