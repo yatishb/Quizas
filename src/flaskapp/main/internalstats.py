@@ -3,6 +3,7 @@ from sqlalchemy import func, and_
 from . import main
 from .. import db, redis
 import json, uuid
+from flask import make_response
 import authhelper
 
 # To serialise datetime to JSON
@@ -82,11 +83,11 @@ def soloGameResultsWriteDb(userid, receivedData) :
 
 
 # Given num of questions got correct by user and opponent, update win/draw/loss
-def updateWinDrawLossStat(noOfQuestionsCorrectUser, noOfQuestionsCorrectOpponent, 
+def updateWinDrawLossStat(pointsUser, pointsOpponent, 
 		noOfWins, noOfDraws, noOfLosses):
-	if noOfQuestionsCorrectUser > noOfQuestionsCorrectOpponent:
+	if pointsUser > pointsOpponent:
 		noOfWins += 1
-	elif noOfQuestionsCorrectUser < noOfQuestionsCorrectOpponent:
+	elif pointsUser < pointsOpponent:
 		noOfLosses += 1
 	else:
 		noOfDraws += 1
@@ -109,6 +110,27 @@ def findNumOfQuesEachUserInGameGotCorrect(allQuestionsInGame, userid):
 				noOfQuestionsCorrectOpponent += 1
 
 	return noOfQuestionsCorrectUser, noOfQuestionsCorrectOpponent
+
+
+def findPointsEachUser(allQuestionsInGame, userid):
+	noOfQuestionsCorrectUser = 0
+	noOfQuestionsCorrectOpponent = 0
+	pointsUser = 0
+	pointsOpponent = 0
+
+	for row in allQuestionsInGame:
+		if row.user == userid:
+			if row.flashcardId == row.userAns:
+				# Check if ans is correct
+				noOfQuestionsCorrectUser += 1
+				pointsUser += 1.0*(10000 - row.time) / 1000
+		else:
+			if row.flashcardId == row.userAns:
+				# Check if ans is correct
+				noOfQuestionsCorrectOpponent += 1
+				pointsOpponent += 1.0*(10000 - row.time) / 1000
+
+	return pointsUser, pointsOpponent
 
 
 
@@ -153,10 +175,10 @@ def getIndividualUserGameStats(userid):
 		if singleGame == True:
 			continue
 				
-		noOfQuestionsCorrectUser, noOfQuestionsCorrectOpponent = findNumOfQuesEachUserInGameGotCorrect(
-																		allQuestionsInGame, userid)
-		noOfWins, noOfDraws, noOfLosses = updateWinDrawLossStat(noOfQuestionsCorrectUser, 
-									noOfQuestionsCorrectOpponent, noOfWins, noOfDraws, noOfLosses)
+		pointsUser, pointsOpponent = findPointsEachUser(allQuestionsInGame, userid)
+		
+		noOfWins, noOfDraws, noOfLosses = updateWinDrawLossStat(pointsUser, 
+									pointsOpponent, noOfWins, noOfDraws, noOfLosses)
 
 	numPlayed = noOfDraws + noOfWins + noOfLosses
 	return json.dumps({'played': numPlayed, 
@@ -186,10 +208,11 @@ def getCommonGamesStats(userid, opponentUserId):
 	for eachGameId in commonGames:		
 		# Retrieve complete details about the game
 		allQuestionsInGame = FC.query.filter(FC.gameId == eachGameId).all()
-		noOfQuestionsCorrectUser, noOfQuestionsCorrectOpponent = findNumOfQuesEachUserInGameGotCorrect(
-																		allQuestionsInGame, userid)
-		noOfWins, noOfDraws, noOfLosses = updateWinDrawLossStat(noOfQuestionsCorrectUser, 
-									noOfQuestionsCorrectOpponent, noOfWins, noOfDraws, noOfLosses)
+		
+		pointsUser, pointsOpponent = findPointsEachUser(allQuestionsInGame, userid)
+		
+		noOfWins, noOfDraws, noOfLosses = updateWinDrawLossStat(pointsUser, 
+									pointsOpponent, noOfWins, noOfDraws, noOfLosses)
 
 	numPlayed = noOfDraws + noOfWins + noOfLosses
 	return json.dumps({'played': numPlayed, 
@@ -268,10 +291,11 @@ def getGameStats(userid, gameidForStats):
 
 	noOfQuestionsCorrectUser, noOfQuestionsCorrectOpponent = findNumOfQuesEachUserInGameGotCorrect(
 																		questionsInGame, userid)
+	pointsUser, pointsOpponent = findPointsEachUser(allQuestionsInGame, userid)
 
-	if noOfQuestionsCorrectUser > noOfQuestionsCorrectOpponent:
+	if pointsUser > pointsOpponent:
 		gameResult = "Won"
-	elif noOfQuestionsCorrectUser < noOfQuestionsCorrectOpponent:
+	elif pointsUser < pointsOpponent:
 		gameResult = "Lost"
 	else:
 		gameResult = "Drew"
@@ -306,25 +330,10 @@ def getUserSetStats(userid, setid):
 		eachGameId = eachGamePlayed.gameId
 		allQuestionsInGame = FC.query.filter_by(gameId = eachGameId).all()
 
-		# This is written in a very imperative style!
-
-		noOfQuestionsCorrectUser = 0
-		noOfQuestionsCorrectOpponent = 0
-		for row in allQuestionsInGame:
-			rowIsCorrect = row.flashcardId == row.userAns
-			if row.user == userid:
-				if rowIsCorrect:
-					noOfQuestionsCorrectUser += 1
-			else:
-				if rowIsCorrect:
-					noOfQuestionsCorrectOpponent += 1
-
-		if noOfQuestionsCorrectUser > noOfQuestionsCorrectOpponent:
-			noOfWins += 1
-		elif noOfQuestionsCorrectUser < noOfQuestionsCorrectOpponent:
-			noOfLosses += 1
-		else:
-			noOfDraws += 1
+		pointsUser, pointsOpponent = findPointsEachUser(allQuestionsInGame, userid)
+		
+		noOfWins, noOfDraws, noOfLosses = updateWinDrawLossStat(pointsUser, 
+									pointsOpponent, noOfWins, noOfDraws, noOfLosses)
 
 
 	# For this, we want to get all the flashcardIds
