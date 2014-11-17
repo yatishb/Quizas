@@ -444,24 +444,13 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
 
     var maxTotal = d3.max(data, function(d) { return d.total; });
 
-    // TODO: `left` margin, where we show the words should be wide enough?
-    // .... or should we display the word within the progress bar? Hmm.
-    var margin = {top: 20, right: 20, bottom: 70, left: 160};
+    var margin = {top: 20, right: 20, bottom: 20, left: 20};
     var width = graphWidth - margin.left - margin.right;
     var height = graphHeight - margin.top - margin.bottom;
 
     var pGapBetweenBars = 0.05; // padding, proportion of bar thickness.
     var x = d3.scale.linear().range([0, width]);
-    var y = d3.scale.ordinal().rangeRoundBands([height, 0], pGapBetweenBars);
-
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom")
-        .ticks(maxTotal);
-
-    var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left")
+    var y = d3.scale.ordinal().rangeRoundBands([0, height], pGapBetweenBars);
 
     var svg = d3.select("#" + graphId).append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -472,10 +461,6 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
 
     x.domain([0, 1]);
     y.domain(data.map(function(d) { return d.fcid; }));
-
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis)
 
     // "Correct" Clip Rects
     function correctClipRectId(i) { return graphId + "_correctClip" + i; };
@@ -548,6 +533,32 @@ function outputFlashsetBarGraph (graphId, flashsetResults) {
         .style("clip-path", refIncorrectClipRectId)
         .attr("fill", "black")
         .text(function(d) { return d.total - d.correct; })
+
+    // Question text. (Correct half)
+    svg.selectAll("bar")
+        .data(data)
+      .enter().append("text")
+        .attr("x", function(d) { return x(0.5); })
+        .attr("y", function(d) { return y(d.fcid); })
+        .attr("dy", y.rangeBand() * 3 / 4) // Fiddly. Really, this will depend on font size.
+        .style("text-anchor", "middle")
+        .style("font-size", (y.rangeBand() * 3 / 4) + "px")
+        .style("clip-path", refCorrectClipRectId)
+        .attr("fill", "red")
+        .text("QUESTION WORD")
+
+    // Question text. (Incorrect half)
+    svg.selectAll("bar")
+        .data(data)
+      .enter().append("text")
+        .attr("x", function(d) { return x(0.5); })
+        .attr("y", function(d) { return y(d.fcid); })
+        .attr("dy", y.rangeBand() * 3 / 4) // Fiddly. Really, this will depend on font size.
+        .style("text-anchor", "middle")
+        .style("font-size", (y.rangeBand() * 3 / 4) + "px")
+        .style("clip-path", refIncorrectClipRectId)
+        .attr("fill", "green")
+        .text("QUESTION WORD")
 }
 
 </script>
