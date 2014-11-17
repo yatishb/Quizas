@@ -57,7 +57,7 @@
 <body>
     <div id="fb-root"></div>
 
-    <div class="container settings">
+    <div class="container settings noselect">
     <div class="profile_container">
         <div class="profile_photo">
             <img src="">
@@ -78,15 +78,15 @@
     </div>
 
     <div class="login_container v_setting">
-        <div class="login_button" onclick="location.href='/api/quizletauth';">
+        <div class="login_button quizlet" onclick="location.href='/api/quizletauth';">
             <div class="let-icon-bg"></div>
             <div class="let-bg link"></div>
         </div>
-        <div class="login_button" onclick="doFacebookLogin()">
+        <div class="login_button facebook" onclick="doFacebookLogin()">
             <div class="fb-icon-bg"></div>
             <div class="fb-bg link"></div>
         </div>
-        <div class="login_button" onclick="location.href='/api/twitterauth';">
+        <div class="login_button twitter" onclick="location.href='/api/twitterauth';">
             <div class="twi-icon-bg"></div>
             <div class="twi-bg link"></div>
         </div>
@@ -95,7 +95,7 @@
     <div class="logout" onclick="logout_clear()">Log Out</div>
     </div>
 
-    <div class="footer">
+    <div class="footer noselect">
         <ul class="footer_container group_3">
             <li onclick="window.open('study.html','_self');"><a><i class="fa fa-book"></i> Study</a></li>
             <li onclick="window.open('stats.html','_self');"><a><i class="fa fa-line-chart"></i> Stats</a></li>
@@ -103,7 +103,6 @@
         </ul>
     </div>
 
-    <script src="js/jquery.mobile.js"></script>
     <script src="js/settings.js"></script>
 
     <script>

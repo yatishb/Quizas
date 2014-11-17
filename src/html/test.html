@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+	<script src="js/quizas_facebook.js"></script>
+	<script type="text/javascript">
+
+	window.fbAsyncInit = function() {
+        FB.init({
+            appId      : quizas_fbappid,
+            xfbml      : true,
+            version    : 'v2.1'
+        });
+    };
+
+    (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {return;}
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+    
+	</script>
+</head>
+<body>
+	<div id="requestsBtn">Request</div>
+	<div id="turnBtn">Turn</div>
+	<script type="text/javascript">
+		document.getElementById('requestsBtn').onclick = function() {
+	          FB.ui({method: 'apprequests',
+	              message: 'This is a test message for the requests dialog.'//,
+	              //filters: 'app_non_users'
+	          }, function(data) {
+	            console.log(data);
+	          });
+	        }
+
+	    document.getElementById('turnBtn').onclick = function() {
+	          FB.ui({method: 'apprequests',
+	              message: 'I have challenged you to a round on Quizas',
+	              to: '337962156375018',
+	              action_type:'turn'
+	          }, function(data) {
+	            console.log(data);
+	          });
+	        }
+	</script>
+</body>
+</html>

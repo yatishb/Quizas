@@ -38,8 +38,7 @@ $(document).ready(function() {
 $(document).ajaxComplete(function() {
     cardIndex = 0;
 
-    var top_bar = $('.top_bar');
-    top_bar.html(content.name);
+    $('.top_bar div').html(content.name);
 
     var flashcards = $('.flashcards');
     for (var i = 0; i < content.cards.length && i < cardPerPage; i++) {
@@ -88,7 +87,7 @@ function getStudySetContent(setid) {
     });
 }
 
-$('.flashcards').on('tap', '.simple_card', function() {
+$('.flashcards').on('click', '.simple_card', function() {
     // var cardID= this.id;
     // var card = $('#'+cardID).find('.flipper');
     //this.classList.toggle('hover');
@@ -100,6 +99,6 @@ $('.flashcards').on('tap', '.simple_card', function() {
     }
 });
 
-$('.back_button').on("tap", function(){
+$('.back_button').on("click", function(){
     window.location.href="study.html";
 });

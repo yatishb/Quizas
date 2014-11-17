@@ -20,12 +20,18 @@
     
     <link rel="stylesheet" type="text/css" href="css/main.css"></link>
     <link rel="stylesheet" type="text/css" href="css/font-awesome.css"></link>
+    <link rel="stylesheet" type="text/css" href="css/animations.css"></link>
+    <link rel="stylesheet" type="text/css" href="css/quizas_gamestats_linegraph.css"></link>
+    <link rel="stylesheet" type="text/css" href="css/quizas_gamestats_barchart.css"></link>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.4/d3.min.js"></script>
 
     <script src="js/quizas_auth_helper.js"></script>
     <script src="js/quizas_facebook.js"></script>
+    <script src="js/quizas_gamestats_linegraph.js"></script>
+    <script src="js/quizas_gamestats_barchart.js"></script>
     <script src="js/Chart.js"></script>
 
     <!-- Load the FB JS SDK -->
@@ -57,38 +63,35 @@
 </head>
 <body>
     <div id="fb-root"></div>
+    <div class="grey_cover"></div>
 
-    <div class="header group_2 stats">
+    <div class="header group_2 stats noselect">
         <div class="stats_tab current_tab">Myself</div>
         <div class="stats_tab">My Friends</div>
     </div>
 
-    <div class="page_me">
+    <div class="page_me noselect">
+        <div class="chartTitle"></div>
         <canvas class="myChart"></canvas>
-        <table class="chartTable">
-            <tr>
-                <td>Total</td>
-                <td>6</td> 
-            </tr>
-            <tr>
-                <td>Win</td> 
-                <td>3</td>
-            </tr>
-            <tr>
-                <td>Draw</td> 
-                <td>2</td>
-            </tr>
-            <tr>
-                <td>Lose</td> 
-                <td>1</td>
-            </tr>
-        </table>
+        <table class="chartTable"></table>
     </div>
 
-    <div class="page_friend">
+    <div class="page_friend noselect"></div>
+
+    <div class="friend_stats">
+        <div class="button_close"><i class="fa fa-plus rotate"></i></div>
+        <div class="friendTitle"></div>
+        <div class="chartContainer"></div>
+        <div class="friendTable"></div>
     </div>
 
-    <div class="footer">
+    <div class="friend_window noselect">
+        <div class="list_search stats"><input type="text" placeholder="Search here..."></div>
+        <div class="friend_list stats"></div>
+        <div class="list_bottom">Submit</div>
+    </div>
+
+    <div class="footer noselect">
         <ul class="footer_container group_3">
             <li onclick="window.open('study.html','_self');"><a><i class="fa fa-book"></i> Study</a></li>
             <li class="current_tab" href="#"><a><i class="fa fa-line-chart"></i> Stats</a></li>
@@ -96,7 +99,6 @@
         </ul>
     </div>
 
-    <script src="js/jquery.mobile.js"></script>
     <script src="js/stats.js"></script>
 
     <script>

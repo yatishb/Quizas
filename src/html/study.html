@@ -55,7 +55,7 @@
 <body class="background_set">
     <div id="fb-root"></div>
 
-    <div class="header">
+    <div class="header noselect">
         <div class="header_title">Welcome</div>
         <div class="notification">
             <i class="fa fa-info"></i>
@@ -70,24 +70,35 @@
     </div>
 
     <div class="grey_cover"></div>
-    <div class="button_container">
+    <div class="button_container noselect">
         <div class="round_button" id="flashcard"><span>Study</span></div>
         <div class="round_button" id="quiz"><span>Quiz</span></div>
         <div class="round_button" id="challenge"><span>Challenge</span></div>
     </div>
 
-    <div class="friend_window">
+    <div class="friend_window noselect">
         <div class="list_search"><input type="text" placeholder="Search here..."></div>
         <div class="friend_list"></div>
         <div class="list_bottom">Submit</div>
     </div>
 
-    <div class="search_result"></div>
-    <div class="set_info"><div class="space"></div></div>
+    <div class="challenge_info noselect">
+        <div class="button_close"><i class="fa fa-plus rotate"></i></div>
+        <div class="challenge_title"><span>Notifications</span></div>
+        <div class="simple_info">
+            <div class="info_profile"><img src="https://fbquizlet-quizletllc.netdna-ssl.com/hprofile-ak-prn2/v/t1.0-1/c22.22.276.276/p320x320/553330_10150698488976166_881941362_n.jpg?oh=159abad459c441584dc500f980d8ee69&oe=54C27821&__gda__=1421579834_09f548ddd4c1be0769f908b091b82de3"></div>
+            <div class="info_content">Yatish challenged you on set xxx</div>
+            <div class="action_set">
+                <div class="button_accept"><i class="fa fa-check"></i></div>
+                <div class="button_reject"><i class="fa fa-plus rotate"></i></div>
+            </div>
+        </div>
+    </div>
 
-    <div></div>
+    <div class="search_result noselect"></div>
+    <div class="set_info noselect"><div class="space"></div></div>
 
-    <div class="footer">
+    <div class="footer noselect">
         <ul class="footer_container group_3">
             <li class="current_tab" href="#"><a><i class="fa fa-book"></i> Study</a></li>
             <li onclick="window.open('stats.html','_self');"><a><i class="fa fa-line-chart"></i> Stats</a></li>
@@ -95,7 +106,7 @@
         </ul>
     </div>
 
-    <script src="js/jquery.mobile.js"></script>
+
     <script src="js/study.js"></script>
 
     <script>

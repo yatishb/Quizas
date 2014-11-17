@@ -15,6 +15,10 @@ $('.add_sns').on('click', function() {
     } else {
         $('.login_container').show();
         $(this).addClass('clicked');
+
+        if(quizas_is_authorized_for("twitter")) $('.login_button.twitter').hide();
+        if(quizas_is_authorized_for("quizlet")) $('.login_button.quizlet').hide();
+        if(quizas_is_authorized_for("facebook")) $('.login_button.facebook').hide();
     }
 });
 

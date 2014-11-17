@@ -1,0 +1,36 @@
+.linegraph .axis {
+    shape-rendering: crispEdges;
+}
+
+.linegraph .x.axis line {
+    stroke: lightgrey;
+    stroke-width: 2;
+}
+
+.linegraph .x.axis .minor {
+    stroke-opacity: .5;
+}
+
+.linegraph .x.axis path {
+    display: none;
+}
+
+.linegraph .y.axis line, .y.axis path {
+    fill: none;
+    stroke: #000;
+}
+
+/* User and opponent lines. One blue, the other red. */
+.linegraph .line {
+    stroke-width: 3;
+    fill: none;
+    stroke-opacity: .7;
+}
+
+.linegraph .line.user {
+    stroke: steelblue;
+}
+
+.linegraph .line.opponent {
+    stroke: red;
+}
