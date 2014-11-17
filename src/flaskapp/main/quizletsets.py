@@ -311,13 +311,21 @@ initial_flashsets = [# http://quizlet.com/2429383/basic-physics-final-review-fla
                      "quizlet:57054880",
                      # http://quizlet.com/30160654/first-1000-words-in-spanish-la-granja-flash-cards/
                      "quizlet:30160654",
-                     # http://quizlet.com/17775641/singapore-math-4-vocabulary-flash-cards/
-                     "quizlet:17775641",
                      # http://quizlet.com/27972497/challenge-a-geography-terms-flash-cards/
                      # ^^ some of these are quite long; a test for the UI
                      "quizlet:27972497",
                      # http://quizlet.com/6860191/chemical-elements-flash-cards/
-                     "quizlet:6860191"]
+                     "quizlet:6860191",
+                     # http://quizlet.com/249254/basic-japanese-vocabulary-romanji-flash-cards/
+                     "quizlet:249254",
+                     # http://quizlet.com/39050337/countries-and-capitals-flash-cards/
+                     "quizlet:39050337",
+                     # http://quizlet.com/51808929/currencies-flash-cards/
+                     "quizlet:51808929",
+                     # http://quizlet.com/56371322/best-picture-oscar-winners-by-year-and-lead-actors-flash-cards/,
+                     "quizlet:56371322",
+                     # http://quizlet.com/45551558/oscar-best-picture-winners-by-director-flash-cards/(HARD)
+                     "quizlet:45551558"]
 
 
 # Possibly repeated code w/ `modify_user_sets`.
