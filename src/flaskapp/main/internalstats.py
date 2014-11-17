@@ -34,8 +34,10 @@ def documentGame(room, user1, user2, userAns1, userAns2, flashsetId, timeTaken1,
 		user2AnsChosen = userAns2.get(questionId)
 		time1 = int(timeTaken1.get(questionId))
 		time2 = int(timeTaken2.get(questionId))
-		points1 += 1.0*(10000 - time1) / 1000
-		points2 += 1.0*(10000 - time2) / 1000
+		if questionId == user1AnsChosen:
+			points1 += 1.0*(10000 - time1) / 1000
+		if questionId == user2AnsChosen:
+			points2 += 1.0*(10000 - time2) / 1000
 
 		# -1 refers to time taken by client for each answer
 		cardUser1 = FC(room, flashsetId, questionId, user1, user1AnsChosen, time1)
@@ -65,7 +67,8 @@ def soloGameResultsWriteDbWithGameId(userid, gameId, receivedData) :
 		questionId = eachQues['flashcard']
 		userAns = eachQues['result']
 		time = eachQues['time']
-		pointsScored += 1.0*(10000 - time) / 1000
+		if userAns == questionId:
+			pointsScored += 1.0*(10000 - time) / 1000
 		cardUser = FC(gameId, flashsetId, questionId, userid, userAns, time)
 		db.session.add(cardUser)
 
