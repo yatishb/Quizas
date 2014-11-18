@@ -778,7 +778,7 @@
 			if (Q.state.get("currentIndex") > 1) {
 			console.log("TIME OF RECKONING: " + (prevFcQuestion.id == prevEnemyAns));
 			console.log("prevQnId " + prevFcQuestion.id + " vs enemy " + prevEnemyAns)
-			console.log("END");
+			console.log(prevEnemyTime + " " + maxTimeAllowed + " " + convertPoints(prevEnemyTime, maxTimeAllowed * 1000));
 				if (prevFcQuestion.id == prevEnemyAns) {
 					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "green";
 					Q.state.inc("enemyScore", convertPoints(prevEnemyTime, maxTimeAllowed * 1000));
