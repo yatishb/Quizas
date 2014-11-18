@@ -1,7 +1,10 @@
 var content;
 var next_page;
 var pupup_mode;
+var myname;
+var myurl;
 var selected_set_id;
+var selected_set_name;
 var selected_friend_id = "0";
 
 $(document).ready(function() {
@@ -15,7 +18,6 @@ $(document).ready(function() {
 
     $('.list_search input').on('input', function() {
         var search_txt = $(this).val();
-        console.log(search_txt);
 
         $('.simple_friend').each(function() {
             var this_friend = $(this);
@@ -41,14 +43,10 @@ $(document).ready(function() {
                                 "hearbeat timeout": 30
                             });*/
 
-    console.log(socket);
-
     // event handler for server sent data
     // the data is displayed in the "Received" section of the page
     socket.on('game request', function(msg) {
         content = JSON.parse(msg.data);
-        console.log("Request info is ");
-        console.log(content);
 
         pupup_mode = "request";
 
@@ -59,8 +57,6 @@ $(document).ready(function() {
     // event handler for rejected request
     socket.on('game rejected', function(msg) {
         content = JSON.parse(msg.data);
-        console.log("Reject by ")
-        console.log(content);
 
         pupup_mode = "rejected";
 
@@ -71,8 +67,6 @@ $(document).ready(function() {
     // event handler for when user not online
     socket.on('user not online', function(msg) {
         content = JSON.parse(msg.data);
-        console.log("Reject by ")
-        console.log(content);
 
         pupup_mode = "offline";
 
@@ -83,24 +77,40 @@ $(document).ready(function() {
     // event handler for when user does not exist
     socket.on('user non-existent', function(msg) {
         content = JSON.parse(msg.data);
-        console.log("Reject by ")
-        console.log(content);
 
         pupup_mode = "non-existent";
 
-        showPopup(content.rejectedby);
+        showPopup(content.rejectedby,"nothing");
     });
 
     // event handler for accepted request
     socket.on('game accepted', function(msg) {
         content = JSON.parse(msg.data);
-        console.log("Accepted by ");
-        console.log(content);
 
         pupup_mode = "accepted";
-
-        socket.emit('disconnect');
-        initializeMultiplayerGame(content);
+        
+        quizas_get_profile_for(content.enemyID, function (p) {
+            var newInit = {
+                playerName: myname,
+                playerSprite: myrul,
+                playerPoints: content.playerPoints,
+                playerWin: content.playerWin,
+                playerTotal: content.playerTotal,
+                enemyName: p.name,
+                enemySprite: p.picture,
+                enemyPoints: content.enemyPoints,
+                enemyWin: content.enemyWin,
+                enemyTotal: content.enemyTotal,
+                encounterTotal: content.encounterTotal,
+                encounterWin: content.encounterWin,
+                matchName: content.matchName,
+                totalQuestions: content.totalQuestions,
+                room: content.room
+            };
+            
+            socket.emit('disconnect');
+            initializeMultiplayerGame(newInit);
+        });
     });
 });
 
@@ -128,8 +138,7 @@ $('.set_info').on("click", '.content_container', function() {
     $('.grey_cover').show();
 
     selected_set_id = $(this).parent().attr('id');
-
-    console.log("selected_set_id is " + selected_set_id);
+    selected_set_name = $(this).find('.set_content p').text();
 });
 
 $('.set_info').on("click", '.favorite', function() {
@@ -224,6 +233,11 @@ $('#challenge').on("click", function(){
     $('.friend_window').show();
     $('.friend_window').addClass('fadeIn');
     $('.list_search').focus();
+
+    quizas_get_profile(function(profile) {
+        myname = profile.name;
+        myurl = profile.practice;
+    });
 });
 
 $('#practice').on("click", function(){
@@ -240,8 +254,6 @@ $('.friend_list').on("click", '.simple_friend', function () {
     else next_page = "c";
 
     selected_friend_id = this.id;
-
-    console.log("selected_friend_id is " + selected_friend_id);
 });
 
 $('.list_bottom').on("click", function () {
@@ -252,8 +264,6 @@ $('.list_bottom').on("click", function () {
 
     if (next_page=="q") {
         // quiz with ONLINE friend
-        console.log("namespace: "+namespace);
-        console.log("socket: "+socket);
         socket.emit('send notification', {
             'opponent': selected_friend_id,
             'set': selected_set_id,
@@ -269,7 +279,6 @@ $('.list_bottom').on("click", function () {
 $(document.body).on("click", '.popup_button.cancel', function() {
     $('.popup_window').remove();
 
-    console.log('rejected');
     socket.emit('reject', {
         'requester': content.requestfrom,
         'receiver': quizas_user_id()
@@ -350,16 +359,20 @@ function initializePracticeGame(set_id, user_id) {
 function getSetContent() {
     $.get("/api/user/" + quizas_user_id() + "/sets", function(data) {
         var set_ids = JSON.parse(data);
-        // console.log(set_ids);
 
         var sets = $('.set_info');
-        sets.append("<div class='space'></div>");
+        sets.append("<div class='space top'></div>");
         for (var i = 0; i < set_ids.length; i++) {
+            if(set_ids[i]=="undefined") continue;
             $.get("/api/sets/" + set_ids[i], function(data) {
                 var set_content = JSON.parse(data);
 
+                var additionalClass = "";
+                if(i==(set_ids.length-1)) additionalClass="last ";
+
                 sets.append(
                     "<div class='simple_set " +
+                    additionalClass +
                     ("" + set_content.id).replace(":", "_") +
                     "' id='" +
                     set_content.id +
@@ -385,7 +398,10 @@ function getSearchResult(txt) {
         var result = JSON.parse(data);
 
         var sets = $('.search_result');
+        sets.append("<div class='space top'></div>");
         for (var i = 0; i < result.length; i++) {
+            // var additionalClass = "";
+            // if(i==(result.length-1)) additionalClass="last ";
             sets.append(
                 "<div class='simple_set search " +
                 ("" + result[i].id).replace(":", "_") +
@@ -481,38 +497,6 @@ function favoriteSet(id, flag) {
     
 }
 
-function outputFriends(friends) {
-    friends.forEach(function (f) {
-        $('.list_online').append(
-            "<div class='simple_friend " +
-            ("" + f.userid).replace(":", "_") +
-            "' id='" +
-            f.userid +
-            "'><div class='friend_profile'><img src='" +
-            "'></div><span>" +
-            f.name +
-            "</span></div>"
-        );
-
-        console.log("test");
-
-        quizas_get_profile_for(f.userid, function (p) {
-            var address;
-
-            address = p.picture;
-
-            if (!address || address.length == 0 || address == undefined) {
-                address = '../css/images/profile_default.png';
-            }
-
-            var newname = '.' + ("" + f.userid).replace(":", "_");
-            $(newname).find('.friend_profile img').attr('src', address);
-        });
-    });
-
-    console.log("finish friends");
-}
-
 function splitFriend(listOnlineUsers) {
     var offlineList = $('.list_offline');
 
@@ -521,7 +505,6 @@ function splitFriend(listOnlineUsers) {
         var userid = $(this).attr('id');
 
         for (var i = 0; i < listOnlineUsers.length; i++) {
-            console.log(listOnlineUsers[i]);
             if(userid == listOnlineUsers[i]) flag = true;
         }
 
