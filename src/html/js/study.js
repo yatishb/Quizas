@@ -338,7 +338,7 @@ function initializeGame(friend_id, set_id, user_id) {
     sessionStorage.setItem("friend_id", JSON.stringify(friend_id));
     sessionStorage.setItem("set_id", JSON.stringify(set_id));
     sessionStorage.setItem("user_id", JSON.stringify(user_id));
-    window.location.href="singlePlayer.html";
+    window.location.href="challenge.html";
 }
 
 function initializeMultiplayerGame(content) {

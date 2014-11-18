@@ -9,6 +9,9 @@
     <!-- <script src='example1.js'></script> -->
 	<link rel="stylesheet" type="text/css" href="css/singlePlayer.css">
 	<script>
+		var globalTestVar;
+	
+	
 		// socket stuff
 	/*
 			namespace = '/test'; // change to an empty string to use the global namespace
@@ -32,6 +35,27 @@
 		
 	
 		// helper functions
+		
+		String.prototype.insert = function (index, string) {
+			  if (index > 0)
+				return this.substring(0, index) + string + this.substring(index, this.length);
+			  else
+				return string + this;
+			};
+		
+		function wordWrap(iStr, cardWidth, pixelPerChar) {
+			var wrappedStr = iStr;
+			var n = iStr.length;
+			
+			if ((n * pixelPerChar) > cardWidth) {
+				var m = Math.floor((n * pixelPerChar)/cardWidth);
+				for (i=0;i<m;i++) {
+					wrappedStr = wrappedStr.insert((i+1)*(cardWidth/pixelPerChar), "\n");
+				}
+			}
+			
+			return wrappedStr;
+		}
 		
 		function Countdown(options) {
 			var timer,
@@ -233,6 +257,7 @@
 		
 		// Start load test
 			INITIATING_FORM = TestInitiatingForm;
+			
 		// End load test
 
 		var FLASH_SET = TestFlashSet;
@@ -247,23 +272,10 @@
 		
 		// interpreting info from server
 		var initiatingJSON = JSON.parse(INITIATING_FORM);
-		var enemyName, enemySprite, enemyWinRate, enemyEncounter, totalQuestions;
-		/*
-		var enemyName = initiatingJSON.name,
-		  enemySprite = initiatingJSON.sprite,
-		  enemyWinRate = initiatingJSON.win,
-		  enemyEncounter = initiatingJSON.encounter,
-		  totalQuestions = initiatingJSON.total;
-		*/
-		//var serverJSON = JSON.parse(SERVER_FORM);
-		/*
-		var fcQuestion = serverJSON.question,
-		  fcAnswers = serverJSON.answers,
-		  questionNumber = serverJSON.index,
-		  maxTimeAllowed = serverJSON.time,
-		  prevPlayerAns = serverJSON.player,
-		  prevEnemyAns = serverJSON.enemy;
-		*/
+		console.log(initiatingJSON);
+		var playerName, playerSprite, playerPoints, playerWin, playerTotal;
+		var enemyName, enemySprite, enemyPoints, enemyWin, enemyTotal;
+		var encounterTotal, encounterWin, matchName, totalQuestions;
 		
 		var battleLibrary = []
 		function createBattle(fcQ, fcA, playerA, enemyA, playerTime, enemyTime) {
@@ -301,11 +313,20 @@
 	var qy = Q.height/568;
 	
 	// load initiating form here
-	enemyName = initiatingJSON.name,
-	  enemySprite = initiatingJSON.sprite,
-	  enemyWinRate = initiatingJSON.win,
-	  enemyEncounter = initiatingJSON.encounter,
-	  totalQuestions = initiatingJSON.total;
+	playerName = initiatingJSON.playerName;
+	playerSprite = initiatingJSON.playerSprite;
+	playerPoints = initiatingJSON.playerPoints;
+	playerWin = initiatingJSON.playerWin;
+	playerTotal = initiatingJSON.playerTotal;
+	enemyName = initiatingJSON.enemyName;
+	enemySprite = initiatingJSON.enemySprite;
+	enemyPoints = initiatingJSON.enemyPoints;
+	enemyWin = initiatingJSON.enemyWin;
+	enemyTotal = initiatingJSON.enemyTotal;
+	encounterTotal = initiatingJSON.encounterTotal;
+	encounterWin = initiatingJSON.encounterWin;
+	matchName = initiatingJSON.matchName;
+	totalQuestions = initiatingJSON.totalQuestions;	  
 	  
 	 battleLibrary[0] = totalQuestions;
 
@@ -418,7 +439,8 @@
 				id: 'fc-null',
 				question: 'q-null',
 				answer: 'a-null',
-				isQuestion: true
+				isQuestion: true,
+				label: ""
 			});
 		},
 	
@@ -429,7 +451,7 @@
 			this.p.question = parsedArgument.question;
 			this.p.answer = parsedArgument.answer;
 			if (this.p.isQuestion) {
-				this.p.label = this.p.question;
+				this.p.label = wordWrap(this.p.question, 250, 15);
 			} else {
 				this.p.label = this.p.answer;
 			}
@@ -457,60 +479,63 @@
 		
 	// versus screen with countdown
 	Q.scene("scene0", function(stage) {
-		var cdText = stage.insert(new Q.UI.TimeCounter({x: qx*160, y: qy*284}));
-		
+		var cdText = stage.insert(new Q.UI.TimeCounter({x: qx*160, y: qy*284, size: 8}));
+
 		var playerContainer = stage.insert(new Q.UI.Container({
 			fill: "white",
-			x: 220 * qx,
-			y: 142 * qy,
+			x: ((2/3) * 320) * qx,
+			y: 90 * qy,
 			border: 2,
 			shadow: 3,
 			shadowColor: "rgba(0,0,0,0.5)",
-			w: 160 * qx,
+			w: (((2/3) * 320) - 20) * qx,
 			h: 150 * qy
 		}));
 		
 		var enemyContainer = stage.insert(new Q.UI.Container({
 			fill: "white",
-			x: 100 * qx,
-			y: 426 * qy,
+			x: ((2/3) * 320) * qx,
+			y: 478 * qy,
 			border: 2,
 			shadow: 3,
 			shadowColor: "rgba(0,0,0,0.5)",
-			w: 160 * qx,
+			w: (((2/3) * 320) - 20) * qx,
 			h: 150 * qy
 		}));
 		
+		function expressStats(iName, iLevel, iTitle, iWinRate, iTotalMatches) {
+			var labelStr = "[" + iName + "]" + "\n" +
+			  "Level " + iLevel + " " + iTitle + "\n" +
+			  "Winrate: " + iWinRate + "%" + "\n" +
+			  "Total Matches: " + iTotalMatches;
+			return labelStr;
+		}
+		
+		var playerStats = stage.insert(new Q.UI.Text({size: 60}), playerContainer);
+		var enemyStats = stage.insert(new Q.UI.Text({size: 8}), enemyContainer);
+		playerStats.p.label = expressStats('John Smith', 23, 'Matrix Agent', 86, 305);
+		enemyStats.p.label = expressStats('Darth Vader', 37, 'Sith Lord', 67, 1300);
+		
 		var playerPortrait = stage.insert(new Q.PlayerPortrait({
-			x: qx * 80, 
-			y: qy * 142, 
+			x: qx * (320/6), 
+			y: qy * 90, 
 			scale: 0.05, 
 			asset: PLAYER_SPRITE,
 		}));
 		
 		var enemyPortrait = stage.insert(new Q.EnemyPortrait({
-			x: qx * 260, 
-			y: qy * 426, 
+			x: qx * (320/6), 
+			y: qy * 478, 
 			scale: 0.05, 
 			asset: ENEMY_SPRITE
 		}));
 		
-		var playerName = stage.insert(new Q.UI.Text({
-			x: qx * 80,
-			y: qy * 200,
-			label: PLAYER_NAME
-		}));
 		
-		var enemyName = stage.insert(new Q.UI.Text({
-			x: qx * 260,
-			y: qy * 484,
-			label: ENEMY_NAME
-		}));
 	
 		var cdTimer = new Countdown({
 			seconds: 10,
 			onUpdateStatus: function(sec) {cdText.p.label = "Game starting in " + (Math.ceil(sec)) + " seconds."},
-			onCounterEnd: function() {Q.stageScene("scene1");}
+			onCounterEnd: function() {/*Q.stageScene("scene1");*/}
 		});
 		
 		cdTimer.start();
@@ -933,8 +958,8 @@
 		// create testBattleLibrary
 		
 		testBL = [{totalQuestions: 3}, 
-		  {question: JSON.parse(createFlashCard("101", "A", "A")),
-		    answers: [JSON.parse(createFlashCard("101", "A", "A")), 
+		  {question: JSON.parse(createFlashCard("101", "ajdks asdasd kasdjdjjd ajssjdaask jkajigrjgdnkjfg dfgj", "fnsdjfjh seifksdf")),
+		    answers: [JSON.parse(createFlashCard("101", "ajdks asdasd kasdjdjjd ajssjdaask jkajigrjgdnkjfg dfgj", "fnsdjfjh seifksdf")), 
 			  JSON.parse(createFlashCard("102", "B", "B")),
 			  JSON.parse(createFlashCard("103", "C", "C")),
 			  JSON.parse(createFlashCard("104", "D", "D")),],
@@ -962,7 +987,7 @@
 			etime: 6000}];
 			
 			battleLibrary = testBL;
-			
+	
 			
 			
 			function generateAnswers() {
@@ -998,6 +1023,17 @@
 						customId: fcAnswers[k].id,
 						}, function() {
 							// do something
+					}));
+					console.log(k);
+					
+					globalTestVar = fcAns;
+					//console.log(wordWrap(fcAns, 110, 7));
+					//console.log(fcAns);
+					
+					stage.insert(new Q.UI.Text({
+						x: (90 + (140*j)) * qx,
+						y: (320 + (120*i)) * qy,
+						label: ""
 					}));
 					
 					k++;
@@ -1076,6 +1112,7 @@
 			
 			qCard = stage.insert(new Q.UI.FlashCard(), qContainer);
 			qCard.generate(fcQuestion);
+			
 			aBtns = generateAnswers();
 			aTabs = generateTabs();
 
@@ -1248,7 +1285,7 @@
 	
 	// stage scene
 	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE], function() {
-		Q.stageScene("scene3");
+		Q.stageScene("scene0");
 	});
      
 	 //setTimeout(function(){Q.state.inc("currentIndex", 1);}, 5000);
