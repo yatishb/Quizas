@@ -84,6 +84,131 @@ img {
     user-select: none;
 }
 
+/*** Buttons ***/
+
+.button_close {
+    top: 0;
+    right: 0;
+    position: absolute;
+    margin: 3px 10px;
+    font-size: 20pt;
+    cursor: pointer;
+    color: #6b6b6b;
+    z-index: 1000;
+}
+
+.button_close:active {
+    color: #000;
+}
+
+@media screen and (max-width: 500px) {
+    .popup_window {
+        width: 300px;
+        height: 120px;
+        left: 50%;
+        top: 50%;
+        margin-left: -150px;
+        margin-top: -60px;
+    }
+}
+
+@media screen and (min-width: 501px) {
+    .popup_window {
+        width: 400px;
+        height: 150px;
+        left: 50%;
+        top: 50%;
+        margin-left: -200px;
+        margin-top: -75px;
+    }
+}
+
+.popup_window {
+    position: fixed;
+    background-color: white;
+    z-index: 1001;
+    border-radius: 6px;
+    -o-border-radius: 6px;
+    -ms-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+}
+
+.popup_message {
+    margin: 6px 15px;
+}
+
+.popup_window span {
+    
+}
+
+.popup_buttons {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /*height: 20%;*/
+    text-align: center;
+}
+
+.popup_button {
+    width: 49.6%;
+    color: white;
+    cursor: pointer;
+    border-top: solid 1px white;
+}
+
+.popup_button.cancel {
+    background-color: red;
+    border-right: solid 1px white;
+    border-bottom-left-radius: 6px;
+    -o-border-bottom-left-radius: 6px;
+    -ms-border-bottom-left-radius: 6px;
+    -moz-border-bottom-left-radius: 6px;
+    -webkit-border-bottom-left-radius: 6px;
+    float: left;
+}
+
+.popup_button.cancel:active {
+    background-color: ;
+}
+
+.popup_button.accept {
+    background-color: green;
+    border-left: solid 1px white;
+    border-bottom-right-radius: 6px;
+    -o-border-bottom-right-radius: 6px;
+    -ms-border-bottom-right-radius: 6px;
+    -moz-border-bottom-right-radius: 6px;
+    -webkit-border-bottom-right-radius: 6px;
+    float: right;
+}
+
+.popup_button.ok {
+    background-color: blue;
+    border-bottom-right-radius: 6px;
+    -o-border-bottom-right-radius: 6px;
+    -ms-border-bottom-right-radius: 6px;
+    -moz-border-bottom-right-radius: 6px;
+    -webkit-border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    -o-border-bottom-left-radius: 6px;
+    -ms-border-bottom-left-radius: 6px;
+    -moz-border-bottom-left-radius: 6px;
+    -webkit-border-bottom-left-radius: 6px;
+    left: 0;
+    right: 0;
+    width: 100%;
+}
+
+.popup_button.ok:active {
+    background-color: ;
+}
+
+.popup_button.accept:active {
+    background-color: ;
+}
+
 /*** Start of footer ***/
 @media screen and (max-width: 500px) {
     .footer_container li {
@@ -112,11 +237,11 @@ img {
     width: 100%;
     height: 100%;
     padding: 0;
-    box-sizing:border-box;
-    -o-box-sizing:border-box;
-    -ms-box-sizing:border-box;
-    -moz-box-sizing:border-box;
-    -webkit-box-sizing:border-box;
+    box-sizing: border-box;
+    -o-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
     text-align: center;
 }
 
@@ -885,13 +1010,83 @@ i.rotate {
     cursor: pointer;
 }
 
-/*** the top layer ***/
+/** the top layer **/
+@media screen and (max-width: 600px) {
+    .button_container {
+        width: 100%;
+    }
+
+    .round_button {
+        width: 25vw;
+        height: 25vw;
+        max-width: 200px;
+        max-height: 200px;
+        margin: 10px 11px;
+    }
+
+    .info_container {
+        margin-top: 30%;
+    }
+
+    .round_button .explain {
+        font-size: 8pt;
+    }
+}
+
+@media screen and (min-width: 601px) {
+    .button_container {
+        width: 81vw;
+        max-width: 600px;
+        left: 50%;
+        margin-left: -300px;
+    }
+
+    .round_button {
+        width: 25vw;
+        height: 25vw;
+        max-width: 140px;
+        max-height: 140px;
+    }
+
+    #flashcard {
+        margin: 20px 0 20px 21px;
+    }
+
+    #challenge {
+        margin: 20px 12px;
+    }
+
+    #practice {
+        margin: 20px 21px 20px 0;
+    }
+
+    .round_button span {
+        font-size: 27px;
+    }
+
+    .info_container {
+        margin-top: 20%;
+    }
+
+    .round_button .explain {
+        font-size: 12pt;
+        margin-top: -8px;
+    }
+}
+
+@media screen and (min-width: 751px) {
+    #flashcard,
+    #challenge,
+    #practice {
+        margin: 20px 30px;
+    }
+}
 
 .grey_cover {
     background-color: #000;
     /*background-color: rgba(255, 255, 255, 0.75);*/
-    background-color: rgba(0, 0, 0, 0.6);
-    opacity: 0.6;
+    background-color: rgba(0, 0, 0, 0.7);
+    opacity: 0.7;
     width: 110vw;
     height: 2000px;
     margin-top: -10px;
@@ -902,7 +1097,6 @@ i.rotate {
 }
 
 .button_container {
-    width: 100%;
     text-align: center;
     z-index: 100;
     position: fixed;
@@ -911,84 +1105,73 @@ i.rotate {
 
 .round_button {
     font-family: 'open_sans', sans-serif;
-    width: 25vw;
-    height: 25vw;
-    max-width: 200px;
-    max-height: 200px;
     border-radius: 50%;
     -o-border-radius: 50%;
     -ms-border-radius: 50%;
     -moz-border-radius: 50%;
     -webkit-border-radius: 50%;
-    margin-top: 10px;
     text-align: center;
     z-index: 500;
     cursor: pointer;
+    float: left;
 }
 
 .round_button span {
     position: relative;
-    top: 36%;
     color: white;
+}
+
+.round_button .explain {
+    color: white;
+    font-style: italic;
+    font-weight: 100;
+    font-family: 'open_sans', sans-serif;
 }
 
 #flashcard {
     background-color: #3e8871;
-    float: left;
-    margin-left: 5%;
 }
 
 #flashcard:active {
     background-color: 2B5F4F;
 }
 
-#quiz {
-    background-color: #fbd546;
-    display: inline-block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-#quiz:active {
-    background-color: C9AA38;
-}
-
 #challenge {
     background-color: #eb6566;
-    float: right;
-    margin-right: 5%;
 }
 
 #challenge:active {
     background-color: BC5152;
 }
 
+#practice {
+    background-color: #fbd546;
+}
+
+#practice:active {
+    background-color: C9AA38;
+}
+
 /** The Friend List **/
 @media screen and (max-width: 500px) {
-    .friend_window,
-    .friend_list,
-    .list_search,
-    .list_bottom {
-        width: 60vw;
-    }
-
     .friend_window {
-        height: 40vh;
-        top: 27%;
+        width: 88vw;
+        height: 60vh;
+        top: 20%;
         left: 50%;
-        margin-left: -30vw;
+        margin-left: -44vw;
     }
 
     .list_search {
-        height: 32px;
+        height: 10%;
     }
 
     .friend_list {
-        height: 90%;
+        height: 80%;
     }
 
     .list_bottom {
-        height: 10%;
+        height: 8%;
         line-height: 30px;
     }
 
@@ -1000,34 +1183,26 @@ i.rotate {
 }
 
 @media screen and (min-width: 501px) {
-    .friend_window,
-    .friend_list,
-    .list_search,
-    .list_bottom {
-        width: 300px;
-    }
-
     .friend_window {
-        height: 50vh;
-        max-height: 600px;
-        top: 27%;
+        height: 60vh;
+        width: 88vw;
+        max-width: 500px;
+        top: 28%;
         left: 50%;
-        margin-left: -150px;
+        margin-left: -250px;
     }
 
     .list_search {
-        height: 36px;
+        height: 10%;
     }
 
     .friend_list {
-        height: 90%;
-        max-height: 570px;
+        height: 80%;
     }
 
     .list_bottom {
-        height: 10%;
-        max-height: 70px;
-        line-height: 25px;
+        height: 8%;
+        line-height: 30px;
     }
 
     .list_search input[type="text"] {
@@ -1039,17 +1214,25 @@ i.rotate {
 
 .friend_window {
     z-index: 500;
-    background-color: red;
     position: fixed;
+    border-radius: 5px;
+    -o-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border: solid 1px #6b6b6b;
+    background-color: #EEEEEE;
     display: none;
 }
 
 .list_search {
     background-color: white;
     background: white;
-    margin: -4px 0;
     text-align: center;
-    width: 100%;
+    width: 90%;
+    margin: 6px 3px 0 3px;
+    background-color: #EEEEEE;
+    position: relative;
     /*border-bottom: solid 1px #c9c9c9;*/
 }
 
@@ -1057,14 +1240,14 @@ i.rotate {
     font-family: 'open_sans', sans-serif;
     border: 0;
     outline: none;
-    left: 3;
-    border-bottom: solid 2px #c9c9c9;
+    border-bottom: solid 1px #c9c9c9;
     border-radius: 0;
     -o-border-radius: 0;
     -ms-border-radius: 0;
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
     transition: border 0.3s;
+    background-color: #EEEEEE;
 }
 
 .list_search input[type="text"]:focus,
@@ -1072,24 +1255,39 @@ i.rotate {
 }
 
 .friend_list {
-    background-color: white;
-    background: whte;
     margin-right: auto;
     margin-left: auto;
+    overflow-x: hidden;
     overflow-y: auto;
+    width: 100%;
+    color: #2d2d2d;
 }
 
 .list_bottom {
     font-family: 'open_sans', sans-serif;
     background-color: #1E8BC3;
     background: #1E8BC3;
-    position: relative;
+    position: absolute;
     text-align: center;
     color: white;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-bottom-radius: 5px;
+    -o-border-bottom-radius: 5px;
+    -ms-border-bottom-radius: 5px;
+    -moz-border-bottom-radius: 5px;
+    -webkit-border-bottom-radius: 5px;
+    /*width: 100%;*/
 }
 
 .list_bottom:active {
     background-color: #2574a9;
+}
+
+.friend_list h3 {
+    margin: 10px 15px 0 15px;
+    color: #999999;
 }
 
 .simple_friend {
@@ -1295,20 +1493,6 @@ i.rotate {
 }
 
 /*** Start of flashcard.html ***/
-@media screen and (max-width: 500px) {
-    .popup_title {
-        width: 80vw;
-        min-width: 300px;
-        margin-left: -40vw;
-    }
-}
-
-@media screen and (min-width: 501px) {
-    .simple_card {
-        max-width: 500px;
-        margin-left: -250px;
-    }
-}
 
 .top_bar {
     width: 100%;
@@ -1330,30 +1514,6 @@ i.rotate {
     overflow: hidden;
     white-space: nowrap;
     margin: 0 auto;
-}
-
-.popup_title {
-    /*visibility: hidden;*/
-    min-height: 40px;
-    display: table;
-    margin: 50px auto 0 auto;
-    position: fixed;
-    left: 50;
-    color: white;
-    z-index: 100;
-    word-wrap: break-word;
-    text-align: center;
-    background-color: #3e8871;
-    border-radius: 3px;
-    -o-border-radius: 3px;
-    -ms-border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-}
-
-.popup_title span {
-    display: table-cell;
-    margin: 5px;
 }
 
 .back_button {
@@ -1504,7 +1664,7 @@ i.rotate {
         height: 40vh;
         max-height: 400px;
         margin-left: -35vw;
-        margin-top: -20vh;
+        margin-top: -8vh;
     }
 
     .friendChart {
@@ -1551,7 +1711,7 @@ i.rotate {
         height: 60vh;
         max-height: 500px;
         margin-left: -250px;
-        margin-top: -30vh;
+        margin-top: -15vh;
     }
 
     .friendChart {
@@ -1655,21 +1815,6 @@ i.rotate {
     margin: 20px auto;
 }
 
-.button_close {
-    top: 0;
-    right: 0;
-    position: absolute;
-    margin: 3px 10px;
-    font-size: 20pt;
-    cursor: pointer;
-    color: #6b6b6b;
-    z-index: 1000;
-}
-
-.button_close:active {
-    color: #000;
-}
-
 .invite_friend {
     margin: 50px auto;
     background-color: #4183D7;
@@ -1688,8 +1833,10 @@ i.rotate {
 }
 
 .friend_profile.stats img {
-    width: 90&;
+    width: 90%;
     height: 90%;
+    max-width: 48px;
+    max-height: 48px;
 }
 
 .list_search.stats,

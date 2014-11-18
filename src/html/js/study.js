@@ -1,5 +1,6 @@
 var content;
 var next_page;
+var pupup_mode;
 var selected_set_id;
 var selected_friend_id = "0";
 
@@ -42,6 +43,12 @@ $(document).ready(function() {
 
     console.log(socket);
 
+    // Get the list of online users
+    socket.emit('online users');
+    socket.on('online', function(msg) {
+        var listOnlineUsers = msg.data;
+    });
+
     // event handler for server sent data
     // the data is displayed in the "Received" section of the page
     socket.on('game request', function(msg) {
@@ -49,20 +56,23 @@ $(document).ready(function() {
         console.log("Request info is ")
         console.log(content);
 
-        var result;
-        if (confirm("User " + content.requestfrom + " is inviting you to compete set " + content.set) == true) {
-            socket.emit('assignroom', {
-                'user1': content.requestfrom,
-                'flashset': content.set,
-                'user2': quizas_user_id()
-            });
-        } else {
-            console.log('rejected');
-            socket.emit('reject', {
-                'requester': content.requestfrom,
-                'receiver': quizas_user_id()
-            });
-        }
+        pupup_mode = "request";
+
+        showPopup("User " + content.requestfrom + " is inviting you to compete set " + content.set);
+
+        // if (confirm("User " + content.requestfrom + " is inviting you to compete set " + content.set) == true) {
+        //     socket.emit('assignroom', {
+        //         'user1': content.requestfrom,
+        //         'flashset': content.set,
+        //         'user2': quizas_user_id()
+        //     });
+        // } else {
+        //     console.log('rejected');
+        //     socket.emit('reject', {
+        //         'requester': content.requestfrom,
+        //         'receiver': quizas_user_id()
+        //     });
+        // }
     });
 
     // event handler for rejected request
@@ -71,7 +81,9 @@ $(document).ready(function() {
         console.log("Reject by ")
         console.log(content);
 
-        alert("Your request was rejected by " + content.rejectedby);
+        pupup_mode = "rejected";
+
+        showPopup("Your request was rejected by " + content.rejectedby);
     });
 
     // event handler for when user not online
@@ -80,7 +92,9 @@ $(document).ready(function() {
         console.log("Reject by ")
         console.log(content);
 
-        alert("The user " + content.rejectedby + " is not online");
+        pupup_mode = "offline";
+
+        showPopup("The user " + content.rejectedby + " is not online");
     });
 
     // event handler for when user does not exist
@@ -89,7 +103,9 @@ $(document).ready(function() {
         console.log("Reject by ")
         console.log(content);
 
-        alert("The user " + content.rejectedby + " does not exist");
+        pupup_mode = "non-existent";
+
+        showPopup("The user " + content.rejectedby + " does not exist");
     });
 
     // event handler for accepted request
@@ -97,6 +113,8 @@ $(document).ready(function() {
         content = JSON.parse(msg.data);
         console.log("Accepted by ");
         console.log(content);
+
+        pupup_mode = "accepted";
 
         socket.emit('disconnect');
         initializeMultiplayerGame(content);
@@ -109,7 +127,11 @@ $('.notification').on("click", function() {
     $('.challenge_info').addClass('fadeIn');
 });
 
-$('.button_close').on("click", function() {
+$('.friend_window .button_close').on("click", function() {
+    $('.friend_window').hide();
+});
+
+$('.challenge_info .button_close').on("click", function() {
     $('.grey_cover').hide();
     $('.challenge_info').hide();
 });
@@ -195,18 +217,11 @@ $('.grey_cover').on("click", function() {
         $('.friend_window').hide();
         $('.friend_window').removeClass('fadeIn');
     } else {
-        $(this).hide(); 
+        $('.grey_cover').hide();
         $('.button_container').hide();
         $('.add_set').show();
         $('.notification').show();
     }
-});
-
-$('#quiz').on("click", function(){
-    next_page = "q";
-    $('.friend_window').show();
-    $('.friend_window').addClass('fadeIn');
-    $('.list_search').focus();
 });
 
 $('#flashcard').on("click", function(){
@@ -215,17 +230,24 @@ $('#flashcard').on("click", function(){
 });
 
 $('#challenge').on("click", function(){
-    //window.location.href="challenge.html";
-    next_page = "c";
     $('.friend_window').show();
     $('.friend_window').addClass('fadeIn');
     $('.list_search').focus();
 });
 
+$('#practice').on("click", function(){
+    next_page = "s";
+    // $('.friend_window').show();
+    // $('.friend_window').addClass('fadeIn');
+    // $('.list_search').focus();
+});
+
 $('.friend_list').on("click", '.simple_friend', function () {
     $('.selected').removeClass('selected');
     $(this).addClass('selected');
-    // $(this).find('.friend_profile').addClass('selected');
+
+    if($(this).parent().hasClass('list_online')) next_page = "q";
+    else next_page = "c";
 
     selected_friend_id = this.id;
 
@@ -239,6 +261,7 @@ $('.list_bottom').on("click", function () {
     }
 
     if (next_page=="q") {
+        // quiz with ONLINE friend
         console.log("namespace: "+namespace);
         console.log("socket: "+socket);
         socket.emit('send notification', {
@@ -247,10 +270,60 @@ $('.list_bottom').on("click", function () {
             'user': quizas_user_id()
         });
     } else if (next_page=="c") {
+        // challenge with OFFLINE friend
         initializeGame(selected_friend_id, selected_set_id, quizas_user_id());
     }
-
 });
+
+
+$(document.body).on("click", '.popup_button.cancel', function() {
+    $('.popup_window').remove();
+
+    console.log('rejected');
+    socket.emit('reject', {
+        'requester': content.requestfrom,
+        'receiver': quizas_user_id()
+    });
+});
+
+$(document.body).on("click", '.popup_button.accept', function() {
+    $('.popup_window').remove();
+
+    socket.emit('assignroom', {
+        'user1': content.requestfrom,
+        'flashset': content.set,
+        'user2': quizas_user_id()
+    });
+});
+
+$(document.body).on("click", '.popup_button.ok', function() {
+    $('.popup_window').remove();
+});
+
+function showPopup(message) {
+    if(pupup_mode == "request") {
+        $(document.body).append(
+            "<div class='popup_window'>" +
+            "<div class='popup_message'><span>" +
+            message +
+            "</span></div>" +
+            "<div class='popup_buttons'>" +
+            "<div class='popup_button cancel'>Reject</div>" +
+            "<div class='popup_button accept'>Accept</div>" +
+            "</div></div>"
+        );
+    } else {
+        $(document.body).append(
+            "<div class='popup_window'>" +
+            "<div class='popup_message'><span>" +
+            message +
+            "</span></div>" +
+            "<div class='popup_buttons'>" +
+            "<div class='popup_button ok'>Ok</div>" +
+            "</div></div>"
+        );
+    }
+}
 
 function initializeGame(friend_id, set_id, user_id) {
     sessionStorage.setItem("friend_id", JSON.stringify(friend_id));
@@ -377,7 +450,7 @@ function favoriteSet(id, flag) {
 
 function outputFriends(friends) {
     friends.forEach(function (f) {
-        $('.friend_list').append(
+        $('.list_online').append(
             "<div class='simple_friend " +
             ("" + f.userid).replace(":", "_") +
             "' id='" +
