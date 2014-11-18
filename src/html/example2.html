@@ -632,21 +632,35 @@
 			return outStr;
 		}
 		
-		var timerBox = stage.insert(new Q.UI.Button({
+		var loadBox = stage.insert(new Q.UI.Container({
 			fill: "white",
 			x: (65) * qx,
 			y: (284) * qy,
-			w: 30 * qx,
-			h: 30 * qy,
+			w: 80 * qx,
+			h: 200 * qy,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			
+		}));
+		
+		var timerBox = stage.insert(new Q.UI.Container({
+			fill: "white",
+			x: (65) * qx,
+			y: (284) * qy,
+			w: 40 * qx,
+			h: 40 * qy,
 			border: 1,
 		}));
+		
+		var timerCD = stage.insert(new Q.UI.Text({size: 50, label: ""}), timerBox);
 		
 		var matchDetails = stage.insert(new Q.UI.Text({size: 28}), matchContainer);
 		matchDetails.p.label = expressMatch(matchName, totalQuestions, encounterTotal, encounterWin);
 		
 		var cdTimer = new Countdown({
 			seconds: 10,
-			onUpdateStatus: function(sec) {timerBox.p.label = (Math.ceil(sec)) + ""},
+			onUpdateStatus: function(sec) {timerCD.p.label = (Math.ceil(sec)) + "";},
 			onCounterEnd: function() {/*Q.stageScene("scene1");*/}
 		});
 		
