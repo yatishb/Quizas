@@ -43,6 +43,12 @@ $(document).ready(function() {
 
     console.log(socket);
 
+    // Get the list of online users
+    socket.emit('online users');
+    socket.on('online', function(msg) {
+        var listOnlineUsers = msg.data;
+    });
+
     // event handler for server sent data
     // the data is displayed in the "Received" section of the page
     socket.on('game request', function(msg) {
@@ -54,19 +60,19 @@ $(document).ready(function() {
 
         showPopup("User " + content.requestfrom + " is inviting you to compete set " + content.set);
 
-        // if (confirm("User " + content.requestfrom + " is inviting you to compete set " + content.set) == true) {
-        //     socket.emit('assignroom', {
-        //         'user1': content.requestfrom,
-        //         'flashset': content.set,
-        //         'user2': quizas_user_id()
-        //     });
-        // } else {
-        //     console.log('rejected');
-        //     socket.emit('reject', {
-        //         'requester': content.requestfrom,
-        //         'receiver': quizas_user_id()
-        //     });
-        // }
+        if (confirm("User " + content.requestfrom + " is inviting you to compete set " + content.set) == true) {
+            socket.emit('assignroom', {
+                'user1': content.requestfrom,
+                'flashset': content.set,
+                'user2': quizas_user_id()
+            });
+        } else {
+            console.log('rejected');
+            socket.emit('reject', {
+                'requester': content.requestfrom,
+                'receiver': quizas_user_id()
+            });
+        }
     });
 
     // event handler for rejected request

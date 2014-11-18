@@ -551,18 +551,16 @@
 		// start receive serverForm
 		var serverJSON, fcQuestion, fcAnswers, questionNumber = "0", maxTimeAllowed, prevPlayerAns, prevEnemyAns, prevPlayerTime, prevEnemyTime;
 		var timeOutTimer, gameOverTimer;
-		/*var serverJSON = JSON.parse(TestServerForm[0]);
-		var fcQuestion = serverJSON.question,
-		  fcAnswers = serverJSON.answers,
-		  questionNumber = serverJSON.index,
-		  maxTimeAllowed = serverJSON.time,
-		  prevPlayerAns = serverJSON.player,
-		  prevEnemyAns = serverJSON.enemy;*/
 		var currentFcAnswer, prevFcQuestion;
 		//Q.state.set("currentQuestion", fcQuestion.id);
 		// end receive serverForm
 		
-		timeOutTimer = setTimeout(function(){if (serverJSON == null) {alert("TIMEOUT NIGGA");}}, 10000);
+		timeOutTimer = setTimeout(function(){
+			if (serverJSON == null) {
+				alert("TIMEOUT NIGGA");
+    			window.location.href = "study.html";
+			}
+		}, 10000);
 		
 		function generateAnswers() {
 			Q.state.set("waiting", false);
