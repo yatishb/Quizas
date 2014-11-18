@@ -228,11 +228,21 @@
 		var TestTotalQuestions = 10;
 		
 		var TestInitiatingForm = JSON.stringify({
-			name: "John Smith",
-			sprite: "smiley.png",
-			win: "75%",
-			encounter: "6",
-			total: "3",
+			playerName: "John Smith",
+			playerSprite: "smiley.png",
+			playerPoints: 300*50000,
+			playerWin: 120,
+			playerTotal: 300,
+			enemyName: "Darth Vader",
+			enemySprite: "smiley.png",
+			enemyPoints: 750*64000,
+			enemyWin: 800,
+			enemyTotal: 1000,
+			encounterTotal: 12,
+			encounterWin: 3,
+			matchName: "Hardkore Mathematics",
+			totalQuestions: 10,
+			room: "something",
 		});
 		
 		var TestServerForm = [];
@@ -479,9 +489,9 @@
 		
 	// versus screen with countdown
 	Q.scene("scene0", function(stage) {
-		Q.state.reset({cardSize: 12});
+		//Q.state.reset({cardSize: 12});
 	
-		var cdText = stage.insert(new Q.UI.TimeCounter({x: qx*160, y: qy*284}));
+		//var cdText = stage.insert(new Q.UI.TimeCounter({x: qx*160, y: qy*284}));
 
 		/*gtv_c = stage.insert(new Q.UI.Container({
 			fill: "white",
@@ -524,12 +534,20 @@
 			return labelStr;
 		}
 		
+		function getWinRate(wins, total) {
+			return ((wins/total)*100).toFixed(1);
+		}
+		
+		function getLevel(accumPoints) {
+			return Math.floor(accumPoints/100000);
+		}
+		
 		//gtv_b = stage.insert(new Q.UI.Text(), gtv_c);
 		var playerStats = stage.insert(new Q.UI.Text({size: 32}), playerContainer);
 		var enemyStats = stage.insert(new Q.UI.Text({size: 32}), enemyContainer);
 		//gtv_b.p.label = expressStats('John Smith', 23, 'Matrix Agent', 86, 305);
-		playerStats.p.label = expressStats('John Smith', 23, 'Matrix Agent', 86, 305);
-		enemyStats.p.label = expressStats('Darth Vader', 37, 'Sith Lord', 67, 1300);
+		playerStats.p.label = expressStats(playerName, getLevel(playerPoints), 'Matrix Agent', getWinRate(playerWin, playerTotal), playerTotal);
+		enemyStats.p.label = expressStats(enemyName, getLevel(enemyPoints), 'Sith Lord', getWinRate(enemyWin, enemyTotal), enemyTotal);
 		
 		
 		/*stage.insert(new Q.UI.Button({x: 100*qx, y: 300*qy, w: 50*qx, h: 50*qy, label: "^", fill: "white"}, 
@@ -556,24 +574,93 @@
 		});*/
 		
 		var playerPortrait = stage.insert(new Q.PlayerPortrait({
-			x: qx * (320/6), 
+			x: qx * 65, 
 			y: qy * 90, 
 			scale: 0.05, 
-			asset: PLAYER_SPRITE,
+			asset: playerSprite,
 		}));
 		
 		var enemyPortrait = stage.insert(new Q.EnemyPortrait({
-			x: qx * (320/6), 
+			x: qx * 65, 
 			y: qy * 478, 
 			scale: 0.05, 
-			asset: ENEMY_SPRITE
+			asset: enemySprite,
 		}));
 		
+		var matchContainer = stage.insert(new Q.UI.Container({
+			fill: "white",
+			x: ((2/3) * 320) * qx,
+			y: 284 * qy,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			w: (((2/3) * 320) - 20) * qx,
+			h: 200 * qy
+		}));
 		
-	
+		function expressMatch(matchName, totalQuestions, encounterTotal, encounterWin) {
+			var outStr;
+			outStr = "<< Match Details >>" + "\n\n" +
+			  "[" + matchName + "]" + "\n" +
+			  totalQuestions + " Questions" + "\n\n";
+			if (encounterTotal == 0) {
+				outStr += "First Encounter!";
+			} else {
+				var ewr = ((encounterWin/encounterTotal) * 100).toFixed(2);
+				if (ewr > 75) {
+					outStr += "Deliver the Smackdown!";
+				} else if (ewr < 25) {
+					outStr += "Reclaim your Honor!";
+				} else {
+					outStr += "Struggle for Dominance!";
+				}
+				outStr += "\n";
+				var numDenom;
+				switch (encounterTotal) {
+					case 1:
+						numDenom = "nd";
+						break;
+					case 2:
+						numDenom = "rd";
+						break;
+					default:
+						numDenom = "th";
+				}
+				outStr += (encounterTotal + 1) + numDenom + " Encounter" + "\n" +
+				  ewr + "% success rate";
+			}
+			return outStr;
+		}
+		
+		var loadBox = stage.insert(new Q.UI.Container({
+			fill: "white",
+			x: (65) * qx,
+			y: (284) * qy,
+			w: 80 * qx,
+			h: 200 * qy,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			
+		}));
+		
+		var timerBox = stage.insert(new Q.UI.Container({
+			fill: "white",
+			x: (65) * qx,
+			y: (284) * qy,
+			w: 40 * qx,
+			h: 40 * qy,
+			border: 1,
+		}));
+		
+		var timerCD = stage.insert(new Q.UI.Text({size: 50, label: ""}), timerBox);
+		
+		var matchDetails = stage.insert(new Q.UI.Text({size: 28}), matchContainer);
+		matchDetails.p.label = expressMatch(matchName, totalQuestions, encounterTotal, encounterWin);
+		
 		var cdTimer = new Countdown({
 			seconds: 10,
-			onUpdateStatus: function(sec) {cdText.p.label = "Game starting in " + (Math.ceil(sec)) + " seconds."},
+			onUpdateStatus: function(sec) {timerCD.p.label = (Math.ceil(sec)) + "";},
 			onCounterEnd: function() {/*Q.stageScene("scene1");*/}
 		});
 		
@@ -1340,4 +1427,4 @@
         ga('send', 'pageview');
     </script> -->
  </body>
-</html>
+</html>>
