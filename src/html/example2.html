@@ -486,12 +486,12 @@
 
 		var playerContainer = stage.insert(new Q.UI.Container({
 			fill: "white",
-			x: 220 * qx,
+			x: ((2/3) * 320) * qx,
 			y: 142 * qy,
 			border: 2,
 			shadow: 3,
 			shadowColor: "rgba(0,0,0,0.5)",
-			w: 160 * qx,
+			w: (((2/3) * 320) - 20) * qx,
 			h: 150 * qy
 		}));
 		
@@ -506,8 +506,21 @@
 			h: 150 * qy
 		}));
 		
+		function expressStats(iName, iLevel, iTitle, iWinRate, iTotalMatches) {
+			var labelStr = "[" + iName + "]" + "\n" +
+			  "Level " + iLevel + " " + iTitle + "\n" +
+			  "Winrate: " + iWinRate + "%" + "\n" +
+			  "Total Matches: " + iTotalMatches;
+			return labelStr;
+		}
+		
+		var playerStats = stage.insert(new Q.UI.Text(), playerContainer);
+		var enemyStats = stage.insert(new Q.UI.Text(), enemyContainer);
+		playerStats.p.label = expressStats('John Smith', 23, 'Matrix Agent', 86, 305);
+		enemyStats.p.label = "";
+		
 		var playerPortrait = stage.insert(new Q.PlayerPortrait({
-			x: qx * 80, 
+			x: qx * (320/6), 
 			y: qy * 142, 
 			scale: 0.05, 
 			asset: PLAYER_SPRITE,
@@ -520,6 +533,7 @@
 			asset: ENEMY_SPRITE
 		}));
 		
+		/*
 		var playerName = stage.insert(new Q.UI.Text({
 			x: qx * 80,
 			y: qy * 200,
@@ -531,6 +545,7 @@
 			y: qy * 484,
 			label: ENEMY_NAME
 		}));
+		*/
 	
 		var cdTimer = new Countdown({
 			seconds: 10,
