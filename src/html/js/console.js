@@ -1,5 +1,4 @@
 $(document).ready(function() {
-		displayContent();
 		setInterval(displayContent, 60000);
 });
 
@@ -24,7 +23,8 @@ function displayContent() {
 						else if(i == 2) extraClass = "second";
 						else if(i == 3) extraClass = "third";
 
-						quizas_get_profile_for(id, function(profile) {
+						quizas_get_profile_for(userid, function(profile) {
+								console.log(rank + " *** " + pic + " *** " + profile.name + " *** " + points);
 								$('.board_container').append(
 															               		"<div class='simple_leader'>" +
 																		            "<div class='rank font-effect-shadow-multiple " +
