@@ -18,18 +18,17 @@ $(document).ready(function() {
 
 								element.append(
 								               		"<div class='simple_leader'>" +
-								               		id +
 											            "<div class='rank font-effect-shadow-multiple " +
 											            extraClass +
 											            " '>" +
-											            name +
+											            i +
 											            "</div><div class='profile'><img src='" +
 											            pic +
 											            "'></div>" +
 											            "<div class='name' title='" +
-											            name +
+											            id +
 											            "'>" +
-											            name +
+											            id +
 											            "</div><div class='score'>" +
 											            points +
 											            "</div></div>"

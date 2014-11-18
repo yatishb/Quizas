@@ -87,12 +87,12 @@ body {
     .profile {
         width: 80px;
         height: 80px;
-        /*padding-top: 14px;*/
     }
 
     .profile img {
         height: 90%;
         width: 90%;
+        margin-top: 3px;
     }
 
     .name {
