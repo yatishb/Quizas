@@ -648,6 +648,7 @@ img {
     border-right-style: solid;
     border-right-width: 1px;
     border-right-color: #C4C4C4;
+    cursor: pointer;
     /*z-index: 50;
     color: white;
     background-color: red;
@@ -705,6 +706,7 @@ i.rotate {
     border-right-style: solid;
     border-right-width: 1px;
     border-right-color: #C4C4C4;
+    cursor: pointer;
     /*z-index: 50;
     color: white;
     background-color: yellow;
@@ -1117,6 +1119,7 @@ i.rotate {
     height: 50px;
     width: 50px;
     display: table;
+    overflow: hidden;
 }
 
 .friend_profile.selected {
@@ -1132,8 +1135,8 @@ i.rotate {
     margin: 2px;
     /*width: 80%;
     zoom: 50%;*/
-    width: 90%;
-    height: 90%;
+    width: 46px;
+    height: 46px;
     border-radius: 25%;
     -o-border-radius: 25%;
     -ms-border-radius: 25%;
@@ -1682,6 +1685,11 @@ i.rotate {
 
 .invite_friend:active {
     background-color: #2E5C96;
+}
+
+.friend_profile.stats img {
+    width: 90&;
+    height: 90%;
 }
 
 .list_search.stats,

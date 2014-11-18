@@ -278,5 +278,5 @@ function outputFriends(friends) {
         });
     });
 
-    $('.page_friend').append("<div class='invite_friend'>Invite Friends</div>");
+    // $('.page_friend').append("<div class='invite_friend'>Invite Friends</div>");
 }
