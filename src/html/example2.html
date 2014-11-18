@@ -632,17 +632,28 @@
 			return outStr;
 		}
 		
-		var loadBox = stage.insert(new Q.UI.Container({
+		var loadContainer = stage.insert(new Q.UI.Container({
 			fill: "white",
-			x: (65) * qx,
-			y: (284) * qy,
+			x: 65 * qx,
+			y: 284 * qy,
 			w: 80 * qx,
-			h: 200 * qy,
+			h: 202 * qy,
 			border: 2,
 			shadow: 3,
 			shadowColor: "rgba(0,0,0,0.5)",
-			
 		}));
+		
+		var loadBox = [], numBox = 21, midNum = Math.floor(numBox/2), incLvl = Math.floor((numBox - 1) / 2);
+		for (i=0;i<numBox;i++) {
+			loadBox[i] = stage.insert(new Q.UI.Container({
+				fill: "white",
+				x: 65 * qx,
+				y: (184 + (100/numBox) + (i * (200/numBox))) * qy,
+				w: 78 * qx,
+				h: (200/numBox) * qy,
+			}));
+		}
+		loadBox[midNum].p.fill = "green";
 		
 		var timerBox = stage.insert(new Q.UI.Container({
 			fill: "white",
@@ -658,10 +669,19 @@
 		var matchDetails = stage.insert(new Q.UI.Text({size: 28}), matchContainer);
 		matchDetails.p.label = expressMatch(matchName, totalQuestions, encounterTotal, encounterWin);
 		
+		var cdSec = 10;
 		var cdTimer = new Countdown({
-			seconds: 10,
-			onUpdateStatus: function(sec) {timerCD.p.label = (Math.ceil(sec)) + "";},
-			onCounterEnd: function() {/*Q.stageScene("scene1");*/}
+			seconds: cdSec,
+			onUpdateStatus: function(sec) {
+				var ceilSec = Math.ceil(sec);
+				var incCS = cdSec - ceilSec;
+				loadBox[midNum + incCS].p.fill = "green";
+				loadBox[midNum - incCS].p.fill = "green";
+				timerCD.p.label = ceilSec + "";
+			},
+			onCounterEnd: function() {
+				setTimeout(function() {Q.stageScene("scene1");}, 1000);
+			}
 		});
 		
 		cdTimer.start();
