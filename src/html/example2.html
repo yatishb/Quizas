@@ -1040,22 +1040,73 @@
 			fontColor: "black",
 			border: 2,
 			shadow: 3,
-			x: (320/2) * qx,
+			x: (160) * qx,
 			y: 48 * qy,
 			w: 290 * qx,
 			h: 60 * qy,
 			label: 'Glorious Victory/Defeat',
 		}));
 		
-		var ResultsBox = stage.insert(new Q.UI.Container({
+		var PlayerPointsBox = stage.insert(new Q.UI.Container({
 			fill: "white",
-			fontColor: "black",
+			border: 2,
+			x: 73 * qx,
+			y: 103.5 * qy,
+			w: 116 * qx,
+			h: 50 * qy,
+		}));
+		
+		var PlayerPointsText = stage.insert(new Q.UI.Text({label: "99.99"}),PlayerPointsBox);
+		
+		var VersusBox = stage.insert(new Q.UI.Button({
+			fill: "white",
+			border: 2,
+			x: 160 * qx,
+			y: 103.5 * qy,
+			w: 58 * qx,
+			h: 50 * qy,
+			label: "VS",
+		}));
+		
+		var EnemyPointsBox = stage.insert(new Q.UI.Container({
+			fill: "white",
+			border: 2,
+			x: 247 * qx,
+			y: 103.5 * qy,
+			w: 116 * qx,
+			h: 50 * qy,
+		}));
+		
+		var ResultsCanvas = stage.insert(new Q.UI.Container({
+			fill: "white",
 			border: 2,
 			shadow: 3,
-			x: (320/2) * qx,
-			y: (((450-78)/2)+78) * qy,
+			x: (160) * qx,
+			y: (284) * qy,
 			w: 290 * qx,
-			h: 350 * qy,
+			h: 310 * qy,
+			shadowColor: "rgba(0,0,0,0.5)",
+		}));
+		
+		var TextResultsContainer = stage.insert(new Q.UI.Container({
+			fill: "yellow",
+			opacity: 0.5,
+			x: (160) * qx,
+			y: (181) * qy,
+			w: 290 * qx,
+			h: 103 * qy,
+		}));
+		
+		var TextResults = stage.insert(new Q.UI.Text({label: ""}), TextResultsContainer);
+		TextResults.p.label = "XP: +50" + "\n" + "Avg W/R: +8.75%";
+		
+		var GraphResultsContainer = stage.insert(new Q.UI.Container({
+			fill: "blue",
+			opacity: 0.5,
+			x: (160) * qx,
+			y: (336) * qy,
+			w: 290 * qx,
+			h: 207 * qy,
 		}));
 	
 		var ReviewBtn = stage.insert(new Q.UI.Button({
@@ -1431,7 +1482,7 @@
 	
 	// stage scene
 	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE], function() {
-		Q.stageScene("scene0");
+		Q.stageScene("scene2");
 	});
      
 	 //setTimeout(function(){Q.state.inc("currentIndex", 1);}, 5000);
