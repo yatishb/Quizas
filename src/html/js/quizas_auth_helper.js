@@ -107,3 +107,31 @@ function quizas_get_profile(profileCallback) {
         });
     }
 }
+
+function outputFriendsStudy(friends) {
+    friends.forEach(function (f) {
+        $('.list_online').append(
+            "<div class='simple_friend " +
+            ("" + f.userid).replace(":", "_") +
+            "' id='" +
+            f.userid +
+            "'><div class='friend_profile'><img src='" +
+            "'></div><span>" +
+            f.name +
+            "</span></div>"
+        );
+
+        quizas_get_profile_for(f.userid, function (p) {
+            var address;
+
+            address = p.picture;
+
+            if (!address || address.length == 0 || address == undefined) {
+                address = '../css/images/profile_default.png';
+            }
+
+            var newname = '.' + ("" + f.userid).replace(":", "_");
+            $(newname).find('.friend_profile img').attr('src', address);
+        });
+    });
+}
