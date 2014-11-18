@@ -37,13 +37,9 @@
 		
 	
 		// helper functions
-		
-		String.prototype.insert = function (index, string) {
-			  if (index > 0)
-				return this.substring(0, index) + string + this.substring(index, this.length);
-			  else
-				return string + this;
-			};
+		function insertString(a, position, b) {
+			return output = a.substr(0, position) + b + a.substr(position);
+		}
 		
 		function wordWrap(iStr, cardWidth, pixelPerChar) {
 			var wrappedStr = iStr;
@@ -52,10 +48,11 @@
 			if ((n * pixelPerChar) > cardWidth) {
 				var m = Math.floor((n * pixelPerChar)/cardWidth);
 				for (i=0;i<m;i++) {
-					wrappedStr = wrappedStr.insert((i+1)*(cardWidth/pixelPerChar), "\n");
+					//wrappedStr = insertString(wrappedStr, (i+1)*(cardWidth/pixelPerChar), "\n");
+					position = Math.floor((i+1)*(cardWidth/pixelPerChar));
+					wrappedStr = wrappedStr.substr(0, position) + "\n" + wrappedStr.substr(position);
 				}
 			}
-			
 			return wrappedStr;
 		}
 		
@@ -1030,9 +1027,10 @@
 			
 		});
 
-		
-		//var whiteScreen = stage.insert(new Q.UI.WhiteOut());
-		//var nuclearExplosion = stage.insert(new Q.Nuke());
+		setTimeout(function() {
+		var whiteScreen = stage.insert(new Q.UI.WhiteOut());
+		var nuclearExplosion = stage.insert(new Q.Nuke());
+		}, 1000);
 	});
 	
 	// set scene
@@ -1192,12 +1190,12 @@
 	
 			
 			
-			function generateAnswers() {
+		function generateAnswers() {
 			var aBtns = [];
 			var k = 0;
+			
 			for (i=0;i<2;i++) {
 				for (j=0;j<2;j++) {
-					var fcAns = fcAnswers[k].answer;
 					var fillColor = "white", wordColor = "black";
 					if (fcQuestion.id == fcAnswers[k].id) {
 						fillColor = "green";
@@ -1208,6 +1206,7 @@
 							wordColor = "white";
 						}
 					}
+					
 					
 					aBtns[k] = stage.insert(new Q.UI.Button({
 						fill: fillColor,
@@ -1220,28 +1219,29 @@
 						shadowColor: "rgba(0,0,0,0.5)",
 						w: 110 * qx,
 						h: 100 * qy,
-						label: fcAns,
 						counter: k,
 						customId: fcAnswers[k].id,
 						}, function() {
 							// do something
 					}));
-					console.log(k);
 					
-					globalTestVar = fcAns;
+					
+					//console.log(k);
+					
+					//globalTestVar = fcAns;
 					//console.log(wordWrap(fcAns, 110, 7));
 					//console.log(fcAns);
 					
-					stage.insert(new Q.UI.Text({
+					/*stage.insert(new Q.UI.Text({
 						x: (90 + (140*j)) * qx,
 						y: (320 + (120*i)) * qy,
 						label: ""
-					}));
+					}));*/
 					
 					k++;
 				}
 			}
-			
+
 			return aBtns;
 		}
 		
@@ -1280,12 +1280,18 @@
 			return aTabs;
 		}
 		
-		function destroyAnswers(aBtns, aTabs) {
+		function destroyAnswers(aBtns, aTabs, aCont, aLab) {
 			for (i=0;i<aBtns.length;i++) {
 				aBtns[i].destroy();
 			}
 			for (j=0;j<aTabs.length;j++) {
 				aTabs[j].destroy();
+			}
+			for (i=0;i<aCont.length;i++) {
+				aCont[i].destroy();
+			}
+			for (i=0;i<aLab.length;i++) {
+				aLab[i].destroy();
 			}
 		}
 	
@@ -1307,7 +1313,9 @@
 			pTime = battlePage.ptime;
 			eTime = battlePage.etime;
 			
-			if (aBtns != null && aTabs != null) {destroyAnswers(aBtns, aTabs);}
+			if (aBtns != null && aTabs != null && aContainer != null && aBtnLabel != null) {
+				destroyAnswers(aBtns, aTabs, aContainer, aBtnLabel);
+			}
 			if (qCard != null) {qCard.destroy();}
 			if (PrevQBtn != null) {PrevQBtn.destroy();}
 			if (NextQBtn != null) {NextQBtn.destroy();}
@@ -1317,6 +1325,22 @@
 			
 			aBtns = generateAnswers();
 			aTabs = generateTabs();
+			aContainer = generateAContainer();
+			aBtnLabel = generateALabel(aContainer);
+			for (i=0;i<4;i++) {
+				//aBtnLabel[i].p.label = wordWrap(fcAnswers[i].answer, 110, 10);
+				if (fcQuestion.id == fcAnswers[i].id) {
+					aBtnLabel[i].p.color = "white";
+				} else {
+					if (fcAnswers[i].id == pAnswer || fcAnswers[i].id == eAnswer) {
+						aBtnLabel[i].p.color = "white";
+					}
+				}
+			}
+			aBtnLabel[0].p.label = wordWrap(fcAnswers[0].answer, 110, 10);
+			aBtnLabel[1].p.label = wordWrap(fcAnswers[1].answer, 110, 10);
+			aBtnLabel[2].p.label = wordWrap(fcAnswers[2].answer, 110, 10);
+			aBtnLabel[3].p.label = wordWrap(fcAnswers[3].answer, 110, 10);
 
 			if (pAnswer == "null") {
 				PTimeCounter.p.label = "None";
@@ -1391,6 +1415,38 @@
 			w: 250 * qx,
 			h: 180 * qy
 		}));
+		
+		var aContainer = [], aBtnLabel = [];
+		
+		function generateAContainer() {
+			var aContainer = [];
+			var k = 0;
+			for (i=0;i<2;i++) {
+				for (j=0;j<2;j++) {
+					aContainer[k] = stage.insert(new Q.UI.Container({
+						fill: "black",
+						opacity: 0,
+						x: (90 + (140*j)) * qx,
+						y: (320 + (120*i)) * qy,
+						border: 2,
+						shadow: 3,
+						shadowColor: "rgba(0,0,0,0.5)",
+						w: 110 * qx,
+						h: 100 * qy,
+					}));
+					k++;
+				}
+			}
+			return aContainer;
+		}
+		
+		function generateALabel(array) {
+			var aBtnLabel = [];
+			for (i=0;i<4;i++) {
+				aBtnLabel[i] = stage.insert(new Q.UI.Text({label: ""}),array[i]);
+			}
+			return aBtnLabel;
+		}
 		
 		var PrevQBtn, NextQBtn, qCard;
 		
@@ -1543,7 +1599,7 @@
 	
 	// stage scene
 	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE, playerSprite, enemySprite, NUKE_SPRITE], function() {
-		Q.stageScene("scene1");
+		Q.stageScene("scene3");
 	});
 	 //setTimeout(function(){Q.state.inc("currentIndex", 1);}, 5000);
 });

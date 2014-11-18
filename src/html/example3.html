@@ -15,36 +15,8 @@
 </head>
 
 <body>
-<script>
-		// socket stuff
-	/*
-			namespace = '/test'; // change to an empty string to use the global namespace
-
-            // the socket.io documentation recommends sending an explicit package upon connection
-            // this is specially important when using the global namespace
-            var socket = io.connect('http://' + document.domain + ':' + location.port + namespace,
-                                    {"connect timeout": 300,
-                                     "close timeout": 30,
-                                     "hearbeat timeout": 30});
-            socket.on('connect', function() {
-            });
-			
-			 
-		
-		// socket handler
-		socket.on('initiating', function(msg) {
-                //$('#log').append('<br>Received #' + msg.count + ': ' + msg.data);
-            });
-	*/
-	
+<script>	
 		// helper functions
-		
-		String.prototype.insert = function (index, string) {
-			  if (index > 0)
-				return this.substring(0, index) + string + this.substring(index, this.length);
-			  else
-				return string + this;
-			};
 		
 		function wordWrap(iStr, cardWidth, pixelPerChar) {
 			var wrappedStr = iStr;
@@ -53,10 +25,10 @@
 			if ((n * pixelPerChar) > cardWidth) {
 				var m = Math.floor((n * pixelPerChar)/cardWidth);
 				for (i=0;i<m;i++) {
-					wrappedStr = wrappedStr.insert((i+1)*(cardWidth/pixelPerChar), "\n");
+					position = Math.floor((i+1)*(cardWidth/pixelPerChar));
+					wrappedStr = wrappedStr.substr(0, position) + "\n" + wrappedStr.substr(position);
 				}
 			}
-			
 			return wrappedStr;
 		}
 		
@@ -216,44 +188,6 @@
 		var playerCounters = [];
 		var enemyCounters = [];
 
-		// declare JSON vars for testing purposes
-		var TestFlashCard = createFlashCard('22', 'F=??', 'M x A');
-		
-		var TestFCArray = [];
-		for (i=0;i<30;i++) {
-			var stringId = i.toString();
-			var stringQn = i.toString() + ' + ' + i.toString() + ' = ??';
-			var stringAns = (i + i).toString();
-			var fc = createFlashCard(stringId, stringQn, stringAns);
-			TestFCArray[i] = fc;
-		}
-		var TestFlashSet = createFlashSet('101', 'Simple Additions', 'Mathematics', TestFCArray);
-		var TestTotalQuestions = 10;
-		
-		var TestInitiatingForm = JSON.stringify({
-			name: "John Smith",
-			sprite: "smiley.png",
-			win: "75%",
-			encounter: "6",
-			total: "3",
-		});
-		
-		var TestServerForm = [];
-		for (i=0;i<3;i++) {
-		m = getRandomInt(0, 2);
-			j = i + 1, k = j + 1, l = k + 1;
-			TestServerForm[i] = JSON.stringify({
-				question: JSON.parse(createFlashCard('test:'+i, i + ' x 1 = ??', i.toString())),
-				answers: [JSON.parse(createFlashCard('test:'+i, i + ' x 1 = ??', i.toString())), 
-				  JSON.parse(createFlashCard('test:'+j, i + ' x 1 = ??', j.toString())), 
-				  JSON.parse(createFlashCard('test:'+k, i + ' x 1 = ??', k.toString())), 
-				  JSON.parse(createFlashCard('test:'+l, i + ' x 1 = ??', l.toString()))],
-				index: "" + (i + 1),
-				time: "" + 5,
-				player: null,
-				enemy: JSON.parse(createFlashCard('test:'+m, m + ' x 1 = ??', m.toString())),
-			});
-		}
 		
 		// fetching info from server
 		var INITIATING_FORM, SERVER_FORM;
@@ -302,7 +236,7 @@
 			return Math.round(resultPoints);
 		}
 		
-		var qppc = 15, appc = 10;
+		var qppc = 10, appc = 10;
 		var globalPlayerScore, globalEnemyScore;
 		
 //HERE********************************************************************************************
@@ -757,7 +691,7 @@
 						shadowColor: "rgba(0,0,0,0.5)",
 						w: 110 * qx,
 						h: 100 * qy,
-						label: fcAns,
+						//label: fcAns,
 						counter: k,
 						customId: fcAnswers[k].id,
 						}, function() {
@@ -852,12 +786,44 @@
 			h: 180 * qy
 		}));
 		
-		if (Q.state.get("currentIndex") > 0) {
-		var aBtns = generateAnswers();
-		var qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
-		qCard.generate(fcQuestion);
+		var aContainer, aBtnLabel;
+		
+		function generateAContainer() {
+			var aContainer = [];
+			var k = 0;
+			for (i=0;i<2;i++) {
+				for (j=0;j<2;j++) {
+					aContainer[k] = stage.insert(new Q.UI.Container({
+						fill: "black",
+						opacity: 0,
+						x: (90 + (140*j)) * qx,
+						y: (320 + (120*i)) * qy,
+						border: 2,
+						shadow: 3,
+						shadowColor: "rgba(0,0,0,0.5)",
+						w: 110 * qx,
+						h: 100 * qy,
+					}));
+					k++;
+				}
+			}
+			return aContainer;
 		}
-		var qCard;
+		
+		function generateALabel(array) {
+			var aBtnLabel = [];
+			for (i=0;i<4;i++) {
+				aBtnLabel[i] = stage.insert(new Q.UI.Text({label: ""}),array[i]);
+			}
+			return aBtnLabel;
+		}
+		
+		/*if (Q.state.get("currentIndex") > 0) {
+			var aBtns = generateAnswers();
+			var qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
+			qCard.generate(fcQuestion);
+		}*/
+		var qCard, aBtns;
 		//var qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
 		
 		var playerPortrait = stage.insert(new Q.PlayerPortrait());
@@ -925,21 +891,31 @@
 		Q.state.on("change.phaseToggle", function() {
 			midNuke = false;
 			if(totalQuestions - Q.state.get("currentIndex") >= 0) {
-				// Get next question only if there is another question to show
+					// Get next question only if there is another question to show
 
-				qCard.generate(fcQuestion);
-				if (Q.state.get("currentIndex") > 1) {destroyAnswers(aBtns)};
-				aBtns = generateAnswers();
-				if (Q.state.get("currentIndex") > 1) {TIMER.stop();}
-				if (Q.state.get("currentIndex") > 0 && Q.state.get("currentIndex") <= totalQuestions) {
-					TIMER = new Countdown({
-						seconds: maxTimeAllowed,
-						onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
-						onCounterEnd: function() {outOfTime();}
-					});
-					TIMER.start();
+					qCard.generate(fcQuestion);
+					//if (Q.state.get("currentIndex") > 1) {destroyAnswers(aBtns)};
+					if (aBtns != null) {destroyAnswers(aBtns);}
+					if (aContainer != null) {destroyAnswers(aContainer);}
+					if (aBtnLabel != null) {destroyAnswers(aBtnLabel);}
+					aBtns = generateAnswers();
+					aContainer = generateAContainer();
+					aBtnLabel = generateALabel(aContainer);
+						aBtnLabel[0].p.label = wordWrap(fcAnswers[0].answer, 110, appc);
+						aBtnLabel[1].p.label = wordWrap(fcAnswers[1].answer, 110, appc);
+						aBtnLabel[2].p.label = wordWrap(fcAnswers[2].answer, 110, appc);
+						aBtnLabel[3].p.label = wordWrap(fcAnswers[3].answer, 110, appc);
+					
+					if (Q.state.get("currentIndex") > 1) {TIMER.stop();}
+					if (Q.state.get("currentIndex") > 0 && Q.state.get("currentIndex") <= totalQuestions) {
+						TIMER = new Countdown({
+							seconds: maxTimeAllowed,
+							onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
+							onCounterEnd: function() {outOfTime();}
+						});
+						TIMER.start();
+					}
 				}
-			}
 		});
 			
 	
@@ -994,13 +970,28 @@
 					qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
 				}
 				
-			if (midNuke) {
+			if (!midNuke) {
 				if(totalQuestions - Q.state.get("currentIndex") >= 0) {
 					// Get next question only if there is another question to show
 
+					//qCard.generate(fcQuestion);
+					//if (Q.state.get("currentIndex") > 1) {destroyAnswers(aBtns)};
+					if (aBtns != null) {destroyAnswers(aBtns);}
+					if (aContainer != null) {destroyAnswers(aContainer);}
+					if (aBtnLabel != null) {destroyAnswers(aBtnLabel);}
+					if (qCard != null) {qCard.destroy();}
+					
+					qCard = stage.insert(new Q.UI.FlashCard(), qContainer);
 					qCard.generate(fcQuestion);
-					if (Q.state.get("currentIndex") > 1) {destroyAnswers(aBtns)};
+					
 					aBtns = generateAnswers();
+					aContainer = generateAContainer();
+					aBtnLabel = generateALabel(aContainer);
+						aBtnLabel[0].p.label = wordWrap(fcAnswers[0].answer, 110, appc);
+						aBtnLabel[1].p.label = wordWrap(fcAnswers[1].answer, 110, appc);
+						aBtnLabel[2].p.label = wordWrap(fcAnswers[2].answer, 110, appc);
+						aBtnLabel[3].p.label = wordWrap(fcAnswers[3].answer, 110, appc);
+					
 					if (Q.state.get("currentIndex") > 1) {TIMER.stop();}
 					if (Q.state.get("currentIndex") > 0 && Q.state.get("currentIndex") <= totalQuestions) {
 						TIMER = new Countdown({
@@ -1158,9 +1149,9 @@
 		function generateAnswers() {
 			var aBtns = [];
 			var k = 0;
+			
 			for (i=0;i<2;i++) {
 				for (j=0;j<2;j++) {
-					var fcAns = fcAnswers[k].answer;
 					var fillColor = "white", wordColor = "black";
 					if (fcQuestion.id == fcAnswers[k].id) {
 						fillColor = "green";
@@ -1171,6 +1162,7 @@
 							wordColor = "white";
 						}
 					}
+					
 					
 					aBtns[k] = stage.insert(new Q.UI.Button({
 						fill: fillColor,
@@ -1183,17 +1175,15 @@
 						shadowColor: "rgba(0,0,0,0.5)",
 						w: 110 * qx,
 						h: 100 * qy,
-						label: fcAns,
 						counter: k,
 						customId: fcAnswers[k].id,
 						}, function() {
 							// do something
-					}));
-					
+					}));					
 					k++;
 				}
 			}
-			
+
 			return aBtns;
 		}
 		
@@ -1232,12 +1222,18 @@
 			return aTabs;
 		}
 		
-		function destroyAnswers(aBtns, aTabs) {
+		function destroyAnswers(aBtns, aTabs, aCont, aLab) {
 			for (i=0;i<aBtns.length;i++) {
 				aBtns[i].destroy();
 			}
 			for (j=0;j<aTabs.length;j++) {
 				aTabs[j].destroy();
+			}
+			for (i=0;i<aCont.length;i++) {
+				aCont[i].destroy();
+			}
+			for (i=0;i<aLab.length;i++) {
+				aLab[i].destroy();
 			}
 		}
 	
@@ -1259,15 +1255,35 @@
 			pTime = battlePage.ptime;
 			eTime = battlePage.etime;
 			
-			if (aBtns != null && aTabs != null) {destroyAnswers(aBtns, aTabs);}
+			if (aBtns != null && aTabs != null && aContainer != null && aBtnLabel != null) {
+				destroyAnswers(aBtns, aTabs, aContainer, aBtnLabel);
+			}
 			if (qCard != null) {qCard.destroy();}
 			if (PrevQBtn != null) {PrevQBtn.destroy();}
 			if (NextQBtn != null) {NextQBtn.destroy();}
 			
 			qCard = stage.insert(new Q.UI.FlashCard(), qContainer);
 			qCard.generate(fcQuestion);
+			
 			aBtns = generateAnswers();
 			aTabs = generateTabs();
+			aContainer = generateAContainer();
+			aBtnLabel = generateALabel(aContainer);
+			for (i=0;i<4;i++) {
+				//aBtnLabel[i].p.label = wordWrap(fcAnswers[i].answer, 110, 10);
+				if (fcQuestion.id == fcAnswers[i].id) {
+					aBtnLabel[i].p.color = "white";
+				} else {
+					if (fcAnswers[i].id == pAnswer || fcAnswers[i].id == eAnswer) {
+						aBtnLabel[i].p.color = "white";
+					}
+				}
+			}
+			aBtnLabel[0].p.label = wordWrap(fcAnswers[0].answer, 110, appc);
+			aBtnLabel[1].p.label = wordWrap(fcAnswers[1].answer, 110, appc);
+			aBtnLabel[2].p.label = wordWrap(fcAnswers[2].answer, 110, appc);
+			aBtnLabel[3].p.label = wordWrap(fcAnswers[3].answer, 110, appc);
+			
 
 			if (pAnswer == "null") {
 				PTimeCounter.p.label = "None";
@@ -1342,6 +1358,38 @@
 			w: 250 * qx,
 			h: 180 * qy
 		}));
+		
+		var aContainer = [], aBtnLabel = [];
+		
+		function generateAContainer() {
+			var aContainer = [];
+			var k = 0;
+			for (i=0;i<2;i++) {
+				for (j=0;j<2;j++) {
+					aContainer[k] = stage.insert(new Q.UI.Container({
+						fill: "black",
+						opacity: 0,
+						x: (90 + (140*j)) * qx,
+						y: (320 + (120*i)) * qy,
+						border: 2,
+						shadow: 3,
+						shadowColor: "rgba(0,0,0,0.5)",
+						w: 110 * qx,
+						h: 100 * qy,
+					}));
+					k++;
+				}
+			}
+			return aContainer;
+		}
+		
+		function generateALabel(array) {
+			var aBtnLabel = [];
+			for (i=0;i<4;i++) {
+				aBtnLabel[i] = stage.insert(new Q.UI.Text({label: ""}),array[i]);
+			}
+			return aBtnLabel;
+		}
 		
 		var PrevQBtn, NextQBtn, qCard;
 		
