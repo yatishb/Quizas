@@ -813,17 +813,22 @@
 				if (Q.state.get("currentIndex") == 1) {
 					qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
 				}
-				qCard.generate(fcQuestion);
-				if (Q.state.get("currentIndex") > 1) {destroyAnswers(aBtns)};
-				aBtns = generateAnswers();
-				if (Q.state.get("currentIndex") > 1) {TIMER.stop();}
-				if (Q.state.get("currentIndex") > 0 && Q.state.get("currentIndex") <= totalQuestions) {
-					TIMER = new Countdown({
-						seconds: maxTimeAllowed,
-						onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
-						onCounterEnd: function() {outOfTime();}
-					});
-					TIMER.start();
+
+				if(totalQuestions - Q.state.get("currentIndex") >= 0) {
+					// Get next question only if there is another question to show
+
+					qCard.generate(fcQuestion);
+					if (Q.state.get("currentIndex") > 1) {destroyAnswers(aBtns)};
+					aBtns = generateAnswers();
+					if (Q.state.get("currentIndex") > 1) {TIMER.stop();}
+					if (Q.state.get("currentIndex") > 0 && Q.state.get("currentIndex") <= totalQuestions) {
+						TIMER = new Countdown({
+							seconds: maxTimeAllowed,
+							onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
+							onCounterEnd: function() {outOfTime();}
+						});
+						TIMER.start();
+					}
 				}
 
 								

@@ -1,4 +1,5 @@
 from . import main
+import json
 from flask import request, abort
 import internalstats, authhelper
 
@@ -58,3 +59,8 @@ def readStatsOfJustEndedGame(userid):
 			return "Successfully updated"
 		else:
 			abort(401)
+
+
+@main.route('/leaderboard')
+def buildLeaderboard():
+	return json.dumps( {'data':internalstats.populateLeaderboard()} )
