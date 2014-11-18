@@ -234,13 +234,14 @@
                 // do something
                 answersChosen.push( ansDeck[this.p.name].id );
                 if (quesDeck[Q.state.get("currentQuestion") - 1].id == ansDeck[this.p.name].id) {
-                  playerCounters[Q.state.get("currentIndex") - 1].p.fill = "green";
+                  playerCounters[Q.state.get("currentQuestion") - 1].p.fill = "green";
                   this.p.fill = "green";
                   console.log("Placeholder Trigger: Correct");
-                  Q.state.inc("playerScore", convertPoints(timeTakenCurrent, maxTimeAllowed * 1000));
+                  //Q.state.inc("playerScore", convertPoints(timeTakenCurrent, maxTimeAllowed * 1000));
+                  Q.state.inc("playerScore", 1);
                 } else {
                   console.log("Placeholder Trigger: Wrong");
-                  playerCounters[Q.state.get("currentIndex") - 1].p.fill = "red";
+                  playerCounters[Q.state.get("currentQuestion") - 1].p.fill = "red";
                   this.p.fill = "red";
                 }
                 
@@ -269,14 +270,14 @@
       }
 
       for (i=0;i<TOTAL_QUESTIONS;i++) {
-      playerCounters[i] = stage.insert(new Q.UI.Container({
-        fill: "white",
-        x: 15 * qx,
-        w: 15 * qx,
-        border: 2,
-        y: (490 - (210/TOTAL_QUESTIONS) - (i*(420/TOTAL_QUESTIONS))) * qy,
-        h: (420/TOTAL_QUESTIONS) * qy
-      }));
+        playerCounters[i] = stage.insert(new Q.UI.Container({
+          fill: "white",
+          x: 15 * qx,
+          w: 15 * qx,
+          border: 2,
+          y: (490 - (210/TOTAL_QUESTIONS) - (i*(420/TOTAL_QUESTIONS))) * qy,
+          h: (420/TOTAL_QUESTIONS) * qy
+        }));
       }
     
       //current question
