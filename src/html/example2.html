@@ -491,7 +491,7 @@
 	Q.scene("scene0", function(stage) {
 		//Q.state.reset({cardSize: 12});
 	
-		var cdText = stage.insert(new Q.UI.TimeCounter({x: qx*160, y: qy*284}));
+		//var cdText = stage.insert(new Q.UI.TimeCounter({x: qx*160, y: qy*284}));
 
 		/*gtv_c = stage.insert(new Q.UI.Container({
 			fill: "white",
@@ -574,14 +574,14 @@
 		});*/
 		
 		var playerPortrait = stage.insert(new Q.PlayerPortrait({
-			x: qx * ((320/6) + 20), 
+			x: qx * 65, 
 			y: qy * 90, 
 			scale: 0.05, 
 			asset: playerSprite,
 		}));
 		
 		var enemyPortrait = stage.insert(new Q.EnemyPortrait({
-			x: qx * ((320/6) + 20), 
+			x: qx * 65, 
 			y: qy * 478, 
 			scale: 0.05, 
 			asset: enemySprite,
@@ -632,12 +632,21 @@
 			return outStr;
 		}
 		
+		var timerBox = stage.insert(new Q.UI.Button({
+			fill: "white",
+			x: (65) * qx,
+			y: (284) * qy,
+			w: 30 * qx,
+			h: 30 * qy,
+			border: 1,
+		}));
+		
 		var matchDetails = stage.insert(new Q.UI.Text({size: 28}), matchContainer);
 		matchDetails.p.label = expressMatch(matchName, totalQuestions, encounterTotal, encounterWin);
 		
 		var cdTimer = new Countdown({
 			seconds: 10,
-			onUpdateStatus: function(sec) {cdText.p.label = "Game starting in " + (Math.ceil(sec)) + " seconds."},
+			onUpdateStatus: function(sec) {timerBox.p.label = (Math.ceil(sec)) + ""},
 			onCounterEnd: function() {/*Q.stageScene("scene1");*/}
 		});
 		
