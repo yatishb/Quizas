@@ -483,7 +483,18 @@
 	
 		var cdText = stage.insert(new Q.UI.TimeCounter({x: qx*160, y: qy*284}));
 
-		gtv_c = stage.insert(new Q.UI.Container({
+		/*gtv_c = stage.insert(new Q.UI.Container({
+			fill: "white",
+			x: ((2/3) * 320) * qx,
+			y: 90 * qy,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			w: (((2/3) * 320) - 20) * qx,
+			h: 150 * qy
+		}));*/
+		
+		var playerContainer = stage.insert(new Q.UI.Container({
 			fill: "white",
 			x: ((2/3) * 320) * qx,
 			y: 90 * qy,
@@ -513,13 +524,15 @@
 			return labelStr;
 		}
 		
-		gtv_b = stage.insert(new Q.UI.Text(), gtv_c);
-		var enemyStats = stage.insert(new Q.UI.Text(), enemyContainer);
-		gtv_b.p.label = expressStats('John Smith', 23, 'Matrix Agent', 86, 305);
+		//gtv_b = stage.insert(new Q.UI.Text(), gtv_c);
+		var playerStats = stage.insert(new Q.UI.Text({size: 32}), playerContainer);
+		var enemyStats = stage.insert(new Q.UI.Text({size: 32}), enemyContainer);
+		//gtv_b.p.label = expressStats('John Smith', 23, 'Matrix Agent', 86, 305);
+		playerStats.p.label = expressStats('John Smith', 23, 'Matrix Agent', 86, 305);
 		enemyStats.p.label = expressStats('Darth Vader', 37, 'Sith Lord', 67, 1300);
 		
 		
-		stage.insert(new Q.UI.Button({x: 100*qx, y: 300*qy, w: 50*qx, h: 50*qy, label: "^", fill: "white"}, 
+		/*stage.insert(new Q.UI.Button({x: 100*qx, y: 300*qy, w: 50*qx, h: 50*qy, label: "^", fill: "white"}, 
 			function() {Q.state.inc("cardSize", 1);}));
 		stage.insert(new Q.UI.Button({x: 200*qx, y: 300*qy, w: 50*qx, h: 50*qy, label: "v", fill: "white"}, 
 			function() {Q.state.inc("cardSize" , -1);}));
@@ -540,7 +553,7 @@
 			gtv_b = stage.insert(new Q.UI.Text({size: Q.state.get("cardSize")}), gtv_c);
 			gtv_b.p.label = expressStats('John Smith', 23, 'Matrix Agent', 86, 305);
 			gtv_a.p.label = Q.state.get("cardSize") + "";
-		});
+		});*/
 		
 		var playerPortrait = stage.insert(new Q.PlayerPortrait({
 			x: qx * (320/6), 
