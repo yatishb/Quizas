@@ -17,14 +17,75 @@
     var friend_id = JSON.parse(sessionStorage.getItem("friend_id"));
     var set_id = JSON.parse(sessionStorage.getItem("set_id"));
     var user_id = JSON.parse(sessionStorage.getItem("user_id"));
+    friend_id = "facebook:1503693109883931"
+    user_id = "facebook:1503693109883931"
+    set_id = "quizlet:17775641"
 
     var quesDeck = [];
     var answersDeck = [];
     var answersChosen = [];
     var TOTAL_QUESTIONS ;
+    var TIMER;
 
 
 
+    function Countdown(options) {
+      var timer,
+        instance = this,
+        seconds = options.seconds || 10,
+        updateStatus = options.onUpdateStatus || function () {},
+        counterEnd = options.onCounterEnd || function () {},
+        offset, max;
+        
+      function decrementCounter() {
+        d = delta();
+        seconds = (seconds >= d) ? seconds -= d : 0;
+        updateStatus((seconds/1000).toFixed(2));
+        if (seconds <= 0) {
+          counterEnd();
+          instance.stop();
+        }
+      }
+      
+      function delta() {
+        var now = Date.now(),
+          d = now - offset;
+        offset = now;
+        return d;
+      }
+      
+      this.getTime = function() {
+        return (max - seconds);
+      };
+
+      this.start = function () {
+        clearInterval(timer);
+        timer = 0;
+        offset = Date.now();
+        max = options.seconds * 1000;
+        seconds = options.seconds * 1000;
+        timer = setInterval(decrementCounter, 10);
+      };
+
+       this.stop = function () {
+        clearInterval(timer);
+      };
+    }
+
+    function convertPoints(timeMils, maxTime) { // all in milliseconds
+      var resultPoints = ((maxTime - timeMils) / maxTime) * 10000;
+      return Math.round(resultPoints);
+    }
+
+
+    // some global variables
+    var playerCounters = [];
+    var maxTimeAllowed = 10;
+
+
+  // ***************************************
+  // GAME BEGINS HERE!
+  // ***************************************
   window.addEventListener("load",function() {
     // Get questions and answers for the chosen set id.
     setQuestions = $.get("/api/sets/"+ set_id + "/shuffle/10", function (data) {
@@ -34,7 +95,6 @@
       for (i = 0; i < obj.questions.length; i++) {
         quesDeck.push( obj.questions[i].question );
         answersDeck.push( obj.questions[i].answers );
-        console.log(obj.questions[i])
       }
 
       TOTAL_QUESTIONS = obj.questions.length;
@@ -44,12 +104,15 @@
       .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
       .setup({
       width: 320,
-  	height: 568,
-  	scaleToFit: true
-  	//maximize: "touch"
+      height: 568,
+      scaleToFit: true
+      //maximize: "touch"
     }).touch();
+
+    var qx = Q.width/320;
+    var qy = Q.height/568;
     
-    Q.state.set({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
+    Q.state.set({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1, waiting: true});
     
     Q.UI.Score = Q.UI.Text.extend("UI.Score", { 
       init: function(p) {
@@ -136,13 +199,16 @@
 
     Q.scene("scene1",function(stage) {
     
-      Q.state.reset({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
+      Q.state.reset({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1, waiting: true, isGameOver: false});
     
       var leScore = stage.insert(new Q.UI.Score());
       var leQC = stage.insert(new Q.UI.QuestionCounter());
       var ansDeck ;
+      var timeTakenCurrent = 0;
+      var timeOutTimer, gameOverTimer;
       
       function generateAnswers() {
+        Q.state.set("waiting", false);
         ansDeck = answersDeck[Q.state.get("currentQuestion") - 1];
 
         var aBtns = [];
@@ -169,28 +235,58 @@
               name: k
               }, function() {
                 // do something
-                answersChosen.push( ansDeck[this.p.name].id );
-                if (quesDeck[Q.state.get("currentQuestion") - 1].id == ansDeck[this.p.name].id) {
-                  console.log("Placeholder Trigger: Correct");
-                  Q.state.inc("score", 1);
-                } else {
-                  console.log("Placeholder Trigger: Wrong");
-                }
+                if (!Q.state.get("waiting")) {
+                  console.log(TIMER);
+                  timeTakenCurrent = TIMER.getTime();
+                  Q.state.set("waiting", true);
                 
-                if (Q.state.get("currentQuestion") <= Q.state.get("totalQuestions")) {
-                  Q.state.inc("currentQuestion", 1);
+                  answersChosen.push( ansDeck[this.p.name].id );
+                  if (quesDeck[Q.state.get("currentQuestion") - 1].id == ansDeck[this.p.name].id) {
+                    playerCounters[Q.state.get("currentQuestion") - 1].p.fill = "green";
+                    this.p.fill = "green";
+                    console.log("Placeholder Trigger: Correct");
+                    Q.state.inc("score", convertPoints(timeTakenCurrent, maxTimeAllowed * 1000));
+                    //Q.state.inc("score", 1);
+                  } else {
+                    console.log("Placeholder Trigger: Wrong");
+                    playerCounters[Q.state.get("currentQuestion") - 1].p.fill = "red";
+                    this.p.fill = "red";
+                  }
+                  
+                  if (Q.state.get("currentQuestion") <= Q.state.get("totalQuestions")) {
+                    Q.state.inc("currentQuestion", 1);
+                  }
                 }
-            }));
-            k = k + 1;
+              }));
+              k = k + 1;
           }
         }
         return aBtns;
+      }
+
+      function outOfTime() {
+        if (!Q.state.get("waiting")) {
+        Q.state.set("waiting", true);
+        timeTakenCurrent = maxTimeAllowed * 1000;
+        answersChosen.push("null");
+        }
       }
       
       function destroyAnswers(aBtns) {
         for (i=0;i<aBtns.length;i++) {
           aBtns[i].destroy();
         }
+      }
+
+      for (i=0;i<TOTAL_QUESTIONS;i++) {
+        playerCounters[i] = stage.insert(new Q.UI.Container({
+          fill: "white",
+          x: 15 * qx,
+          w: 15 * qx,
+          border: 2,
+          y: (490 - (210/TOTAL_QUESTIONS) - (i*(420/TOTAL_QUESTIONS))) * qy,
+          h: (420/TOTAL_QUESTIONS) * qy
+        }));
       }
     
       //current question
@@ -210,15 +306,35 @@
       
       var qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
       qCard.generate(Q.state.get("currentQuestion") - 1);
+      TIMER = new Countdown({
+            seconds: maxTimeAllowed,
+            onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
+            onCounterEnd: function() {outOfTime();}
+          });
+          TIMER.start();
       
       Q.state.on("change.currentQuestion", function() {
         if (Q.state.get("currentQuestion") > TOTAL_QUESTIONS) {
+          clearInterval(gameOverTimer);
           Q.stageScene("scene2");
         } 
+        clearTimeout(timeOutTimer);
         qCard.generate(Q.state.get("currentQuestion") - 1);
         destroyAnswers(aBtns);
         aBtns = generateAnswers();
+        
+        if (Q.state.get("currentIndex") > 1) {TIMER.stop();}
+        if (Q.state.get("currentIndex") > 0 && Q.state.get("currentIndex") <= TOTAL_QUESTIONS) {
+          TIMER = new Countdown({
+            seconds: maxTimeAllowed,
+            onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
+            onCounterEnd: function() {outOfTime();}
+          });
+          TIMER.start();
+        }
+
       });
+
       
     });
 
@@ -230,8 +346,7 @@
     Q.scene("scene2",function(stage) {
 
       // POST DATA
-      // Single Player dont post data
-      /*var jsonData = {};
+      var jsonData = {};
       var cardsArray = [];
       jsonData["flashset"] = set_id;
       jsonData['questions'] = obj;
@@ -257,7 +372,7 @@
         },
         dataType: "json"
       });
-      */
+      
     
       var leScore = stage.insert(new Q.UI.Score());
       // Results page!
