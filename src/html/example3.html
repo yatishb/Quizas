@@ -277,6 +277,7 @@
 		var CURRENT_TIME = QUESTION_TIME;
 		var TIMER;
 		var NUKE_SPRITE = "mushroom_cloud.jpg";
+		var NUKE_SOUND = "Bomb_Explosion.mp3";
 		
 		// interpreting info from server
 		var initiatingJSON = JSON.parse(INITIATING_FORM);
@@ -309,7 +310,7 @@
 //HERE********************************************************************************************
 	window.addEventListener("load",function() {
 	
-	var Q = window.Q = Quintus()
+	var Q = window.Q = Quintus({audioSupported: ['mp3', 'wav']})
     .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI, Audio")
     .setup({
 		maximize: true
@@ -1078,8 +1079,6 @@
 			EnemyPointsBox.p.fontColor = "gray";
 		}
 		
-		
-		
 		var ResultsCanvas = stage.insert(new Q.UI.Container({
 			fill: "white",
 			fontColor: "black",
@@ -1091,6 +1090,30 @@
 			h: 310 * qy,
 			shadowColor: "rgba(0,0,0,0.5)",
 		}));
+		
+		// --------------------- text results and richard's graph here -------------------------------->
+		/*
+		var TextResultsContainer = stage.insert(new Q.UI.Container({
+			fill: "yellow",
+			opacity: 0.5,
+			x: (160) * qx,
+			y: (181) * qy,
+			w: 290 * qx,
+			h: 103 * qy,
+		}));
+		
+		var TextResults = stage.insert(new Q.UI.Text({label: ""}), TextResultsContainer);
+		TextResults.p.label = "XP: +50" + "\n" + "Avg W/R: +8.75%";
+		
+		var GraphResultsContainer = stage.insert(new Q.UI.Container({
+			fill: "blue",
+			opacity: 0.5,
+			x: (160) * qx,
+			y: (336) * qy,
+			w: 290 * qx,
+			h: 207 * qy,
+		}));
+		*/
 	
 		var ReviewBtn = stage.insert(new Q.UI.Button({
 			fill: "white",
@@ -1416,7 +1439,7 @@
 	});
 	
 	// stage scene
-	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE, playerSprite, enemySprite, NUKE_SPRITE], function() {
+	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE, playerSprite, enemySprite, NUKE_SPRITE, /*NUKE_SOUND*/], function() {
 		Q.stageScene("scene0");
 	});
      
