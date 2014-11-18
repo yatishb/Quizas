@@ -9,6 +9,9 @@
     <!-- <script src='example1.js'></script> -->
 	<link rel="stylesheet" type="text/css" href="css/singlePlayer.css">
 	<script>
+		var globalTestVar;
+	
+	
 		// socket stuff
 	/*
 			namespace = '/test'; // change to an empty string to use the global namespace
@@ -32,6 +35,27 @@
 		
 	
 		// helper functions
+		
+		String.prototype.insert = function (index, string) {
+			  if (index > 0)
+				return this.substring(0, index) + string + this.substring(index, this.length);
+			  else
+				return string + this;
+			};
+		
+		function wordWrap(iStr, cardWidth, pixelPerChar) {
+			var wrappedStr = iStr;
+			var n = iStr.length;
+			
+			if ((n * pixelPerChar) > cardWidth) {
+				var m = Math.floor((n * pixelPerChar)/cardWidth);
+				for (i=0;i<m;i++) {
+					wrappedStr = wrappedStr.insert((i+1)*(cardWidth/pixelPerChar), "\n");
+				}
+			}
+			
+			return wrappedStr;
+		}
 		
 		function Countdown(options) {
 			var timer,
@@ -418,7 +442,8 @@
 				id: 'fc-null',
 				question: 'q-null',
 				answer: 'a-null',
-				isQuestion: true
+				isQuestion: true,
+				label: ""
 			});
 		},
 	
@@ -429,7 +454,7 @@
 			this.p.question = parsedArgument.question;
 			this.p.answer = parsedArgument.answer;
 			if (this.p.isQuestion) {
-				this.p.label = this.p.question;
+				this.p.label = wordWrap(this.p.question, 250, 15);
 			} else {
 				this.p.label = this.p.answer;
 			}
@@ -510,7 +535,7 @@
 		var cdTimer = new Countdown({
 			seconds: 10,
 			onUpdateStatus: function(sec) {cdText.p.label = "Game starting in " + (Math.ceil(sec)) + " seconds."},
-			onCounterEnd: function() {Q.stageScene("scene1");}
+			onCounterEnd: function() {/*Q.stageScene("scene1");*/}
 		});
 		
 		cdTimer.start();
@@ -933,8 +958,8 @@
 		// create testBattleLibrary
 		
 		testBL = [{totalQuestions: 3}, 
-		  {question: JSON.parse(createFlashCard("101", "A", "A")),
-		    answers: [JSON.parse(createFlashCard("101", "A", "A")), 
+		  {question: JSON.parse(createFlashCard("101", "ajdks asdasd kasdjdjjd ajssjdaask jkajigrjgdnkjfg dfgj", "fnsdjfjh seifksdf")),
+		    answers: [JSON.parse(createFlashCard("101", "ajdks asdasd kasdjdjjd ajssjdaask jkajigrjgdnkjfg dfgj", "fnsdjfjh seifksdf")), 
 			  JSON.parse(createFlashCard("102", "B", "B")),
 			  JSON.parse(createFlashCard("103", "C", "C")),
 			  JSON.parse(createFlashCard("104", "D", "D")),],
@@ -962,7 +987,7 @@
 			etime: 6000}];
 			
 			battleLibrary = testBL;
-			
+	
 			
 			
 			function generateAnswers() {
@@ -998,6 +1023,17 @@
 						customId: fcAnswers[k].id,
 						}, function() {
 							// do something
+					}));
+					console.log(k);
+					
+					globalTestVar = fcAns;
+					//console.log(wordWrap(fcAns, 110, 7));
+					//console.log(fcAns);
+					
+					stage.insert(new Q.UI.Text({
+						x: (90 + (140*j)) * qx,
+						y: (320 + (120*i)) * qy,
+						label: ""
 					}));
 					
 					k++;
@@ -1076,6 +1112,7 @@
 			
 			qCard = stage.insert(new Q.UI.FlashCard(), qContainer);
 			qCard.generate(fcQuestion);
+			
 			aBtns = generateAnswers();
 			aTabs = generateTabs();
 

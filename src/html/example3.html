@@ -41,6 +41,27 @@
 	
 		// helper functions
 		
+		String.prototype.insert = function (index, string) {
+			  if (index > 0)
+				return this.substring(0, index) + string + this.substring(index, this.length);
+			  else
+				return string + this;
+			};
+		
+		function wordWrap(iStr, cardWidth, pixelPerChar) {
+			var wrappedStr = iStr;
+			var n = iStr.length;
+			
+			if ((n * pixelPerChar) > cardWidth) {
+				var m = Math.floor((n * pixelPerChar)/cardWidth);
+				for (i=0;i<m;i++) {
+					wrappedStr = wrappedStr.insert((i+1)*(cardWidth/pixelPerChar), "\n");
+				}
+			}
+			
+			return wrappedStr;
+		}
+		
 		function Countdown(options) {
 			var timer,
 			  instance = this,
@@ -280,6 +301,8 @@
 			return Math.round(resultPoints);
 		}
 		
+		var qppc = 15, appc = 10;
+		
 //HERE********************************************************************************************
 	window.addEventListener("load",function() {
 	
@@ -448,7 +471,7 @@
 			this.p.question = parsedArgument.question;
 			this.p.answer = parsedArgument.answer;
 			if (this.p.isQuestion) {
-				this.p.label = this.p.question;
+				this.p.label = wordWrap(this.p.question, 250, qppc);
 			} else {
 				this.p.label = this.p.answer;
 			}
@@ -901,7 +924,7 @@
 		// create testBattleLibrary
 		
 		/*
-		testBL = [{totalQuestions: 3}, 
+		testBL = [{totalQns: 3}, 
 		  {question: JSON.parse(createFlashCard("101", "A", "A")),
 		    answers: [JSON.parse(createFlashCard("101", "A", "A")), 
 			  JSON.parse(createFlashCard("102", "B", "B")),
