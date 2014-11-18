@@ -25,6 +25,7 @@
     var answersDeck = [];
     var answersChosen = [];
     var TOTAL_QUESTIONS ;
+    var TIMER;
 
 
 
@@ -204,6 +205,8 @@
       var leScore = stage.insert(new Q.UI.Score());
       var leQC = stage.insert(new Q.UI.QuestionCounter());
       var ansDeck ;
+      var timeTakenCurrent = 0;
+      var timeOutTimer, gameOverTimer;
       
       function generateAnswers() {
         ansDeck = answersDeck[Q.state.get("currentQuestion") - 1];
@@ -232,24 +235,29 @@
               name: k
               }, function() {
                 // do something
-                answersChosen.push( ansDeck[this.p.name].id );
-                if (quesDeck[Q.state.get("currentQuestion") - 1].id == ansDeck[this.p.name].id) {
-                  playerCounters[Q.state.get("currentQuestion") - 1].p.fill = "green";
-                  this.p.fill = "green";
-                  console.log("Placeholder Trigger: Correct");
-                  //Q.state.inc("playerScore", convertPoints(timeTakenCurrent, maxTimeAllowed * 1000));
-                  Q.state.inc("playerScore", 1);
-                } else {
-                  console.log("Placeholder Trigger: Wrong");
-                  playerCounters[Q.state.get("currentQuestion") - 1].p.fill = "red";
-                  this.p.fill = "red";
-                }
+                if (!Q.state.get("waiting")) {
+                timeTakenCurrent = TIMER.getTime();
+                Q.state.set("waiting", true);
                 
-                if (Q.state.get("currentQuestion") <= Q.state.get("totalQuestions")) {
-                  Q.state.inc("currentQuestion", 1);
+                  answersChosen.push( ansDeck[this.p.name].id );
+                  if (quesDeck[Q.state.get("currentQuestion") - 1].id == ansDeck[this.p.name].id) {
+                    playerCounters[Q.state.get("currentQuestion") - 1].p.fill = "green";
+                    this.p.fill = "green";
+                    console.log("Placeholder Trigger: Correct");
+                    Q.state.inc("score", convertPoints(timeTakenCurrent, maxTimeAllowed * 1000));
+                    //Q.state.inc("score", 1);
+                  } else {
+                    console.log("Placeholder Trigger: Wrong");
+                    playerCounters[Q.state.get("currentQuestion") - 1].p.fill = "red";
+                    this.p.fill = "red";
+                  }
+                  
+                  if (Q.state.get("currentQuestion") <= Q.state.get("totalQuestions")) {
+                    Q.state.inc("currentQuestion", 1);
+                  }
                 }
-            }));
-            k = k + 1;
+              }));
+              k = k + 1;
           }
         }
         return aBtns;
@@ -300,12 +308,22 @@
       
       Q.state.on("change.currentQuestion", function() {
         if (Q.state.get("currentQuestion") > TOTAL_QUESTIONS) {
+          clearInterval(gameOverTimer);
           Q.stageScene("scene2");
         } 
-        //clearTimeout(timeOutTimer);
+        clearTimeout(timeOutTimer);
         qCard.generate(Q.state.get("currentQuestion") - 1);
         destroyAnswers(aBtns);
         aBtns = generateAnswers();
+        if (Q.state.get("currentIndex") > 1) {TIMER.stop();}
+        if (Q.state.get("currentIndex") > 0 && Q.state.get("currentIndex") <= TOTAL_QUESTIONS) {
+          TIMER = new Countdown({
+            seconds: maxTimeAllowed,
+            onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
+            onCounterEnd: function() {outOfTime();}
+          });
+          TIMER.start();
+        }
       });
       
     });
