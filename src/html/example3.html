@@ -263,14 +263,15 @@
 		var enemyName, enemySprite, enemyWinRate, enemyEncounter, totalQuestions;
 		
 		var battleLibrary = []
-		function createBattle(fcQ, fcA, playerA, enemyA, playerTime) {
+		function createBattle(fcQ, fcA, playerA, enemyA, playerTime, enemyTime) {
 			var battlePage = {
 				question: fcQ,
 				answers: fcA,
 				player: playerA,
 				enemy: enemyA,
-				time: playerTime,
-			};
+				ptime: playerTime,
+				etime: enemyTime,
+			}
 			return battlePage;
 		}
 		
@@ -704,13 +705,15 @@
 		}));
 		
 	// include an event handler, when receive from server, set variables, then set "received" to true.
+	var prevMaxTime;
 	
 		socket.on('nextQuestion', function(msg) {
             //$('#log').append('<br>Received #' + msg.count + ': ' + msg.data);
 			//Q.state.set("received", true);
 			var sqn = fcQuestion,
 			  sans = fcAnswers,
-			  sqnN = questionNumber;
+			  sqnN = questionNumber,
+			  prevMaxTime = maxTimeAllowed;
 			
 			if (Q.state.get("currentIndex") > 0) {prevFcQuestion = fcQuestion};
 			serverJSON = JSON.parse(msg.data);
@@ -777,10 +780,10 @@
 			if (Q.state.get("currentIndex") > 1) {
 			console.log("TIME OF RECKONING: " + (prevFcQuestion.id == prevEnemyAns));
 			console.log("prevQnId " + prevFcQuestion.id + " vs enemy " + prevEnemyAns)
-			console.log("END");
+			console.log(prevEnemyTime + " " + prevMaxTime + " " + convertPoints(prevEnemyTime, prevMaxTime * 1000));
 				if (prevFcQuestion.id == prevEnemyAns) {
 					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "green";
-					Q.state.inc("enemyScore", convertPoints(prevEnemyTime, maxTimeAllowed * 1000));
+					Q.state.inc("enemyScore", convertPoints(prevEnemyTime, prevMaxTime * 1000));
 				} else {
 					enemyCounters[Q.state.get("currentIndex") - 2].p.fill = "red";
 				}

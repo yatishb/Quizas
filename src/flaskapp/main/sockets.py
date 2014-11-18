@@ -74,7 +74,8 @@ def sendNotificationToSocket(message):
 		gameRejection = {'rejectedby': userSendTo}
 		emit('user non-existent', {'data': json.dumps(gameRejection)})
 	else:
-		gameRequest = {"set": flashset, "requestfrom": user}
+		requestUserFacebookId = authhelper.lookupInternalFacebook(internalUser)
+		gameRequest = {"set": flashset, "requestfrom": requestUserFacebookId}
 		for client in clients:
 			if client.session['id'] == internalUserOppo:
 				print "sending request"
