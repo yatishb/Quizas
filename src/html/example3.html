@@ -302,6 +302,7 @@
 		}
 		
 		var qppc = 15, appc = 10;
+		var globalPlayerScore, globalEnemyScore;
 		
 //HERE********************************************************************************************
 	window.addEventListener("load",function() {
@@ -764,6 +765,8 @@
 		Q.state.on("change.isGameOver", function() {
 			if (Q.state.get("isGameOver")) {
 				clearInterval(gameOverTimer);
+				globalPlayerScore = Q.state.get("playerScore");
+				globalEnemyScore = Q.state.get("enemyScore");
 				Q.stageScene("scene2");
 			}
 			
@@ -859,9 +862,9 @@
 			//label: 'Glorious Victory/Defeat',
 		}));
 		
-		if (Q.state.get("playerScore") > Q.state.get("enemyScore")) {
+		if (globalPlayerScore > globalEnemyScore) {
 			ResultsBanner.p.label = "Glorious Victory :)";
-		} else if (Q.state.get("playerScore") < Q.state.get("enemyScore")) {
+		} else if (globalPlayerScore < globalEnemyScore) {
 			ResultsBanner.p.label = "You Lose :(";
 		} else {
 			ResultsBanner.p.label = "Draw :O";
