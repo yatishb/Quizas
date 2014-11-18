@@ -280,8 +280,9 @@
 		// interpreting info from server
 		var initiatingJSON = JSON.parse(INITIATING_FORM);
 		console.log(initiatingJSON);
-		var playerName;
-		var enemyName, enemySprite, enemyWinRate, enemyEncounter, totalQuestions;
+		var playerName, playerSprite, playerPoints, playerWin, playerTotal;
+		var enemyName, enemySprite, enemyPoints, enemyWin, enemyTotal;
+		var encounterTotal, encounterWin, matchName, totalQuestions;
 		
 		var battleLibrary = []
 		function createBattle(fcQ, fcA, playerA, enemyA, playerTime, enemyTime) {
@@ -323,18 +324,22 @@
 	var initiatingJSON = JSON.parse(INITIATING_FORM);
 	
 	// load initiating form here
-	//enemyName = initiatingJSON.name,
-	  //enemySprite = initiatingJSON.sprite,
-	  //playerName = quizas_user_id();
-	  enemyWinRate = initiatingJSON.win;
-	  enemyEncounter = initiatingJSON.encounter;
-	  totalQuestions = initiatingJSON.total;
-	  var gameroom = initiatingJSON.room;
-	  // encounterwin
+	playerName = initiatingJSON.playerName;
+	playerSprite = initiatingJSON.playerSprite;
+	playerPoints = initiatingJSON.playerPoints;
+	playerWin = initiatingJSON.playerWin;
+	playerTotal = initiatingJSON.playerTotal;
+	enemyName = initiatingJSON.enemyName;
+	enemySprite = initiatingJSON.enemySprite;
+	enemyPoints = initiatingJSON.enemyPoints;
+	enemyWin = initiatingJSON.enemyWin;
+	enemyTotal = initiatingJSON.enemyTotal;
+	encounterTotal = initiatingJSON.encounterTotal;
+	encounterWin = initiatingJSON.encounterWin;
+	matchName = initiatingJSON.matchName;
+	totalQuestions = initiatingJSON.totalQuestions;	  
 	  
-	  
-	  
-	PLAYER_NAME = "John Smith", ENEMY_NAME = "Darth Vader";
+	//PLAYER_NAME = "John Smith", ENEMY_NAME = "Darth Vader";
 	
 	// initialize Battle Library
 	battleLibrary[0] = {
@@ -343,7 +348,7 @@
 	};
 	
 	Q.state.set({playerScore: 0, enemyScore: 0, currentIndex: 0, currentQuestion: "", waiting: true});
-	var deck = shuffleDeck(totalQuestions, DECK_SIZE);
+	//var deck = shuffleDeck(totalQuestions, DECK_SIZE);
 	var isBombMoving = false;
 	
 	Q.UI.PlayerScore = Q.UI.Text.extend("UI.PlayerScore", { 
@@ -1205,7 +1210,7 @@
 	});
 	
 	// stage scene
-	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE], function() {
+	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE, playerSprite, enemySprite], function() {
 		Q.stageScene("scene1");
 	});
      
