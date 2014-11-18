@@ -37,6 +37,9 @@
             xfbml      : true,
             version    : 'v2.1'
         });
+
+        // FB API has loaded; now we can list friends.
+        listFacebookFriends(outputFriends);
     };
 
     (function(d, s, id){
