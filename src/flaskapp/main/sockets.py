@@ -78,9 +78,14 @@ def sendNotificationToSocket(message):
 		gameRequest = {"set": flashset, "requestfrom": requestUserFacebookId}
 		for client in clients:
 			if client.session['id'] == internalUserOppo:
-				print "sending request"
 				flagFoundUser = True
-				client.base_emit('game request', {'data': json.dumps(gameRequest)})
+				if client.session['room'] != defaultRoom:
+					print "user in another room"
+					gameRejection = {'rejectedby': userSendTo}
+					emit('game rejected', {'data': json.dumps(gameRejection)})
+				else:
+					print "sending request"
+					client.base_emit('game request', {'data': json.dumps(gameRequest)})
 
 	# If user not found
 	if flagFoundUser == False:
