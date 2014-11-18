@@ -1,0 +1,187 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800);
+@import url(http://fonts.googleapis.com/css?family=Tangerine&effect=fire-animation);
+@import url(http://fonts.googleapis.com/css?family=Rancho&effect=shadow-multiple);
+
+body {
+    background-color: #D2D7D3;
+}
+
+@media screen and (max-width: 600px) {
+    #heading {
+        font-size: 40pt;
+        text-shadow: 2px 2px 2px #aaa;
+    }
+
+    #subtitle {
+        font-size: 27pt;
+        font-weight: 200;
+        margin: 0 auto 5px auto;
+    }
+
+    .board_container {
+        width: 90vw;
+        height: auto;
+    }
+
+    .simple_leader {
+        height: 60px;
+    }
+
+    .rank {
+        font-size: 20pt;
+        padding: 0 15px 5px 15px;
+        width: 20px;
+    }
+
+    .profile {
+        width: 60px;
+        height: 60px;
+        padding-top: 5px;
+    }
+
+    .profile img {
+        height: 70%;
+        width: 70%;
+    }
+
+    .name {
+        font-size: 27pt;
+        font-weight: 300;
+        padding-top: 5px;
+    }
+
+    .score {
+        font-size: 27pt;
+        font-weight: 300;
+        padding-top: 5px;
+    }
+}
+
+@media screen and (min-width: 601px) {
+    #heading {
+        font-size: 70pt;
+        text-shadow: 4px 4px 4px #aaa;
+    }
+
+    #subtitle {
+        font-size: 40pt;
+        font-weight: 200;
+        margin: 0 auto 10px auto;
+    }
+
+    .board_container {
+        width: 80vw;
+        max-width: 600px;
+    }
+
+    .simple_leader {
+        height: 80px;
+    }
+
+    .rank {
+        font-size: 40pt;
+        padding: 5px 20px 0 20px;
+        width: 40px;
+    }
+
+    .profile {
+        width: 80px;
+        height: 80px;
+        /*padding-top: 14px;*/
+    }
+
+    .profile img {
+        height: 90%;
+        width: 90%;
+    }
+
+    .name {
+        font-size: 35pt;
+        font-weight: 500;
+        padding-top: 5px;
+    }
+
+    .score {
+        font-size: 35pt;
+        font-weight: 500;
+        padding-top: 5px;
+    }
+}
+
+#heading {
+    margin: 30px auto 10px auto;
+    text-align: center;
+    width: 100%;
+    top: 0;
+    font-family: 'Tangerine', sans-serif;
+}
+
+#subtitle {
+    font-family: 'Open Sans', sans-serif;
+    text-align: center;
+    color: #ABB7B7;
+    width: 100%;
+}
+
+.board_container {
+    margin: 20px auto;
+}
+
+.simple_leader {
+    font-family: 'Open Sans', sans-serif;
+    width: 100%;
+    border-bottom: solid 1px #95A5A6;
+    display: inline-block;
+}
+
+.rank,
+.profile,
+.name {
+    float: left;
+}
+
+.rank {
+    font-family: 'Rancho', sans-serif;
+    font-size: 40pt;
+    color: #6C7A89;
+}
+
+.rank.first {
+    color: #F22613;
+}
+
+.rank.second {
+    color: #C0392B;
+}
+
+.rank.third {
+    color: #E26A6A;
+}
+
+.profile {
+    width: 80px;
+    height: 80px;
+    margin: auto 10px;
+}
+
+.profile img {
+    border-radius: 50%;
+    -o-border-radius: 50%;
+    -ms-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    box-shadow: -1px 1px 3px #888888;
+}
+
+.name {
+    font-family: 'Open Sans', sans-serif;
+    color: #2C3E50;
+    width: 50%;
+    overflow: hidden;
+}
+
+.score {
+    float: right;
+    font-family: 'Open Sans', sans-serif;
+    color: #2C3E50;
+}
