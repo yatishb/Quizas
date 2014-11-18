@@ -6,7 +6,61 @@ body {
     background-color: #D2D7D3;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (min-width: 500px) {
+    #heading {
+        font-size: 30pt;
+        text-shadow: 2px 2px 2px #aaa;
+    }
+
+    #subtitle {
+        font-size: 25pt;
+        font-weight: 200;
+        margin: 0 auto 5px auto;
+    }
+
+    .board_container {
+        width: 90vw;
+        height: auto;
+    }
+
+    .simple_leader {
+        height: 60px;
+    }
+
+    .rank {
+        font-size: 18pt;
+        padding: 0 20px 5px 20px;
+        width: 30px;
+    }
+
+    .profile {
+        width: 60px;
+        height: 60px;
+        padding-top: 10px;
+    }
+
+    .profile img {
+        height: 70%;
+        width: 70%;
+        margin-top: 10px;
+    }
+
+    .name {
+        font-size: 18pt;
+        font-weight: 200;
+        padding-top: 10px;
+    }
+
+    .score {
+        font-size: 18pt;
+        font-weight: 200;
+        padding-top: 10px;
+        width: 40px;
+        margin-right: 10px;
+    }
+}
+
+@media screen and (min-width: 501px) {
     #heading {
         font-size: 40pt;
         text-shadow: 2px 2px 2px #aaa;
@@ -34,14 +88,16 @@ body {
     }
 
     .profile {
-        width: 60px;
-        height: 60px;
-        padding-top: 5px;
+        width: 70px;
+        height: 70px;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
     }
 
     .profile img {
         height: 70%;
         width: 70%;
+        margin-bottom: 10px;
     }
 
     .name {
@@ -54,10 +110,11 @@ body {
         font-size: 27pt;
         font-weight: 300;
         padding-top: 5px;
+        margin-right: 20px;
     }
 }
 
-@media screen and (min-width: 601px) {
+@media screen and (min-width: 701px) {
     #heading {
         font-size: 70pt;
         text-shadow: 4px 4px 4px #aaa;
@@ -87,6 +144,7 @@ body {
     .profile {
         width: 80px;
         height: 80px;
+        margin: auto 10px;
     }
 
     .profile img {
@@ -159,9 +217,7 @@ body {
 }
 
 .profile {
-    width: 80px;
-    height: 80px;
-    margin: auto 10px;
+    
 }
 
 .profile img {
