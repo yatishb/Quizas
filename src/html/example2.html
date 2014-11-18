@@ -9,7 +9,7 @@
     <!-- <script src='example1.js'></script> -->
 	<link rel="stylesheet" type="text/css" href="css/singlePlayer.css">
 	<script>
-		var globalTestVar, gtv_a;
+		var globalTestVar, gtv_a, gtv_b, gtv_c;
 	
 	
 		// socket stuff
@@ -483,7 +483,7 @@
 	
 		var cdText = stage.insert(new Q.UI.TimeCounter({x: qx*160, y: qy*284}));
 
-		var playerContainer = stage.insert(new Q.UI.Container({
+		gtv_c = stage.insert(new Q.UI.Container({
 			fill: "white",
 			x: ((2/3) * 320) * qx,
 			y: 90 * qy,
@@ -513,9 +513,9 @@
 			return labelStr;
 		}
 		
-		var playerStats = stage.insert(new Q.UI.Text(), playerContainer);
+		gtv_b = stage.insert(new Q.UI.Text(), gtv_c);
 		var enemyStats = stage.insert(new Q.UI.Text(), enemyContainer);
-		playerStats.p.label = expressStats('John Smith', 23, 'Matrix Agent', 86, 305);
+		gtv_b.p.label = expressStats('John Smith', 23, 'Matrix Agent', 86, 305);
 		enemyStats.p.label = expressStats('Darth Vader', 37, 'Sith Lord', 67, 1300);
 		
 		
@@ -525,7 +525,20 @@
 			function() {Q.state.inc("cardSize" , -1);}));
 		gtv_a = stage.insert(new Q.UI.Text({x: 160*qx, y: 350 * qy, label: "test"}));
 		Q.state.on("change.cardSize", function() {
-			playerStats.p.size = Q.state.get("cardSize");
+			
+			gtv_b.destroy(), gtv_c.destroy();
+			gtv_c = stage.insert(new Q.UI.Container({
+				fill: "white",
+				x: ((2/3) * 320) * qx,
+				y: 90 * qy,
+				border: 2,
+				shadow: 3,
+				shadowColor: "rgba(0,0,0,0.5)",
+				w: (((2/3) * 320) - 20) * qx,
+				h: 150 * qy
+			}));
+			gtv_b = stage.insert(new Q.UI.Text({size: Q.state.get("cardSize")}), gtv_c);
+			gtv_b.p.label = expressStats('John Smith', 23, 'Matrix Agent', 86, 305);
 			gtv_a.p.label = Q.state.get("cardSize") + "";
 		});
 		
