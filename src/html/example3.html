@@ -314,8 +314,8 @@
 	
 	// initialize Battle Library
 	battleLibrary[0] = {
-		totalQuestions: totalQuestions,
-		enemyName: ENEMY_NAME,
+		totalQns: totalQuestions,
+		//enemyName: ENEMY_NAME,
 	};
 	
 	Q.state.set({playerScore: 0, enemyScore: 0, currentIndex: 0, currentQuestion: "", waiting: true});
@@ -1017,11 +1017,11 @@
 			}
 		}
 	
-		// battleLibrary[0] = totalQuestions, enemyName
+		// battleLibrary[0] = totalQns, enemyName
 		// battleLibrary[i] = question, answers, player, enemy, ptime, etime
 	
 		Q.state.reset({battleIndex: 0, totalIndex: 0});
-		Q.state.set("totalIndex", battleLibrary[0].totalQuestions);
+		Q.state.set("totalIndex", battleLibrary[0].totalQns);
 		
 		
 		var fcQuestion, fcAnswers, pAnswer, eAnswer, pTime, eTime, aBtns, aTabs;
