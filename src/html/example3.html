@@ -505,60 +505,159 @@
 		
 	// versus screen with countdown
 	Q.scene("scene0", function(stage) {
-		var cdText = stage.insert(new Q.UI.TimeCounter({x: qx*160, y: qy*284}));
-		
+	
 		var playerContainer = stage.insert(new Q.UI.Container({
 			fill: "white",
-			x: 220 * qx,
-			y: 142 * qy,
+			x: ((2/3) * 320) * qx,
+			y: 90 * qy,
 			border: 2,
 			shadow: 3,
 			shadowColor: "rgba(0,0,0,0.5)",
-			w: 160 * qx,
+			w: (((2/3) * 320) - 20) * qx,
 			h: 150 * qy
 		}));
 		
 		var enemyContainer = stage.insert(new Q.UI.Container({
 			fill: "white",
-			x: 100 * qx,
-			y: 426 * qy,
+			x: ((2/3) * 320) * qx,
+			y: 478 * qy,
 			border: 2,
 			shadow: 3,
 			shadowColor: "rgba(0,0,0,0.5)",
-			w: 160 * qx,
+			w: (((2/3) * 320) - 20) * qx,
 			h: 150 * qy
 		}));
 		
+		function expressStats(iName, iLevel, iTitle, iWinRate, iTotalMatches) {
+			var labelStr = "[" + iName + "]" + "\n" +
+			  "Level " + iLevel + " " + iTitle + "\n" +
+			  "Winrate: " + iWinRate + "%" + "\n" +
+			  "Total Matches: " + iTotalMatches;
+			return labelStr;
+		}
+		
+		function getWinRate(wins, total) {
+			return ((wins/total)*100).toFixed(1);
+		}
+		
+		function getLevel(accumPoints) {
+			return Math.floor(accumPoints/100000);
+		}
+		
+		var playerStats = stage.insert(new Q.UI.Text({size: 32}), playerContainer);
+		var enemyStats = stage.insert(new Q.UI.Text({size: 32}), enemyContainer);
+		playerStats.p.label = expressStats(playerName, getLevel(playerPoints), 'Player', getWinRate(playerWin, playerTotal), playerTotal);
+		enemyStats.p.label = expressStats(enemyName, getLevel(enemyPoints), 'Opponent', getWinRate(enemyWin, enemyTotal), enemyTotal);
+		
 		var playerPortrait = stage.insert(new Q.PlayerPortrait({
-			x: qx * 80, 
-			y: qy * 142, 
+			x: qx * 65, 
+			y: qy * 90, 
 			scale: 1, 
-			asset: PLAYER_SPRITE
+			asset: playerSprite,
 		}));
 		
 		var enemyPortrait = stage.insert(new Q.EnemyPortrait({
-			x: qx * 260, 
-			y: qy * 426, 
+			x: qx * 65, 
+			y: qy * 478, 
 			scale: 1, 
-			asset: ENEMY_SPRITE
+			asset: enemySprite,
 		}));
 		
-		var playerName = stage.insert(new Q.UI.Text({
-			x: qx * 80,
-			y: qy * 200,
-			label: PLAYER_NAME
+		var matchContainer = stage.insert(new Q.UI.Container({
+			fill: "white",
+			x: ((2/3) * 320) * qx,
+			y: 284 * qy,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			w: (((2/3) * 320) - 20) * qx,
+			h: 200 * qy
 		}));
 		
-		var enemyName = stage.insert(new Q.UI.Text({
-			x: qx * 260,
-			y: qy * 484,
-			label: ENEMY_NAME
+		function expressMatch(matchName, totalQuestions, encounterTotal, encounterWin) {
+			var outStr;
+			outStr = "<< Match Details >>" + "\n\n" +
+			  "[" + matchName + "]" + "\n" +
+			  totalQuestions + " Questions" + "\n\n";
+			if (encounterTotal == 0) {
+				outStr += "First Encounter!";
+			} else {
+				var ewr = ((encounterWin/encounterTotal) * 100).toFixed(2);
+				if (ewr > 75) {
+					outStr += "Deliver the Smackdown!";
+				} else if (ewr < 25) {
+					outStr += "Reclaim your Honor!";
+				} else {
+					outStr += "Struggle for Dominance!";
+				}
+				outStr += "\n";
+				var numDenom;
+				switch (encounterTotal) {
+					case 1:
+						numDenom = "nd";
+						break;
+					case 2:
+						numDenom = "rd";
+						break;
+					default:
+						numDenom = "th";
+				}
+				outStr += (encounterTotal + 1) + numDenom + " Encounter" + "\n" +
+				  ewr + "% success rate";
+			}
+			return outStr;
+		}
+		
+		var loadContainer = stage.insert(new Q.UI.Container({
+			fill: "white",
+			x: 65 * qx,
+			y: 284 * qy,
+			w: 80 * qx,
+			h: 202 * qy,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
 		}));
-	
+		
+		var loadBox = [], numBox = 21, midNum = Math.floor(numBox/2), incLvl = Math.floor((numBox - 1) / 2);
+		for (i=0;i<numBox;i++) {
+			loadBox[i] = stage.insert(new Q.UI.Container({
+				fill: "white",
+				x: 65 * qx,
+				y: (184 + (100/numBox) + (i * (200/numBox))) * qy,
+				w: 78 * qx,
+				h: (200/numBox) * qy,
+			}));
+		}
+		loadBox[midNum].p.fill = "green";
+		
+		var timerBox = stage.insert(new Q.UI.Container({
+			fill: "white",
+			x: (65) * qx,
+			y: (284) * qy,
+			w: 40 * qx,
+			h: 40 * qy,
+			border: 1,
+		}));
+		
+		var timerCD = stage.insert(new Q.UI.Text({size: 50, label: ""}), timerBox);
+		
+		var matchDetails = stage.insert(new Q.UI.Text({size: 28}), matchContainer);
+		matchDetails.p.label = expressMatch(matchName, totalQuestions, encounterTotal, encounterWin);
+		
+		var cdSec = 10;
 		var cdTimer = new Countdown({
-			seconds: 10,
-			onUpdateStatus: function(sec) {cdText.p.label = "Game starting in " + (Math.ceil(sec)) + " seconds."},
-			onCounterEnd: function() {Q.stageScene("scene1");}
+			seconds: cdSec,
+			onUpdateStatus: function(sec) {
+				var ceilSec = Math.ceil(sec);
+				var incCS = cdSec - ceilSec;
+				loadBox[midNum + incCS].p.fill = "green";
+				loadBox[midNum - incCS].p.fill = "green";
+				timerCD.p.label = ceilSec + "";
+			},
+			onCounterEnd: function() {
+				setTimeout(function() {Q.stageScene("scene1");}, 1000);
+			}
 		});
 		
 		cdTimer.start();
@@ -772,7 +871,7 @@
 				clearInterval(gameOverTimer);
 				globalPlayerScore = Q.state.get("playerScore");
 				globalEnemyScore = Q.state.get("enemyScore");
-				Q.stageScene("scene2");
+				setTimeout(function() {Q.stageScene("scene2");}, 1000);
 			}
 			
 			//alert("Game Over");
@@ -853,8 +952,6 @@
 	// set scene
 	Q.scene("scene2",function(stage) {
 	
-		//var leScore = stage.insert(new Q.UI.PlayerScore());
-	
 		var ResultsBanner = stage.insert(new Q.UI.Button({
 			fill: "white",
 			fontColor: "black",
@@ -864,7 +961,6 @@
 			y: 48 * qy,
 			w: 290 * qx,
 			h: 60 * qy,
-			//label: 'Glorious Victory/Defeat',
 		}));
 		
 		if (globalPlayerScore > globalEnemyScore) {
@@ -1211,7 +1307,7 @@
 	
 	// stage scene
 	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE, playerSprite, enemySprite], function() {
-		Q.stageScene("scene1");
+		Q.stageScene("scene0");
 	});
      
 });
