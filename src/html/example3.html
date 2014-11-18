@@ -263,14 +263,15 @@
 		var enemyName, enemySprite, enemyWinRate, enemyEncounter, totalQuestions;
 		
 		var battleLibrary = []
-		function createBattle(fcQ, fcA, playerA, enemyA, playerTime) {
+		function createBattle(fcQ, fcA, playerA, enemyA, playerTime, enemyTime) {
 			var battlePage = {
 				question: fcQ,
 				answers: fcA,
 				player: playerA,
 				enemy: enemyA,
-				time: playerTime,
-			};
+				ptime: playerTime,
+				etime: enemyTime,
+			}
 			return battlePage;
 		}
 		

@@ -266,13 +266,14 @@
 		*/
 		
 		var battleLibrary = []
-		function createBattle(fcQ, fcA, playerA, enemyA, playerTime) {
+		function createBattle(fcQ, fcA, playerA, enemyA, playerTime, enemyTime) {
 			var battlePage = {
 				question: fcQ,
 				answers: fcA,
 				player: playerA,
 				enemy: enemyA,
-				time: playerTime,
+				ptime: playerTime,
+				etime: enemyTime,
 			}
 			return battlePage;
 		}
@@ -923,10 +924,94 @@
 		
 		
 	});
+
+	
+	Q.scene("scene3", function(stage) {
+		
+		function generateAnswers() {
+			//Q.state.set("waiting", false);
+			var aBtns = [];
+			var k = 0;
+			for (i=0;i<2;i++) {
+				for (j=0;j<2;j++) {
+					var fcAns = fcAnswers[k].answer;
+					var ansColor = "red";
+					if (fcQuestion.id == fcAnswers[k].id) {
+						ansColor = "green";
+					}
+					aBtns[k] = stage.insert(new Q.UI.Button({
+						fill: "gray",
+						highlight: ansColor,
+						fontColor: "white",
+						x: (85 + (140*j)) * qx,
+						y: (320 + (120*i)) * qy,
+						border: 2,
+						shadow: 3,
+						shadowColor: "rgba(0,0,0,0.5)",
+						w: 110 * qx,
+						h: 100 * qy,
+						label: fcAns,
+						counter: k,
+						customId: fcAnswers[k].id,
+						}, function() {
+							// do something
+							if (!Q.state.get("waiting")) {
+								timeTakenCurrent = TIMER.getTime() + "";
+								Q.state.set("waiting", true);
+							
+								var k = this.p.counter;
+								if (fcQuestion.id == fcAnswers[k].id) {
+									console.log("Placeholder Trigger: Correct");
+									playerCounters[Q.state.get("currentIndex") - 1].p.fill = "green";
+									this.p.fill = "green";
+									Q.state.inc("playerScore", 1);
+								} else {
+									console.log("Placeholder Trigger: Wrong");
+									playerCounters[Q.state.get("currentIndex") - 1].p.fill = "red";
+									this.p.fill = "red";
+								}
+								
+								currentFcAnswer = this.p.customId;
+								//Q.state.inc("currentIndex", 1);
+								
+								
+								
+								// send form to server and wait for next
+								clientJSON = createClientToServerJSON(fcQuestion.id, currentFcAnswer, timeTakenCurrent, Q.state.get("currentIndex") + "");
+								console.log("Post to Server: " + clientJSON);
+								//socket.emit("readanswer", clientJSON);
+								
+							}
+					}));
+					
+					k++;
+				}
+			}
+			
+			return aBtns;
+		}
+    
+    
+	
+	
+		var qContainer = stage.insert(new Q.UI.Container({
+			fill: "gray",
+			x: 160 * qx,
+			y: 160 * qy,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			w: 250 * qx,
+			h: 180 * qy
+		}));
+		
+		var qCard = stage.insert(new Q.UI.FlashCard(), qContainer);
+		qCard.generate(JSON.parse(TestFlashCard));
+	});
 	
 	// stage scene
 	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE], function() {
-		Q.stageScene("scene2");
+		Q.stageScene("scene3");
 	});
      
 	 //setTimeout(function(){Q.state.inc("currentIndex", 1);}, 5000);
