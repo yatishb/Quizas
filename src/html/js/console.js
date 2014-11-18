@@ -1,9 +1,3 @@
-var rank;
-var pic;
-var id;
-var points;
-var extraClass = " ";
-
 $(document).ready(function() {
 		displayContent();
 		setInterval(displayContent, 60000);
@@ -19,10 +13,12 @@ function displayContent() {
 				element.empty();
 
 				for (i = 0; i < leaderboard.length; i++) {
-						rank = i + 1;
-						pic = "http://graph.facebook.com/" + id + "/picture?type=square";
-						id = leaderboard[i].id.substring(9);
-						points = leaderboard[i].points;
+						var rank = i + 1;
+						var userid = leaderboard[i].id;
+						var id = userid.substring(9);
+						var pic = "http://graph.facebook.com/" + id + "/picture?type=square";
+						var points = leaderboard[i].points;
+						var extraClass = " ";
 
 						if(i == 1) extraClass = "first";
 						else if(i == 2) extraClass = "second";

@@ -84,7 +84,7 @@ body {
 
     .rank {
         font-size: 30pt;
-        padding: 0 15px 5px 15px;
+        padding: 0 8px 5px 8px;
         width: 20px;
     }
 
@@ -102,8 +102,8 @@ body {
     }
 
     .name {
-        width: 50%;
-        font-size: 27pt;
+        width: 52%;
+        font-size: 16pt;
         font-weight: 300;
         padding-top: 5px;
     }
@@ -138,9 +138,9 @@ body {
     }
 
     .rank {
-        font-size: 40pt;
-        padding: 5px 20px 0 20px;
-        width: 40px;
+        font-size: 38pt;
+        padding: 5px 10px 0 10px;
+        width: 36px;
     }
 
     .profile {
@@ -156,8 +156,8 @@ body {
     }
 
     .name {
-        width: 50%;
-        font-size: 30pt;
+        width: 56%;
+        font-size: 18pt;
         font-weight: 500;
         margin-top: 8px;
     }
@@ -235,6 +235,7 @@ body {
     font-family: 'Open Sans', sans-serif;
     color: #2C3E50;
     overflow: hidden;
+    word-wrap: break-word;
 }
 
 .score {
