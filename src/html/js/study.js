@@ -43,15 +43,6 @@ $(document).ready(function() {
 
     console.log(socket);
 
-    // Get the list of online users
-    socket.emit('online users');
-    socket.on('online', function(msg) {
-        var listOnlineUsers = msg.data;
-        console.log(listOnlineUsers);
-
-        splitFriend(listOnlineUsers);
-    });
-
     // event handler for server sent data
     // the data is displayed in the "Received" section of the page
     socket.on('game request', function(msg) {
@@ -220,6 +211,13 @@ $('#flashcard').on("click", function(){
 });
 
 $('#challenge').on("click", function(){
+    // Get the list of online users
+    socket.emit('online users');
+    socket.on('online', function(msg) {
+        var listOnlineUsers = msg.data;
+        splitFriend(listOnlineUsers);
+    });
+
     $('.friend_window').show();
     $('.friend_window').addClass('fadeIn');
     $('.list_search').focus();
@@ -491,16 +489,21 @@ function outputFriends(friends) {
             $(newname).find('.friend_profile img').attr('src', address);
         });
     });
+
+    console.log("finish friends");
 }
 
 function splitFriend(listOnlineUsers) {
     var offlineList = $('.list_offline');
+    console.log("gets in here");
 
     $('.list_online .simple_friend').each(function() {
         var flag = false;
         var userid = $(this).attr('id');
+        console.log("obtained friends");
 
         for (var i = 0; i < listOnlineUsers.length; i++) {
+            console.log(listOnlineUsers[i]);
             if(userid == listOnlineUsers[i]) flag = true;
         }
 

@@ -48,6 +48,7 @@ def printSocketsConnected():
 			onlineIDs.append( str(facebookId) )
 
 	emit('online', {'data': onlineIDs})
+	print "sent online users"
 
 
 
