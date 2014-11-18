@@ -294,7 +294,7 @@ def getGameStats(userid, gameidForStats):
 
 	noOfQuestionsCorrectUser, noOfQuestionsCorrectOpponent = findNumOfQuesEachUserInGameGotCorrect(
 																		questionsInGame, userid)
-	pointsUser, pointsOpponent = findPointsEachUser(allQuestionsInGame, userid)
+	pointsUser, pointsOpponent = findPointsEachUser(questionsInGame, userid)
 
 	if pointsUser > pointsOpponent:
 		gameResult = "Won"
