@@ -893,6 +893,8 @@
 	
 	Q.scene("scene3", function(stage) {
 	
+		alert("just to make sure it's the right version :)");
+	
 		// scene-local variables
 		var passive_opacity = 0.3;
 	
@@ -1021,8 +1023,8 @@
 		// battleLibrary[i] = question, answers, player, enemy, ptime, etime
 	
 		Q.state.reset({battleIndex: 0, totalIndex: 0});
-		Q.state.set("totalIndex", battleLibrary[0].totalQns);
-		
+		//Q.state.set("totalIndex", battleLibrary[0].totalQns);
+		Q.state.set("totalIndex", parseInt(totalQuestions));
 		
 		var fcQuestion, fcAnswers, pAnswer, eAnswer, pTime, eTime, aBtns, aTabs;
 	
