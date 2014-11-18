@@ -1,9 +1,4 @@
 $(document).ready(function() {
-	/*function outputProfile (profile) {
-        console.log("got here");
-        $('.profile_photo img').attr('src', profile.picture);
-        $('.name_content').text(profile.name);
-    }*/
 
 
 	$.get("/api/leaderboard", function (data) {
@@ -11,11 +6,11 @@ $(document).ready(function() {
 		var obj = JSON.parse(data);
 		leaderboard = obj.data ;
 		for (i = 0; i < leaderboard.length; i++) {
-			id = leaderboard[i].id;
+			id = leaderboard[i].id.substring(9);
 			points = leaderboard[i].points;
+			pic = "http://graph.facebook.com/" + id + "/picture?type=square";
 
-			//quizas_get_profile_for(id, outputProfile);
-			console.log("called profile pic func");
+			console.log(pic);
 		}
     })
 
