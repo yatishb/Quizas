@@ -109,7 +109,11 @@ $('.notification').on("click", function() {
     $('.challenge_info').addClass('fadeIn');
 });
 
-$('.button_close').on("click", function() {
+$('.friend_window .button_close').on("click", function() {
+    $('.friend_window').hide();
+});
+
+$('.challenge_info .button_close').on("click", function() {
     $('.grey_cover').hide();
     $('.challenge_info').hide();
 });
@@ -195,18 +199,11 @@ $('.grey_cover').on("click", function() {
         $('.friend_window').hide();
         $('.friend_window').removeClass('fadeIn');
     } else {
-        $(this).hide(); 
+        $('.grey_cover').hide();
         $('.button_container').hide();
         $('.add_set').show();
         $('.notification').show();
     }
-});
-
-$('#quiz').on("click", function(){
-    next_page = "q";
-    $('.friend_window').show();
-    $('.friend_window').addClass('fadeIn');
-    $('.list_search').focus();
 });
 
 $('#flashcard').on("click", function(){
@@ -215,17 +212,24 @@ $('#flashcard').on("click", function(){
 });
 
 $('#challenge').on("click", function(){
-    //window.location.href="challenge.html";
-    next_page = "c";
     $('.friend_window').show();
     $('.friend_window').addClass('fadeIn');
     $('.list_search').focus();
 });
 
+$('#practice').on("click", function(){
+    next_page = "s";
+    // $('.friend_window').show();
+    // $('.friend_window').addClass('fadeIn');
+    // $('.list_search').focus();
+});
+
 $('.friend_list').on("click", '.simple_friend', function () {
     $('.selected').removeClass('selected');
     $(this).addClass('selected');
-    // $(this).find('.friend_profile').addClass('selected');
+
+    if($(this.parent().hasClass('list_online'))) next_page = "q";
+    else next_page = "c";
 
     selected_friend_id = this.id;
 
@@ -239,6 +243,7 @@ $('.list_bottom').on("click", function () {
     }
 
     if (next_page=="q") {
+        // quiz with ONLINE friend
         console.log("namespace: "+namespace);
         console.log("socket: "+socket);
         socket.emit('send notification', {
@@ -247,9 +252,9 @@ $('.list_bottom').on("click", function () {
             'user': quizas_user_id()
         });
     } else if (next_page=="c") {
+        // challenge with OFFLINE friend
         initializeGame(selected_friend_id, selected_set_id, quizas_user_id());
     }
-
 });
 
 function initializeGame(friend_id, set_id, user_id) {
@@ -377,7 +382,7 @@ function favoriteSet(id, flag) {
 
 function outputFriends(friends) {
     friends.forEach(function (f) {
-        $('.friend_list').append(
+        $('.list_online').append(
             "<div class='simple_friend " +
             ("" + f.userid).replace(":", "_") +
             "' id='" +
