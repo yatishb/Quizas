@@ -868,8 +868,7 @@
 			h: 100,
 			label: 'Review',
 		}, function() {
-			//Q.stageScene("scene3");
-			alert("Battle Library still under construction.");
+			Q.stageScene("scene3");
 		}));
 		
 		var BackBtn = stage.insert(new Q.UI.Button({
@@ -889,6 +888,327 @@
 			window.location.href="study.html";
 		}));
 		
+		
+	});
+	
+	Q.scene("scene3", function(stage) {
+	
+		// scene-local variables
+		var passive_opacity = 0.3;
+	
+		// create testBattleLibrary
+		
+		/*
+		testBL = [{totalQuestions: 3}, 
+		  {question: JSON.parse(createFlashCard("101", "A", "A")),
+		    answers: [JSON.parse(createFlashCard("101", "A", "A")), 
+			  JSON.parse(createFlashCard("102", "B", "B")),
+			  JSON.parse(createFlashCard("103", "C", "C")),
+			  JSON.parse(createFlashCard("104", "D", "D")),],
+			player: "null",
+			enemy: "102",
+			ptime: 10000,
+			etime: 2000}, 
+		  {question: JSON.parse(createFlashCard("201", "AA", "AA")),
+		    answers: [JSON.parse(createFlashCard("201", "AA", "AA")), 
+			  JSON.parse(createFlashCard("202", "BB", "BB")),
+			  JSON.parse(createFlashCard("203", "CC", "CC")),
+			  JSON.parse(createFlashCard("204", "DD", "DD")),],
+			player: "203",
+			enemy: "201",
+			ptime: 3000,
+			etime: 4000}, 
+		  {question: JSON.parse(createFlashCard("301", "AAA", "AAA")),
+		    answers: [JSON.parse(createFlashCard("301", "AAA", "AAA")), 
+			  JSON.parse(createFlashCard("302", "BBB", "BBB")),
+			  JSON.parse(createFlashCard("303", "CCC", "CCC")),
+			  JSON.parse(createFlashCard("304", "DDD", "DDD")),],
+			player: "301",
+			enemy: "304",
+			ptime: 5000,
+			etime: 6000}];
+			
+			battleLibrary = testBL;
+			*/
+			
+			function generateAnswers() {
+			var aBtns = [];
+			var k = 0;
+			for (i=0;i<2;i++) {
+				for (j=0;j<2;j++) {
+					var fcAns = fcAnswers[k].answer;
+					var fillColor = "white", wordColor = "black";
+					if (fcQuestion.id == fcAnswers[k].id) {
+						fillColor = "green";
+						wordColor = "white";
+					} else {
+						if (fcAnswers[k].id == pAnswer || fcAnswers[k].id == eAnswer) {
+							fillColor = "red";
+							wordColor = "white";
+						}
+					}
+					
+					aBtns[k] = stage.insert(new Q.UI.Button({
+						fill: fillColor,
+						//highlight: ansColor,
+						fontColor: wordColor,
+						x: (90 + (140*j)) * qx,
+						y: (320 + (120*i)) * qy,
+						border: 2,
+						shadow: 3,
+						shadowColor: "rgba(0,0,0,0.5)",
+						w: 110 * qx,
+						h: 100 * qy,
+						label: fcAns,
+						counter: k,
+						customId: fcAnswers[k].id,
+						}, function() {
+							// do something
+					}));
+					
+					k++;
+				}
+			}
+			
+			return aBtns;
+		}
+		
+		function generateTabs() {
+			var aTabs = [];
+			var k = 0, ka = 0;
+			for (i=0;i<2;i++) {
+				for (j=0;j<2;j++) {
+					for (l=0;l<2;l++) {
+						var fcAns = fcAnswers[ka];
+						var fillColor = "white";
+						if ((l == 0 && fcAns.id == pAnswer) || 
+						  (l == 1 && fcAns.id == eAnswer)) {
+							fillColor = "gray";
+							
+							
+						
+						aTabs[aTabs.length] = stage.insert(new Q.UI.Container({
+							fill: fillColor,							
+							x: (62.5 + (140*j) + (55*l)) * qx,
+							y: (265 + (120*i)) * qy,
+							border: 2,
+							shadow: 3,
+							shadowColor: "rgba(0,0,0,0.5)",
+							w: 55 * qx,
+							h: 10 * qy,
+						}));
+						
+						k++;
+						}
+					}
+					ka++;
+				}
+			}
+			
+			return aTabs;
+		}
+		
+		function destroyAnswers(aBtns, aTabs) {
+			for (i=0;i<aBtns.length;i++) {
+				aBtns[i].destroy();
+			}
+			for (j=0;j<aTabs.length;j++) {
+				aTabs[j].destroy();
+			}
+		}
+	
+		// battleLibrary[0] = totalQuestions, enemyName
+		// battleLibrary[i] = question, answers, player, enemy, ptime, etime
+	
+		Q.state.reset({battleIndex: 0, totalIndex: 0});
+		Q.state.set("totalIndex", battleLibrary[0].totalQuestions);
+		
+		
+		var fcQuestion, fcAnswers, pAnswer, eAnswer, pTime, eTime, aBtns, aTabs;
+	
+		Q.state.on("change.battleIndex", function() {
+			battlePage = battleLibrary[Q.state.get("battleIndex")];
+			fcQuestion = battlePage.question;
+			fcAnswers = battlePage.answers;
+			pAnswer = battlePage.player; // id
+			eAnswer = battlePage.enemy; // id
+			pTime = battlePage.ptime;
+			eTime = battlePage.etime;
+			
+			if (aBtns != null && aTabs != null) {destroyAnswers(aBtns, aTabs);}
+			if (qCard != null) {qCard.destroy();}
+			if (PrevQBtn != null) {PrevQBtn.destroy();}
+			if (NextQBtn != null) {NextQBtn.destroy();}
+			
+			qCard = stage.insert(new Q.UI.FlashCard(), qContainer);
+			qCard.generate(fcQuestion);
+			aBtns = generateAnswers();
+			aTabs = generateTabs();
+
+			if (pAnswer == "null") {
+				PTimeCounter.p.label = "None";
+			} else {
+				PTimeCounter.p.label = (pTime / 1000).toFixed(3) + " s";
+			}
+			if (eAnswer == "null") {
+				ETimeCounter.p.label = "None";
+			} else {
+				ETimeCounter.p.label = (eTime / 1000).toFixed(3) + " s";
+			}
+			
+			
+			
+			QCounter.p.label = Q.state.get("battleIndex") + " / " + Q.state.get("totalIndex");
+			if (pBattleCounters.length > 0) {
+				for (i=0;i<pBattleCounters.length;i++) {
+					pBattleCounters[i].p.opacity = passive_opacity;
+				}
+				pBattleCounters[Q.state.get("battleIndex") - 1].p.opacity = 1;
+			}
+			if (eBattleCounters.length > 0) {
+				for (i=0;i<eBattleCounters.length;i++) {
+					eBattleCounters[i].p.opacity = passive_opacity;
+				}
+				eBattleCounters[Q.state.get("battleIndex") - 1].p.opacity = 1;
+			}
+			
+			if (Q.state.get("battleIndex") > 1) {
+				PrevQBtn = stage.insert(new Q.UI.Button({
+				  fill: "white",
+				  fontColor: "black",
+				  highlight: "gray",
+				  x: ((320/4) - 30) * qx,
+				  y: 535 * qy,
+				  border: 2,
+				  shadow: 3,
+				  shadowColor: "rgba(0,0,0,0.5)",
+				  w: 70 * qx,
+				  h: 40 * qy,
+				  label: "< P",
+				}, function() {
+					Q.state.inc("battleIndex", -1);
+				}));
+			}
+			if (Q.state.get("battleIndex") < Q.state.get("totalIndex")) {
+				NextQBtn = stage.insert(new Q.UI.Button({
+				  fill: "white",
+				  fontColor: "black",
+				  highlight: "gray",
+				  x: ((0.75*320) + 30) * qx,
+				  y: 535 * qy,
+				  border: 2,
+				  shadow: 3,
+				  shadowColor: "rgba(0,0,0,0.5)",
+				  w: 70 * qx,
+				  h: 40 * qy,
+				  label: 'N >',
+				}, function() {
+					Q.state.inc("battleIndex", 1);
+				}));
+			}
+		});
+	
+		var qContainer = stage.insert(new Q.UI.Container({
+			fill: "white",
+			x: 160 * qx,
+			y: 160 * qy,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			w: 250 * qx,
+			h: 180 * qy
+		}));
+		
+		var PrevQBtn, NextQBtn, qCard;
+		
+		var QCounter = stage.insert(new Q.UI.Button({
+			fill: "white",
+			x: 160 * qx,
+			y: 535 * qy,
+			w: 120 * qx,
+			h: 40 * qy,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			label: ""
+		}));
+		
+		var PTimeCounter = stage.insert(new Q.UI.Button({
+			fill: "white",
+			x: ((320/4) - 25) * qx,
+			y: 35 * qy,
+			w: 95 * qx,
+			h: 40 * qy,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			label: ""
+		}));
+		
+		var ETimeCounter = stage.insert(new Q.UI.Button({
+			fill: "white",
+			x: ((0.75*320) + 25) * qx,
+			y: 35 * qy,
+			w: 95 * qx,
+			h: 40 * qy,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			label: ""
+		}));
+		
+		var ReturnBtn = stage.insert(new Q.UI.Button({
+			fill: "white",
+			highlight: "gray",
+			x: (320/2) * qx,
+			y: 35 * qy,
+			w: 80 * qx,
+			h: 40 * qy,
+			border: 2,
+			shadow: 3,
+			shadowColor: "rgba(0,0,0,0.5)",
+			label: "Back"
+		}, function() {
+			Q.stageScene("scene2");
+		}));
+		
+		var pBattleCounters = [], eBattleCounters = [];
+		Q.state.inc("battleIndex", 1);
+		
+		for (i=0;i<Q.state.get("totalIndex");i++) {
+			var battlePage = battleLibrary[i+1];
+			var playerFill = "red", enemyFill = "red";
+			var playerOp = passive_opacity, enemyOp = passive_opacity;
+			if (battlePage.question.id == battlePage.player) {
+				playerFill = "green";
+			}
+			if (battlePage.question.id == battlePage.enemy) {
+				enemyFill = "green";
+			}
+			if (i == 0) {
+				playerOp = 1, enemyOp = 1;
+			}
+			pBattleCounters[i] = stage.insert(new Q.UI.Container({
+				fill: playerFill,
+				opacity: playerOp,
+				x: 15 * qx,
+				w: 15 * qx,
+				border: 2,
+				y: (490 - (210/Q.state.get("totalIndex")) - (i*(420/Q.state.get("totalIndex")))) * qy,
+				h: (420/Q.state.get("totalIndex")) * qy
+			}));
+			
+			eBattleCounters[i] = stage.insert(new Q.UI.Container({
+				fill: enemyFill,
+				opacity: enemyOp,
+				x: 305 * qx,
+				w: 15 * qx,
+				border: 2,
+				y: (490 - (210/Q.state.get("totalIndex")) - (i*(420/Q.state.get("totalIndex")))) * qy,
+				h: (420/Q.state.get("totalIndex")) * qy
+			}));
+		}
+
 		
 	});
 	
