@@ -1368,6 +1368,7 @@ i.rotate {
     height: 50px;
     display: relative;
     text-align: left;
+    cursor: pointer;
     border-bottom: solid 1px #D6D6D6;
 }
 
@@ -1438,6 +1439,7 @@ i.rotate {
     position: fixed;
     z-index: 500;
     left: 50%;
+    color: #666666;
     background-color: white;
     border-radius: 5px;
     -o-border-radius: 5px;
@@ -1471,11 +1473,11 @@ i.rotate {
     left: 0;
     right: 0;
     height: 60px;
-    border-top: solid 1px #6b6b6b;
-    /*border-bottom: solid 1px #6b6b6b;*/
+    border-top: solid 1px #E3E3E3;
     position: relative;
     margin: 3px 0;
     display: inline-block;
+    padding-top: 10px;
 }
 
 .info_profile {
@@ -1502,60 +1504,56 @@ i.rotate {
 .info_content {
     top: 0;
     right: 0;
-    width: 78%;
+    width: 66%;
     word-wrap: break-word;
     float: left;
-    margin: 1px;
+    margin-left: 12px;
+    font-size: 12pt;
+    display: table;
+}
+
+.info_content span {
+    display: table-cell;
+    vertical-align: middle;
 }
 
 .action_set {
+    top: 0;
     right: 0;
     bottom: 0;
     position: absolute;
-    height: 27px;
-    width: 110px;
+    height: 115%;
+    width: 30%;
     overflow: hidden;
-    margin-bottom: 2px;
+    /*margin-top: 50px;*/
 }
 
 .button_reject,
 .button_accept {
-    width: 24px;
-    height: 24px;
-    margin: 1px 13px;
-    text-align: center;
+    width: 46%;
+    height: 100%;
+    margin-left: 3px;
     float: right;
     display: table;
-    font-weight: 300;
-    border-radius: 50%;
-    -o-border-radius: 50%;
-    -ms-border-radius: 50%;
-    -moz-border-radius: 50%;
-    -webkit-border-radius: 50%;
+    color: white;
+    text-align: center;
+    cursor: pointer;
 }
 
 .button_reject {
-    bottom: 0;
-    right: 0;
-    border: solid 1px #EE4D4D;
-    color: #EE4D4D;
+    background-color: #D2D7D3;
 }
 
 .button_reject:active {
-    bottom: 0;
-    left: 0;
-    border: solid 1px #E60000;
-    color: #E60000;
+    background-color: #939694;
 }
 
 .button_accept {
-    border: solid 1px #2ECC71;
-    color: #2ECC71;
+    background-color: #F64747;
 }
 
 .button_accept:active {
-    border: solid 1px #219351;
-    color: #219351;
+    background-color: #C53939;
 }
 
 .button_reject i,
@@ -2032,7 +2030,7 @@ i.rotate {
 }
 
 .logout {
-    margin: auto;
+    margin: 10px auto 100px auto;
     height: 100px;
     width: 50%;
     max-width: 500px;
