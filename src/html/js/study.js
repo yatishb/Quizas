@@ -60,19 +60,19 @@ $(document).ready(function() {
 
         showPopup("User " + content.requestfrom + " is inviting you to compete set " + content.set);
 
-        if (confirm("User " + content.requestfrom + " is inviting you to compete set " + content.set) == true) {
-            socket.emit('assignroom', {
-                'user1': content.requestfrom,
-                'flashset': content.set,
-                'user2': quizas_user_id()
-            });
-        } else {
-            console.log('rejected');
-            socket.emit('reject', {
-                'requester': content.requestfrom,
-                'receiver': quizas_user_id()
-            });
-        }
+        // if (confirm("User " + content.requestfrom + " is inviting you to compete set " + content.set) == true) {
+        //     socket.emit('assignroom', {
+        //         'user1': content.requestfrom,
+        //         'flashset': content.set,
+        //         'user2': quizas_user_id()
+        //     });
+        // } else {
+        //     console.log('rejected');
+        //     socket.emit('reject', {
+        //         'requester': content.requestfrom,
+        //         'receiver': quizas_user_id()
+        //     });
+        // }
     });
 
     // event handler for rejected request
