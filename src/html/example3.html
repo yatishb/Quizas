@@ -15,36 +15,8 @@
 </head>
 
 <body>
-<script>
-		// socket stuff
-	/*
-			namespace = '/test'; // change to an empty string to use the global namespace
-
-            // the socket.io documentation recommends sending an explicit package upon connection
-            // this is specially important when using the global namespace
-            var socket = io.connect('http://' + document.domain + ':' + location.port + namespace,
-                                    {"connect timeout": 300,
-                                     "close timeout": 30,
-                                     "hearbeat timeout": 30});
-            socket.on('connect', function() {
-            });
-			
-			 
-		
-		// socket handler
-		socket.on('initiating', function(msg) {
-                //$('#log').append('<br>Received #' + msg.count + ': ' + msg.data);
-            });
-	*/
-	
+<script>	
 		// helper functions
-		
-		String.prototype.insert = function (index, string) {
-			  if (index > 0)
-				return this.substring(0, index) + string + this.substring(index, this.length);
-			  else
-				return string + this;
-			};
 		
 		function wordWrap(iStr, cardWidth, pixelPerChar) {
 			var wrappedStr = iStr;
@@ -53,10 +25,10 @@
 			if ((n * pixelPerChar) > cardWidth) {
 				var m = Math.floor((n * pixelPerChar)/cardWidth);
 				for (i=0;i<m;i++) {
-					wrappedStr = wrappedStr.insert((i+1)*(cardWidth/pixelPerChar), "\n");
+					position = Math.floor((i+1)*(cardWidth/pixelPerChar));
+					wrappedStr = wrappedStr.substr(0, position) + "\n" + wrappedStr.substr(position);
 				}
 			}
-			
 			return wrappedStr;
 		}
 		
@@ -216,44 +188,6 @@
 		var playerCounters = [];
 		var enemyCounters = [];
 
-		// declare JSON vars for testing purposes
-		var TestFlashCard = createFlashCard('22', 'F=??', 'M x A');
-		
-		var TestFCArray = [];
-		for (i=0;i<30;i++) {
-			var stringId = i.toString();
-			var stringQn = i.toString() + ' + ' + i.toString() + ' = ??';
-			var stringAns = (i + i).toString();
-			var fc = createFlashCard(stringId, stringQn, stringAns);
-			TestFCArray[i] = fc;
-		}
-		var TestFlashSet = createFlashSet('101', 'Simple Additions', 'Mathematics', TestFCArray);
-		var TestTotalQuestions = 10;
-		
-		var TestInitiatingForm = JSON.stringify({
-			name: "John Smith",
-			sprite: "smiley.png",
-			win: "75%",
-			encounter: "6",
-			total: "3",
-		});
-		
-		var TestServerForm = [];
-		for (i=0;i<3;i++) {
-		m = getRandomInt(0, 2);
-			j = i + 1, k = j + 1, l = k + 1;
-			TestServerForm[i] = JSON.stringify({
-				question: JSON.parse(createFlashCard('test:'+i, i + ' x 1 = ??', i.toString())),
-				answers: [JSON.parse(createFlashCard('test:'+i, i + ' x 1 = ??', i.toString())), 
-				  JSON.parse(createFlashCard('test:'+j, i + ' x 1 = ??', j.toString())), 
-				  JSON.parse(createFlashCard('test:'+k, i + ' x 1 = ??', k.toString())), 
-				  JSON.parse(createFlashCard('test:'+l, i + ' x 1 = ??', l.toString()))],
-				index: "" + (i + 1),
-				time: "" + 5,
-				player: null,
-				enemy: JSON.parse(createFlashCard('test:'+m, m + ' x 1 = ??', m.toString())),
-			});
-		}
 		
 		// fetching info from server
 		var INITIATING_FORM, SERVER_FORM;
