@@ -47,9 +47,9 @@ body {
 
     .name {
         width: 45%;
-        font-size: 18pt;
+        font-size: 14pt;
         font-weight: 100;
-        padding-top: 10px;
+        margin-top: 15px;
     }
 
     .score {
@@ -98,7 +98,7 @@ body {
     .profile img {
         height: 70%;
         width: 70%;
-        margin-top: -5px;
+        margin-top: 2px;
     }
 
     .name {
@@ -152,14 +152,14 @@ body {
     .profile img {
         height: 90%;
         width: 90%;
-        margin-top: -10px;
+        margin-top: 3px;
     }
 
     .name {
         width: 50%;
-        font-size: 35pt;
+        font-size: 30pt;
         font-weight: 500;
-        padding-top: 5px;
+        margin-top: 8px;
     }
 
     .score {
@@ -241,4 +241,8 @@ body {
     float: right;
     font-family: 'Open Sans', sans-serif;
     color: #2C3E50;
+}
+
+#fb-root {
+    display: none;
 }
