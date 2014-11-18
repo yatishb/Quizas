@@ -18,8 +18,7 @@
     <link rel="apple-touch-icon" sizes="152x152" href="css/images/touch-icon-ipad-retina.png">
     <link rel="apple-touch-startup-image" href="css/images/Geet_App_Startup.png">
     
-    <link rel="stylesheet" type="text/css" href="css/main.css"></link>
-    <link rel="stylesheet" type="text/css" href="css/font-awesome.css"></link>
+    <link rel="stylesheet" type="text/css" href="css/console.css"></link>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
@@ -28,19 +27,46 @@
     <script src="js/quizas_auth_helper.js"></script>
     <script src="js/console.js"></script>
 
+    <script type="text/javascript">
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : quizas_fbappid,
+                xfbml      : true,
+                version    : 'v2.1'
+            });
+        };
+    </script>
 </head>
 <body>
-    <h1>World Leaderboard</h1>
-    <script type="text/javascript">
-    window.fbAsyncInit = function() {
-        FB.init({
-            appId      : quizas_fbappid,
-            xfbml      : true,
-            version    : 'v2.1'
-        });
-    };
-    
-    </script>
+    <h1  id='heading' class='font-effect-fire-animation'>World Leaderboard</h1>
+    <h2 id='subtitle'>Quizas.me</h2>
+
+    <div class='board_container'>
+        <!-- <div class='simple_leader'>
+            <div class='rank first font-effect-shadow-multiple'>1</div>
+            <div class='profile'><img src="http://graph.facebook.com/733712093384160/picture?type=square"></div>
+            <div class='name' title='test'>Test</div>
+            <div class='score'>777</div>
+        </div>
+        <div class='simple_leader'>
+            <div class='rank second font-effect-shadow-multiple'>2</div>
+            <div class='profile'><img src="http://graph.facebook.com/733712093384160/picture?type=square"></div>
+            <div class='name'>Test</div>
+            <div class='score'>777</div>
+        </div>
+        <div class='simple_leader'>
+            <div class='rank third font-effect-shadow-multiple'>3</div>
+            <div class='profile'><img src="http://graph.facebook.com/733712093384160/picture?type=square"></div>
+            <div class='name'>Test</div>
+            <div class='score'>777</div>
+        </div>
+        <div class='simple_leader'>
+            <div class='rank font-effect-shadow-multiple'>4</div>
+            <div class='profile'><img src="http://graph.facebook.com/733712093384160/picture?type=square"></div>
+            <div class='name'>Test</div>
+            <div class='score'>777</div>
+        </div> -->
+    </div>
 
     <script>
         (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
