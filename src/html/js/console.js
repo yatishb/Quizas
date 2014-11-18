@@ -1,6 +1,6 @@
 $(document).ready(function() {
-		// displayContent();
-		// setInterval(displayContent, 60000);
+		displayContent();
+		setInterval(displayContent, 60000);
 });
 
 function displayContent() {
