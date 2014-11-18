@@ -5,7 +5,6 @@ var points;
 var extraClass = " ";
 
 $(document).ready(function() {
-		displayContent();
 		setInterval(displayContent, 60000);
 });
 
@@ -21,7 +20,7 @@ function displayContent() {
 				for (i = 0; i < leaderboard.length; i++) {
 						rank = i + 1;
 						pic = "http://graph.facebook.com/" + id + "/picture?type=square";
-						id = leaderboard[i].id.substring(9);
+						id = leaderboard[i].id;
 						points = leaderboard[i].points;
 
 						if(i == 1) extraClass = "first";
@@ -29,6 +28,7 @@ function displayContent() {
 						else if(i == 3) extraClass = "third";
 
 						quizas_get_profile_for(id, function(profile) {
+								console.log(rank + " *** " + pic + " *** " + profile.name + " *** " + points);
 								$('.board_container').append(
 															               		"<div class='simple_leader'>" +
 																		            "<div class='rank font-effect-shadow-multiple " +
