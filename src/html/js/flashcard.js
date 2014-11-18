@@ -53,34 +53,12 @@ $(document).ajaxComplete(function() {
         );
 
         cardIndex++;
-
-        // if (i>0 && i%10 == 0)
-        //     wait = 10000;
-        // else wait = 0;
-
-        // setTimeout(function(content){
-        //     console.log(content);
-        //     flashcards.append(
-        //         "<div class='simple_card' id='" +
-        //         i +
-        //         "'><div class='flipper'><div class='card_content question'><p class='text_field'>" +
-        //             content.cards[i].question +
-        //             "</div><div class='card_content answer'><p>" +
-        //             content.cards[i].answer +
-        //             "</div></div></div>"
-        //     );
-        // }, wait);
     }
 });
 
 function getStudySetContent(setid) {
     $.get("/api/sets/" + setid, function(data) {
            content = JSON.parse(data);
-           console.log(content);
-           if(content != null)
-               console.log("Set data have been fetched.");
-           else
-               console.log("Failed to fetch data.");
     })
      .fail(function() {
         alert("error in getStudySetContent call back function");

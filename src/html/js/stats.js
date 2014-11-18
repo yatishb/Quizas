@@ -5,7 +5,6 @@ $(document).ready(function() {
 
     $('.list_search input').on('input', function() {
         var search_txt = $(this).val();
-        console.log(search_txt);
 
         $('.simple_friend.invite').each(function() {
             var this_friend = $(this);
@@ -85,7 +84,6 @@ function getUserStats() {
 
     $.get("/api/user/" + userid + "/stats", function(data) {
         var result = JSON.parse(data);
-        console.log(result);
 
         if(result.played == 0) {
             $('.chartTitle').append("No statistics to show!<br><span style='color:red'>START PLAYING!</span>");
@@ -207,7 +205,6 @@ function getFriendStats(friend_id) {
 
     $.get("/api/user/" + userid + "/stats/vs/" + friend_id, function(data) {
         var result = JSON.parse(data);
-        console.log(result);
 
         // var result = {wins: 5, draws: 3, losses: 2, total: 10};
 
