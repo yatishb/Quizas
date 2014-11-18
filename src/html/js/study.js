@@ -1,6 +1,7 @@
 var content;
 var next_page;
 var pupup_mode;
+var listOnlineUsers;
 var selected_set_id;
 var selected_friend_id = "0";
 
@@ -46,7 +47,12 @@ $(document).ready(function() {
     // Get the list of online users
     socket.emit('online users');
     socket.on('online', function(msg) {
-        var listOnlineUsers = msg.data;
+        listOnlineUsers = msg.data;
+        console.log(listOnlineUsers);
+
+        // FB API has loaded; now we can list friends.
+        // setTimeout(listFacebookFriends(outputFriends),5000);
+        listFacebookFriends(outputFriends);
     });
 
     // event handler for server sent data
@@ -59,20 +65,6 @@ $(document).ready(function() {
         pupup_mode = "request";
 
         showPopup("User " + content.requestfrom + " is inviting you to compete set " + content.set);
-
-        // if (confirm("User " + content.requestfrom + " is inviting you to compete set " + content.set) == true) {
-        //     socket.emit('assignroom', {
-        //         'user1': content.requestfrom,
-        //         'flashset': content.set,
-        //         'user2': quizas_user_id()
-        //     });
-        // } else {
-        //     console.log('rejected');
-        //     socket.emit('reject', {
-        //         'requester': content.requestfrom,
-        //         'receiver': quizas_user_id()
-        //     });
-        // }
     });
 
     // event handler for rejected request
@@ -122,6 +114,7 @@ $(document).ready(function() {
 });
 
 $('.notification').on("click", function() {
+    getNotification();
     $('.grey_cover').show();
     $('.challenge_info').show();
     $('.challenge_info').addClass('fadeIn');
@@ -303,7 +296,7 @@ $(document.body).on("click", '.popup_button.ok', function() {
 function showPopup(message) {
     if(pupup_mode == "request") {
         $(document.body).append(
-            "<div class='popup_window'>" +
+            "<div class='popup_window noselect'>" +
             "<div class='popup_message'><span>" +
             message +
             "</span></div>" +
@@ -314,7 +307,7 @@ function showPopup(message) {
         );
     } else {
         $(document.body).append(
-            "<div class='popup_window'>" +
+            "<div class='popup_window noselect'>" +
             "<div class='popup_message'><span>" +
             message +
             "</span></div>" +
@@ -344,17 +337,12 @@ function initializeMultiplayerGame(content) {
 function getSetContent() {
     $.get("/api/user/" + quizas_user_id() + "/sets", function(data) {
         var set_ids = JSON.parse(data);
-        console.log(set_ids);
-        // if(set_ids != null)
-        //     console.log("Set data is empty.");
-        // else
-        //     console.log("Failed to fetch data.");
+        // console.log(set_ids);
 
         var sets = $('.set_info');
         sets.append("<div class='space'></div>");
         for (var i = 0; i < set_ids.length; i++) {
             $.get("/api/sets/" + set_ids[i], function(data) {
-                // console.log(data);
                 var set_content = JSON.parse(data);
 
                 sets.append(
@@ -414,6 +402,38 @@ function getSearchResult(txt) {
     });
 }
 
+function getNotification() {
+    var userid = quizas_user_id();
+
+    $.get("/api/user/" + userid + "/challenges/", function(data) {
+        var result = JSON.parse(data);
+
+        console.log(result);
+
+        // var sets = $('.search_result');
+        // for (var i = 0; i < result.length; i++) {
+        //     sets.append(
+        //         "<div class='simple_set search " +
+        //         ("" + result[i].id).replace(":", "_") +
+        //         "' id='" +
+        //         result[i].id +
+        //         "'><div class='content_container'>" +
+        //         "<div class='set_content title search'><p>" +
+        //         result[i].name + ' [' + result[i].size + ']' +
+        //         "</div><div class='set_content description search'><p>" +
+        //         result[i].description +
+        //         "</div></div>" +
+        //         "<div class='action_container'>" +
+        //         "<div class='action add'><i class='fa fa-plus'></i></div>" +
+        //         "</div></div>"
+        //     );
+        // }
+    })
+    .fail(function() {
+        console.log("error in getNotification call back function");
+    });
+}
+
 function addSet(id) {
     var userid = quizas_user_id();
 
@@ -450,7 +470,19 @@ function favoriteSet(id, flag) {
 
 function outputFriends(friends) {
     friends.forEach(function (f) {
-        $('.list_online').append(
+        var friendList;
+        var flag = false;
+
+        for (var i = 0; i < listOnlineUsers.size(); i++) {
+            if(f.userid == listOnlineUsers[i]) flag = true;
+        }
+
+        if(flag == true)
+            friendList = $('.list_online');
+        else
+            friendList = $('.list_offline');
+
+        friendList.append(
             "<div class='simple_friend " +
             ("" + f.userid).replace(":", "_") +
             "' id='" +
