@@ -301,7 +301,7 @@ $(document.body).on("click", '.popup_button.ok', function() {
 });
 
 function showPopup(message) {
-    if(pupup_mode == "ga") {
+    if(pupup_mode == "request") {
         $(document.body).append(
             "<div class='popup_window'>" +
             "<div class='popup_message'><span>" +

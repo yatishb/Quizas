@@ -1011,7 +1011,7 @@ i.rotate {
 }
 
 /** the top layer **/
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 600px) {
     .button_container {
         width: 100%;
     }
@@ -1033,7 +1033,7 @@ i.rotate {
     }
 }
 
-@media screen and (min-width: 501px) {
+@media screen and (min-width: 601px) {
     .button_container {
         width: 81vw;
         max-width: 600px;
@@ -1042,11 +1042,22 @@ i.rotate {
     }
 
     .round_button {
-        width: 27vw;
-        height: 27vw;
+        width: 25vw;
+        height: 25vw;
         max-width: 140px;
         max-height: 140px;
-        margin: 20px 27px;
+    }
+
+    #flashcard {
+        margin: 20px 0 20px 21px;
+    }
+
+    #challenge {
+        margin: 20px 12px;
+    }
+
+    #practice {
+        margin: 20px 21px 20px 0;
     }
 
     .round_button span {
@@ -1060,6 +1071,14 @@ i.rotate {
     .round_button .explain {
         font-size: 12pt;
         margin-top: -8px;
+    }
+}
+
+@media screen and (min-width: 751px) {
+    #flashcard,
+    #challenge,
+    #practice {
+        margin: 20px 30px;
     }
 }
 
