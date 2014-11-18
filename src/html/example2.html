@@ -632,7 +632,7 @@
 			return outStr;
 		}
 		
-		var matchDetails = stage.insert(new Q.UI.Text(), matchContainer);
+		var matchDetails = stage.insert(new Q.UI.Text({size: 28}), matchContainer);
 		matchDetails.p.label = expressMatch(matchName, totalQuestions, encounterTotal, encounterWin);
 		
 		var cdTimer = new Countdown({
