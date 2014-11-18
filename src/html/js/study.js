@@ -1,7 +1,6 @@
 var content;
 var next_page;
 var pupup_mode;
-var listOnlineUsers;
 var selected_set_id;
 var selected_friend_id = "0";
 
@@ -47,12 +46,10 @@ $(document).ready(function() {
     // Get the list of online users
     socket.emit('online users');
     socket.on('online', function(msg) {
-        listOnlineUsers = msg.data;
+        var listOnlineUsers = msg.data;
         console.log(listOnlineUsers);
 
-        // FB API has loaded; now we can list friends.
-        // setTimeout(listFacebookFriends(outputFriends),5000);
-        listFacebookFriends(outputFriends);
+        splitFriend(listOnlineUsers);
     });
 
     // event handler for server sent data
@@ -470,19 +467,7 @@ function favoriteSet(id, flag) {
 
 function outputFriends(friends) {
     friends.forEach(function (f) {
-        var friendList;
-        var flag = false;
-
-        for (var i = 0; i < listOnlineUsers.size(); i++) {
-            if(f.userid == listOnlineUsers[i]) flag = true;
-        }
-
-        if(flag == true)
-            friendList = $('.list_online');
-        else
-            friendList = $('.list_offline');
-
-        friendList.append(
+        $('.list_online').append(
             "<div class='simple_friend " +
             ("" + f.userid).replace(":", "_") +
             "' id='" +
@@ -505,5 +490,35 @@ function outputFriends(friends) {
             var newname = '.' + ("" + f.userid).replace(":", "_");
             $(newname).find('.friend_profile img').attr('src', address);
         });
+    });
+}
+
+function splitFriend(listOnlineUsers) {
+    var offlineList = $('.list_offline');
+
+    $('.list_online .simple_friend').each(function() {
+        var flag = false;
+        var userid = $(this).attr('id');
+
+        for (var i = 0; i < listOnlineUsers.length; i++) {
+            if(userid == listOnlineUsers[i]) flag = true;
+        }
+
+        if(flag == false) {
+            username = $(this).find('span').text();
+            profileURL = $(this).find('img').attr('src');
+            $(this).remove();
+            offlineList.append(
+                "<div class='simple_friend " +
+                userid.replace(":", "_") +
+                "' id='" +
+                userid +
+                "'><div class='friend_profile'><img src='" +
+                profileURL +
+                "'></div><span>" +
+                username +
+                "</span></div>"
+            );
+        }
     });
 }
