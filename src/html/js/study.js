@@ -1,5 +1,6 @@
 var content;
 var next_page;
+var pupup_mode;
 var selected_set_id;
 var selected_friend_id = "0";
 
@@ -49,20 +50,23 @@ $(document).ready(function() {
         console.log("Request info is ")
         console.log(content);
 
-        var result;
-        if (confirm("User " + content.requestfrom + " is inviting you to compete set " + content.set) == true) {
-            socket.emit('assignroom', {
-                'user1': content.requestfrom,
-                'flashset': content.set,
-                'user2': quizas_user_id()
-            });
-        } else {
-            console.log('rejected');
-            socket.emit('reject', {
-                'requester': content.requestfrom,
-                'receiver': quizas_user_id()
-            });
-        }
+        pupup_mode = "request";
+
+        showPopup("User " + content.requestfrom + " is inviting you to compete set " + content.set);
+
+        // if (confirm("User " + content.requestfrom + " is inviting you to compete set " + content.set) == true) {
+        //     socket.emit('assignroom', {
+        //         'user1': content.requestfrom,
+        //         'flashset': content.set,
+        //         'user2': quizas_user_id()
+        //     });
+        // } else {
+        //     console.log('rejected');
+        //     socket.emit('reject', {
+        //         'requester': content.requestfrom,
+        //         'receiver': quizas_user_id()
+        //     });
+        // }
     });
 
     // event handler for rejected request
@@ -71,7 +75,9 @@ $(document).ready(function() {
         console.log("Reject by ")
         console.log(content);
 
-        alert("Your request was rejected by " + content.rejectedby);
+        pupup_mode = "rejected";
+
+        showPopup("Your request was rejected by " + content.rejectedby);
     });
 
     // event handler for when user not online
@@ -80,7 +86,9 @@ $(document).ready(function() {
         console.log("Reject by ")
         console.log(content);
 
-        alert("The user " + content.rejectedby + " is not online");
+        pupup_mode = "offline";
+
+        showPopup("The user " + content.rejectedby + " is not online");
     });
 
     // event handler for when user does not exist
@@ -89,7 +97,9 @@ $(document).ready(function() {
         console.log("Reject by ")
         console.log(content);
 
-        alert("The user " + content.rejectedby + " does not exist");
+        pupup_mode = "non-existent";
+
+        showPopup("The user " + content.rejectedby + " does not exist");
     });
 
     // event handler for accepted request
@@ -97,6 +107,8 @@ $(document).ready(function() {
         content = JSON.parse(msg.data);
         console.log("Accepted by ");
         console.log(content);
+
+        pupup_mode = "accepted";
 
         socket.emit('disconnect');
         initializeMultiplayerGame(content);
@@ -228,7 +240,7 @@ $('.friend_list').on("click", '.simple_friend', function () {
     $('.selected').removeClass('selected');
     $(this).addClass('selected');
 
-    if($(this.parent().hasClass('list_online'))) next_page = "q";
+    if($(this).parent().hasClass('list_online')) next_page = "q";
     else next_page = "c";
 
     selected_friend_id = this.id;
@@ -256,6 +268,56 @@ $('.list_bottom').on("click", function () {
         initializeGame(selected_friend_id, selected_set_id, quizas_user_id());
     }
 });
+
+
+$(document.body).on("click", '.popup_button.cancel', function() {
+    $('.popup_window').remove();
+
+    console.log('rejected');
+    socket.emit('reject', {
+        'requester': content.requestfrom,
+        'receiver': quizas_user_id()
+    });
+});
+
+$(document.body).on("click", '.popup_button.accept', function() {
+    $('.popup_window').remove();
+
+    socket.emit('assignroom', {
+        'user1': content.requestfrom,
+        'flashset': content.set,
+        'user2': quizas_user_id()
+    });
+});
+
+$(document.body).on("click", '.popup_button.ok', function() {
+    $('.popup_window').remove();
+});
+
+function showPopup(message) {
+    if(pupup_mode == "ga") {
+        $(document.body).append(
+            "<div class='popup_window'>" +
+            "<div class='popup_message'><span>" +
+            message +
+            "</span></div>" +
+            "<div class='popup_buttons'>" +
+            "<div class='popup_button cancel'>Reject</div>" +
+            "<div class='popup_button accept'>Accept</div>" +
+            "</div></div>"
+        );
+    } else {
+        $(document.body).append(
+            "<div class='popup_window'>" +
+            "<div class='popup_message'><span>" +
+            message +
+            "</span></div>" +
+            "<div class='popup_buttons'>" +
+            "<div class='popup_button ok'>Ok</div>" +
+            "</div></div>"
+        );
+    }
+}
 
 function initializeGame(friend_id, set_id, user_id) {
     sessionStorage.setItem("friend_id", JSON.stringify(friend_id));

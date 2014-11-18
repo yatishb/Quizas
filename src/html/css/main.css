@@ -84,6 +84,8 @@ img {
     user-select: none;
 }
 
+/*** Buttons ***/
+
 .button_close {
     top: 0;
     right: 0;
@@ -99,14 +101,30 @@ img {
     color: #000;
 }
 
-.popup_button {
+@media screen and (max-width: 500px) {
+    .popup_window {
+        width: 300px;
+        height: 120px;
+        left: 50%;
+        top: 50%;
+        margin-left: -150px;
+        margin-top: -60px;
+    }
+}
+
+@media screen and (min-width: 501px) {
+    .popup_window {
+        width: 400px;
+        height: 150px;
+        left: 50%;
+        top: 50%;
+        margin-left: -200px;
+        margin-top: -75px;
+    }
+}
+
+.popup_window {
     position: fixed;
-    width: 400px;
-    height: 200px;
-    left: 50%;
-    top: 50%;
-    margin-left: -200px;
-    margin-top: -100px;
     background-color: white;
     z-index: 1001;
     border-radius: 6px;
@@ -114,7 +132,81 @@ img {
     -ms-border-radius: 6px;
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
-    display: none;
+}
+
+.popup_message {
+    margin: 6px 15px;
+}
+
+.popup_window span {
+    
+}
+
+.popup_buttons {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /*height: 20%;*/
+    text-align: center;
+}
+
+.popup_button {
+    width: 49.6%;
+    color: white;
+    cursor: pointer;
+    border-top: solid 1px white;
+}
+
+.popup_button.cancel {
+    background-color: red;
+    border-right: solid 1px white;
+    border-bottom-left-radius: 6px;
+    -o-border-bottom-left-radius: 6px;
+    -ms-border-bottom-left-radius: 6px;
+    -moz-border-bottom-left-radius: 6px;
+    -webkit-border-bottom-left-radius: 6px;
+    float: left;
+}
+
+.popup_button.cancel:active {
+    background-color: ;
+}
+
+.popup_button.accept {
+    background-color: green;
+    border-left: solid 1px white;
+    border-bottom-right-radius: 6px;
+    -o-border-bottom-right-radius: 6px;
+    -ms-border-bottom-right-radius: 6px;
+    -moz-border-bottom-right-radius: 6px;
+    -webkit-border-bottom-right-radius: 6px;
+    float: right;
+}
+
+.popup_button.ok {
+    background-color: blue;
+    border-bottom-right-radius: 6px;
+    -o-border-bottom-right-radius: 6px;
+    -ms-border-bottom-right-radius: 6px;
+    -moz-border-bottom-right-radius: 6px;
+    -webkit-border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    -o-border-bottom-left-radius: 6px;
+    -ms-border-bottom-left-radius: 6px;
+    -moz-border-bottom-left-radius: 6px;
+    -webkit-border-bottom-left-radius: 6px;
+    left: 0;
+    right: 0;
+    width: 100%;
+}
+
+.popup_button.ok:active {
+    background-color: ;
+}
+
+.popup_button.accept:active {
+    background-color: ;
 }
 
 /*** Start of footer ***/
@@ -929,7 +1021,7 @@ i.rotate {
         height: 25vw;
         max-width: 200px;
         max-height: 200px;
-        margin: 10px 12px;
+        margin: 10px 11px;
     }
 
     .info_container {
@@ -954,7 +1046,7 @@ i.rotate {
         height: 27vw;
         max-width: 140px;
         max-height: 140px;
-        margin: 20px 30px;
+        margin: 20px 27px;
     }
 
     .round_button span {
