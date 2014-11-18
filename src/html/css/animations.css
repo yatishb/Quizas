@@ -593,8 +593,8 @@ hatch
 	animation-name: hatch;
 	-webkit-animation-name: hatch;	
 
-	animation-duration: 2s;	
-	-webkit-animation-duration: 2s;
+	animation-duration: 0.75s;	
+	-webkit-animation-duration: 0.75s;
 
 	animation-timing-function: ease-in-out;	
 	-webkit-animation-timing-function: ease-in-out;

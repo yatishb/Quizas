@@ -122,11 +122,13 @@ $('.notification').on("click", function() {
 });
 
 $('.challenge_info').on('click', '.simple_info', function() {
-    $(this).find('.action_set').hide();
-});
-
-$('.challenge_info').on('swipe', '.simple_info', function() {
-    $(this).find('.action_set').show();
+    var element = $(this).find('.action_set');
+    if(element.is(':visible')) {
+        element.hide();
+    } else {
+        element.show();
+        element.addClass('stretchLeft');
+    }
 });
 
 $('.friend_window .button_close').on("click", function() {
