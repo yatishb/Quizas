@@ -29,7 +29,7 @@
 
 
 
-  function Countdown(options) {
+    function Countdown(options) {
       var timer,
         instance = this,
         seconds = options.seconds || 10,
@@ -95,7 +95,6 @@
       for (i = 0; i < obj.questions.length; i++) {
         quesDeck.push( obj.questions[i].question );
         answersDeck.push( obj.questions[i].answers );
-        console.log(obj.questions[i])
       }
 
       TOTAL_QUESTIONS = obj.questions.length;
@@ -105,15 +104,15 @@
       .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
       .setup({
       width: 320,
-  	height: 568,
-  	scaleToFit: true
-  	//maximize: "touch"
+      height: 568,
+      scaleToFit: true
+      //maximize: "touch"
     }).touch();
 
     var qx = Q.width/320;
     var qy = Q.height/568;
     
-    Q.state.set({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
+    Q.state.set({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1, waiting: true});
     
     Q.UI.Score = Q.UI.Text.extend("UI.Score", { 
       init: function(p) {
@@ -200,7 +199,7 @@
 
     Q.scene("scene1",function(stage) {
     
-      Q.state.reset({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
+      Q.state.reset({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1, waiting: true, isGameOver: false});
     
       var leScore = stage.insert(new Q.UI.Score());
       var leQC = stage.insert(new Q.UI.QuestionCounter());
@@ -209,6 +208,7 @@
       var timeOutTimer, gameOverTimer;
       
       function generateAnswers() {
+        Q.state.set("waiting", false);
         ansDeck = answersDeck[Q.state.get("currentQuestion") - 1];
 
         var aBtns = [];
@@ -236,8 +236,9 @@
               }, function() {
                 // do something
                 if (!Q.state.get("waiting")) {
-                timeTakenCurrent = TIMER.getTime();
-                Q.state.set("waiting", true);
+                  console.log(TIMER);
+                  timeTakenCurrent = TIMER.getTime();
+                  Q.state.set("waiting", true);
                 
                   answersChosen.push( ansDeck[this.p.name].id );
                   if (quesDeck[Q.state.get("currentQuestion") - 1].id == ansDeck[this.p.name].id) {
@@ -305,6 +306,12 @@
       
       var qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
       qCard.generate(Q.state.get("currentQuestion") - 1);
+      TIMER = new Countdown({
+            seconds: maxTimeAllowed,
+            onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
+            onCounterEnd: function() {outOfTime();}
+          });
+          TIMER.start();
       
       Q.state.on("change.currentQuestion", function() {
         if (Q.state.get("currentQuestion") > TOTAL_QUESTIONS) {
@@ -315,6 +322,7 @@
         qCard.generate(Q.state.get("currentQuestion") - 1);
         destroyAnswers(aBtns);
         aBtns = generateAnswers();
+        
         if (Q.state.get("currentIndex") > 1) {TIMER.stop();}
         if (Q.state.get("currentIndex") > 0 && Q.state.get("currentIndex") <= TOTAL_QUESTIONS) {
           TIMER = new Countdown({
@@ -324,7 +332,9 @@
           });
           TIMER.start();
         }
+
       });
+
       
     });
 
