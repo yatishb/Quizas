@@ -311,13 +311,21 @@ initial_flashsets = [# http://quizlet.com/2429383/basic-physics-final-review-fla
                      "quizlet:57054880",
                      # http://quizlet.com/30160654/first-1000-words-in-spanish-la-granja-flash-cards/
                      "quizlet:30160654",
-                     # http://quizlet.com/17775641/singapore-math-4-vocabulary-flash-cards/
-                     "quizlet:17775641",
                      # http://quizlet.com/27972497/challenge-a-geography-terms-flash-cards/
                      # ^^ some of these are quite long; a test for the UI
                      "quizlet:27972497",
                      # http://quizlet.com/6860191/chemical-elements-flash-cards/
-                     "quizlet:6860191"]
+                     "quizlet:6860191",
+                     # http://quizlet.com/249254/basic-japanese-vocabulary-romanji-flash-cards/
+                     "quizlet:249254",
+                     # http://quizlet.com/39050337/countries-and-capitals-flash-cards/
+                     "quizlet:39050337",
+                     # http://quizlet.com/51808929/currencies-flash-cards/
+                     "quizlet:51808929",
+                     # http://quizlet.com/56371322/best-picture-oscar-winners-by-year-and-lead-actors-flash-cards/,
+                     "quizlet:56371322",
+                     # http://quizlet.com/45551558/oscar-best-picture-winners-by-director-flash-cards/(HARD)
+                     "quizlet:45551558"]
 
 
 # Possibly repeated code w/ `modify_user_sets`.
@@ -368,4 +376,36 @@ def ensure_some_flashsets(userid):
 
 
 
+# Favorite Sets
 
+@main.route('/user/<user_id>/sets/quizlet/favorites/<set_id>', methods=['PUT', 'DELETE'])
+def modify_quizlet_favorite_sets(user_id, set_id):
+	tokenUrl = "https://api.quizlet.com/oauth/token"
+	clientID = CONSUMER_TOKEN
+	keySecret = CONSUMER_SECRET
+
+	# "quizlet:1234" -> "1234"
+	qzlt_set_id = set_id[set_id.find(':')+1:]
+
+	# Get ACCESS TOKEN from Cookies
+	# Needs to have user id also.
+	# NOTE: ignores user_id
+	qzlt_user_id = request.cookies.get("quizlet_user_id")
+	qzlt_access_token = request.cookies.get("quizlet_access_token")
+	if qzlt_access_token == None or qzlt_user_id == None:
+		abort(401)
+
+	# FIXME: Not sure how to pass access token to `requests` properly
+	# n.b. username is `qzlt_user_id`
+	qzlt_favorites_url = "https://api.quizlet.com/2.0/users/" + user_id + "/favorites/" + qzlt_set_id
+	if request.method == 'PUT':
+		req = requests.put(qzlt_favorites_url,
+		                   headers = {"Authorization": "Bearer " + qzlt_access_token})
+	else:
+		req = requests.delete(qzlt_favorites_url,
+		                      headers = {"Authorization": "Bearer " + qzlt_access_token})
+
+	if req.status_code != 200 :
+		return "Bad Request: " + req.text
+	else :
+		return json.loads(req.text)
