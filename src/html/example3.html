@@ -957,29 +957,68 @@
 			fontColor: "black",
 			border: 2,
 			shadow: 3,
-			x: (320/2) * qx,
+			x: (160) * qx,
 			y: 48 * qy,
 			w: 290 * qx,
 			h: 60 * qy,
 		}));
 		
+		var PlayerPointsBox = stage.insert(new Q.UI.Button({
+			fill: "white",
+			border: 2,
+			x: 73 * qx,
+			y: 103.5 * qy,
+			w: 116 * qx,
+			h: 50 * qy,
+			label: globalPlayerScore.toFixed(2) + "",
+		}));
+		
+		var VersusBox = stage.insert(new Q.UI.Button({
+			fill: "white",
+			border: 2,
+			x: 160 * qx,
+			y: 103.5 * qy,
+			w: 58 * qx,
+			h: 50 * qy,
+			label: "VS",
+		}));
+		
+		var EnemyPointsBox = stage.insert(new Q.UI.Button({
+			fill: "white",
+			border: 2,
+			x: 247 * qx,
+			y: 103.5 * qy,
+			w: 116 * qx,
+			h: 50 * qy,
+			label: globalEnemyScore.toFixed(2) + "",
+		}));
+		
 		if (globalPlayerScore > globalEnemyScore) {
 			ResultsBanner.p.label = "Glorious Victory :)";
+			PlayerPointsBox.p.fontColor = "green";
+			EnemyPointsBox.p.fontColor = "red";
 		} else if (globalPlayerScore < globalEnemyScore) {
 			ResultsBanner.p.label = "You Lose :(";
+			PlayerPointsBox.p.fontColor = "red";
+			EnemyPointsBox.p.fontColor = "green";
 		} else {
 			ResultsBanner.p.label = "Draw :O";
+			PlayerPointsBox.p.fontColor = "gray";
+			EnemyPointsBox.p.fontColor = "gray";
 		}
 		
-		var ResultsBox = stage.insert(new Q.UI.Container({
+		
+		
+		var ResultsCanvas = stage.insert(new Q.UI.Container({
 			fill: "white",
 			fontColor: "black",
 			border: 2,
 			shadow: 3,
-			x: (320/2) * qx,
-			y: (((450-78)/2)+78) * qy,
+			x: (160) * qx,
+			y: (284) * qy,
 			w: 290 * qx,
-			h: 350 * qy,
+			h: 310 * qy,
+			shadowColor: "rgba(0,0,0,0.5)",
 		}));
 	
 		var ReviewBtn = stage.insert(new Q.UI.Button({
