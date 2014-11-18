@@ -705,26 +705,26 @@
 		}));
 		
 	// include an event handler, when receive from server, set variables, then set "received" to true.
-	var prevMaxTime;
+	var prevMaxTime = 0, maxTimeAllowed = 0;
 	
 		socket.on('nextQuestion', function(msg) {
             //$('#log').append('<br>Received #' + msg.count + ': ' + msg.data);
 			//Q.state.set("received", true);
 			var sqn = fcQuestion,
 			  sans = fcAnswers,
-			  sqnN = questionNumber,
-			  prevMaxTime = maxTimeAllowed;
+			  sqnN = questionNumber;
+			prevMaxTime = maxTimeAllowed;
 			
 			if (Q.state.get("currentIndex") > 0) {prevFcQuestion = fcQuestion};
 			serverJSON = JSON.parse(msg.data);
 			fcQuestion = serverJSON.question,
 			  fcAnswers = serverJSON.answers,
 			  questionNumber = parseInt(serverJSON.index),
-			  maxTimeAllowed = serverJSON.time,
 			  prevPlayerAns = serverJSON.player,
 			  prevEnemyAns = serverJSON.enemy,
 			  prevPlayerTime = serverJSON.playerTime,
 			  prevEnemyTime = serverJSON.enemyTime;
+			maxTimeAllowed = serverJSON.time;
 			clearTimeout(timeOutTimer);
 	
 			battleLibrary[sqnN] = createBattle(sqn, sans, prevPlayerAns, prevEnemyAns, prevPlayerTime, prevEnemyTime);
@@ -754,26 +754,7 @@
 			
 			console.log(serverJSON);
 		
-			if (Q.state.get("currentIndex") >= questionNumber) {
-			// this part should be in above handler:
-				// if (Q.state.get("currentIndex") > 1) {prevFcQuestion = fcQuestion};
-				
-				/*
-				if (Q.state.get("currentIndex") <= totalQuestions) {
-				serverJSON = JSON.parse(TestServerForm[parseInt(questionNumber)]);
-				fcQuestion = serverJSON.question,
-				  fcAnswers = serverJSON.answers,
-				  questionNumber = parseInt(serverJSON.index),
-			  	  maxTimeAllowed = parseInt(serverJSON.time),
-				  prevPlayerAns = serverJSON.player,
-				  prevEnemyAns = serverJSON.enemy;
-				} else {
-				prevPlayerAns = null;
-				prevEnemyAns = JSON.parse(createFlashCard('test:'+m, m + ' x 1 = ??', m.toString()));
-				
-				}
-				*/  
-				  
+			if (Q.state.get("currentIndex") >= questionNumber) {				  
 
 
 			// express enemy previous answer
