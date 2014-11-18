@@ -121,18 +121,18 @@ function getUserStats() {
         }
 
         $('.chartTable').append(
-            "<tr><td>Total</td><td>" +
+            "<tr><td>Total</td><td class='number'>" +
             result.played +
-            "</td></tr>" +
-            "<tr><td>Wins</td><td>" +
+            "</td><td class='block white'></tr>" +
+            "<tr><td>Wins</td><td class='number'>" +
             result.wins +
-            "</td></tr>" +
-            "<tr><td>Draws</td><td>" +
+            "</td><td class='block red'></td></tr>" +
+            "<tr><td>Draws</td><td class='number'>" +
             result.draws +
-            "</td></tr>" +
-            "<tr><td>Losses</td><td>" +
+            "</td><td class='block green'></td></tr>" +
+            "<tr><td>Losses</td><td class='number'>" +
             result.losses +
-            "</td></tr>"
+            "</td><td class='block yellow'></td></tr>"
         );
     })
     .fail(function() {

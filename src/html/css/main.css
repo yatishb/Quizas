@@ -1849,6 +1849,31 @@ i.rotate {
     margin: 20px auto;
 }
 
+.number {
+    padding-left: 10px;
+    padding-right: 20px;
+}
+
+.block {
+    width: 20px;
+}
+
+.block.red {
+    background-color: #F7464A;
+}
+
+.block.green {
+    background-color: #46BFBD;
+}
+
+.block.yellow {
+    background-color: #FDB45C;
+}
+
+.block.white {
+    background-color: #ECECEC;
+}
+
 .simple_friend.stats:hover {
     background-color: #4DB8DB;
 }
