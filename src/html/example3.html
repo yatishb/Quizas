@@ -276,6 +276,7 @@
 		var QUESTION_TIME = 10;
 		var CURRENT_TIME = QUESTION_TIME;
 		var TIMER;
+		var NUKE_SPRITE = "mushroom_cloud.jpg";
 		
 		// interpreting info from server
 		var initiatingJSON = JSON.parse(INITIATING_FORM);
@@ -309,10 +310,10 @@
 	window.addEventListener("load",function() {
 	
 	var Q = window.Q = Quintus()
-    .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
+    .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI, Audio")
     .setup({
 		maximize: true
-	}).touch();
+	}).touch().enableSound();
 	
 	// dynamic vars
 	var qx = Q.width/320;
@@ -503,6 +504,51 @@
 		},
 		});
 		
+	Q.UI.WhiteOut = Q.UI.Container.extend("WhiteOut", {
+		init: function(p) {
+			this._super(p, {
+				fill: "white",
+				x: Q.width/2,
+				y: Q.height/2,
+				w: Q.width,
+				h: Q.height,
+				opacity: 1,
+			});
+			//Q.audio.play(NUKE_SOUND);
+		},
+		step: function(dt) {
+			var vt = dt / 3;
+			if (this.p.opacity - vt > 0.1) {
+				this.p.opacity -= vt;
+			} else {
+				this.p.opacity = 0.1;
+				if (Q.state.get("phaseToggle")) {
+					Q.state.set("phaseToggle", false);
+				}
+				//Q.audio.stop(NUKE_SOUND);
+			}
+		}
+	});
+	
+	Q.Nuke = Q.Sprite.extend("Nuke", {
+		init: function(p) {
+			this._super(p, {
+				x: Q.width/2,
+				y: Q.height/2,
+				asset: NUKE_SPRITE,
+				scale: (Q.height / (1020 * qy))
+			});
+		},
+		step: function(dt) {
+			var vt = dt / 3;
+			if (this.p.opacity - vt > 0.1) {
+				this.p.opacity -= vt;
+			} else {
+				this.p.opacity = 0.1;
+			}
+		}
+	});
+		
 	// versus screen with countdown
 	Q.scene("scene0", function(stage) {
 	
@@ -666,14 +712,14 @@
 	// set scene
 	Q.scene("scene1",function(stage) {
 	
-		Q.state.reset({playerScore: 0, enemyScore: 0, currentIndex: 0, currentQuestion: "", waiting: true, isGameOver: false});
+		Q.state.reset({playerScore: 0, enemyScore: 0, currentIndex: 0, currentQuestion: "", waiting: true, isGameOver: false, phaseToggle: true});
 	
 		var playerScore = stage.insert(new Q.UI.PlayerScore());
 		var enemyScore = stage.insert(new Q.UI.EnemyScore());
 		//var leQC = stage.insert(new Q.UI.QuestionCounter());
 		var leTC = stage.insert(new Q.UI.TimeCounter());
 		var ansDeck;
-		var isPhaseOne = true;
+		var isPhaseOne = true, midNuke = false;
 		var timeTakenCurrent = 0;
 		
 		// start receive serverForm
@@ -876,6 +922,26 @@
 			
 			//alert("Game Over");
 		});
+		
+		Q.state.on("change.phaseToggle", function() {
+			midNuke = false;
+			if(totalQuestions - Q.state.get("currentIndex") >= 0) {
+				// Get next question only if there is another question to show
+
+				qCard.generate(fcQuestion);
+				if (Q.state.get("currentIndex") > 1) {destroyAnswers(aBtns)};
+				aBtns = generateAnswers();
+				if (Q.state.get("currentIndex") > 1) {TIMER.stop();}
+				if (Q.state.get("currentIndex") > 0 && Q.state.get("currentIndex") <= totalQuestions) {
+					TIMER = new Countdown({
+						seconds: maxTimeAllowed,
+						onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
+						onCounterEnd: function() {outOfTime();}
+					});
+					TIMER.start();
+				}
+			}
+		});
 			
 	
 		Q.state.on("change.currentIndex", function() {
@@ -913,7 +979,11 @@
 							// initiate Phase 2
 							bomb.destroy();
 							console.log("PHASE TWO");
-							isPhaseOne = false;
+							isPhaseOne = false, midNuke = true;
+							setTimeout(function() {
+								var whiteScreen = stage.insert(new Q.UI.WhiteOut());
+								var nuclearExplosion = stage.insert(new Q.Nuke());
+							}, 1000);
 						}
 					}
 				} else {
@@ -924,7 +994,8 @@
 				if (Q.state.get("currentIndex") == 1) {
 					qCard = stage.insert(new Q.UI.FlashCard(),qContainer);
 				}
-
+				
+			if (midNuke) {
 				if(totalQuestions - Q.state.get("currentIndex") >= 0) {
 					// Get next question only if there is another question to show
 
@@ -941,7 +1012,7 @@
 						TIMER.start();
 					}
 				}
-
+			}
 								
 			}
 			
@@ -1345,7 +1416,7 @@
 	});
 	
 	// stage scene
-	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE, playerSprite, enemySprite], function() {
+	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE, playerSprite, enemySprite, NUKE_SPRITE], function() {
 		Q.stageScene("scene0");
 	});
      

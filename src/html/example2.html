@@ -10,6 +10,8 @@
 	<link rel="stylesheet" type="text/css" href="css/singlePlayer.css">
 	<script>
 		var globalTestVar, gtv_a, gtv_b, gtv_c;
+		var NUKE_SOUND = "Bomb_Explosion.mp3";
+		var NUKE_SPRITE = "mushroom_cloud.jpg";
 	
 	
 		// socket stuff
@@ -309,14 +311,14 @@
 		//setTimeout(function() {
 		//	socket.emit('assignroom', {flashset: "quizlet:39748410", user1: "quizlet:yatish", user2: "quizlet:byatishyuvaraj"});
 		//}, 10000);
-	var Q = window.Q = Quintus()
-    .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
+	var Q = window.Q = Quintus({audioSupported: ['mp3', 'wav']})
+    .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI, Audio")
     .setup({
 		//width: 300,
 		//height: 675,
 		//scaleToFit: true
 		maximize: true
-	}).touch();
+	}).touch().enableSound();
 	
 	// dynamic vars
 	var qx = Q.width/320;
@@ -1028,6 +1030,9 @@
 			
 		});
 
+		
+		//var whiteScreen = stage.insert(new Q.UI.WhiteOut());
+		//var nuclearExplosion = stage.insert(new Q.Nuke());
 	});
 	
 	// set scene
@@ -1480,11 +1485,66 @@
 		
 	});
 	
-	// stage scene
-	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE], function() {
-		Q.stageScene("scene2");
+	Q.UI.WhiteOut = Q.UI.Container.extend("WhiteOut", {
+		init: function(p) {
+			this._super(p, {
+				fill: "white",
+				x: Q.width/2,
+				y: Q.height/2,
+				w: Q.width,
+				h: Q.height,
+				opacity: 1,
+			});
+			//Q.audio.play(NUKE_SOUND);
+		},
+		step: function(dt) {
+			var vt = dt / 3;
+			if (this.p.opacity - vt > 0.1) {
+				this.p.opacity -= vt;
+			} else {
+				this.p.opacity = 0.1;
+				//Q.audio.stop(NUKE_SOUND);
+			}
+		}
 	});
-     
+	
+	Q.Nuke = Q.Sprite.extend("Nuke", {
+		init: function(p) {
+			this._super(p, {
+				x: Q.width/2,
+				y: Q.height/2,
+				asset: NUKE_SPRITE,
+				scale: (Q.height / (1020 * qy))
+			});
+		},
+		step: function(dt) {
+			var vt = dt / 3;
+			if (this.p.opacity - vt > 0.1) {
+				this.p.opacity -= vt;
+			} else {
+				this.p.opacity = 0.1;
+			}
+		}
+	});
+	
+	Q.scene("testScene", function(stage) {
+		Q.state.reset({nuke: false});
+		
+		Q.state.on("change.nuke", function() {
+			if (Q.state.get("nuke")) {
+			// -------------------------------------------------------start
+				var whiteScreen = stage.insert(new Q.UI.WhiteOut());
+				var nuclearExplosion = stage.insert(new Q.Nuke());
+			// ---------------------------------------------------------end
+				Q.state.set("nuke", false);
+			}			
+		});
+	});
+	
+	// stage scene
+	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE, playerSprite, enemySprite, NUKE_SPRITE], function() {
+		Q.stageScene("scene1");
+	});
 	 //setTimeout(function(){Q.state.inc("currentIndex", 1);}, 5000);
 });
 	  </script>
