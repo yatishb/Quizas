@@ -1,5 +1,5 @@
-from models import User, FlashGame as FG, FlashCardInGame as FC, PointsTable as PT
-from sqlalchemy import func, and_
+from models import User, FlashGame as FG, FlashCardInGame as FC, PointsTable as PT, InternalUserAuth as IUA
+from sqlalchemy import func, and_, desc
 from . import main
 from .. import db, redis
 import json, uuid
@@ -371,3 +371,22 @@ def getUserSetStats(userid, setid):
 	                   'fcids': list(flashCardIds),
 	                   'gameids': gameIds,
 	                   'flashcards': flashCardStats})
+
+
+
+# Function to populate leaderboard
+# Return the list of users in the system along with their points
+# Return JSON containing an ordered array of people
+# For each person, facebook id and points
+def populateLeaderboard():
+	orderedPoints = PT.query.order_by(desc(PT.points))
+	leaderboardData = []
+
+	for person in orderedPoints:
+		if person.points == 0:
+			continue
+		leader = {}
+		leader['points'] = person.points
+		leader['id'] = authhelper.lookupInternalFacebook(person.id)
+		leaderboardData.append(leader)
+	return leaderboardData
