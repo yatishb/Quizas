@@ -42,6 +42,12 @@ $(document).ready(function() {
 
     console.log(socket);
 
+    // Get the list of online users
+    socket.emit('online users');
+    socket.on('online', function(msg) {
+        var listOnlineUsers = msg.data;
+    });
+
     // event handler for server sent data
     // the data is displayed in the "Received" section of the page
     socket.on('game request', function(msg) {
@@ -228,7 +234,7 @@ $('.friend_list').on("click", '.simple_friend', function () {
     $('.selected').removeClass('selected');
     $(this).addClass('selected');
 
-    if($(this.parent().hasClass('list_online'))) next_page = "q";
+    if($(this.parent().hasClass('.list_online'))) next_page = "q";
     else next_page = "c";
 
     selected_friend_id = this.id;
