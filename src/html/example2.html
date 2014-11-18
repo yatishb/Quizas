@@ -511,8 +511,8 @@
 			return labelStr;
 		}
 		
-		var playerStats = stage.insert(new Q.UI.Text(), playerContainer);
-		var enemyStats = stage.insert(new Q.UI.Text(), enemyContainer);
+		var playerStats = stage.insert(new Q.UI.Text({size: 60}), playerContainer);
+		var enemyStats = stage.insert(new Q.UI.Text({size: 8}), enemyContainer);
 		playerStats.p.label = expressStats('John Smith', 23, 'Matrix Agent', 86, 305);
 		enemyStats.p.label = expressStats('Darth Vader', 37, 'Sith Lord', 67, 1300);
 		
