@@ -243,6 +243,8 @@ img {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     text-align: center;
+    padding-top: 3px;
+    padding-bottom: 3px;
 }
 
 .footer_container li {
@@ -605,8 +607,8 @@ img {
     }
 
     .space.bottom{
-        height: 10vw;
-        max-height: 32px;
+        height: 15vw;
+        max-height: 100px;
         bottom: 0;
     }
 
@@ -682,7 +684,7 @@ img {
     }
 
     .space.bottom{
-        height: 40px;
+        height: 100px;
         bottom: 0;
     }
 
@@ -897,6 +899,7 @@ i.rotate {
 .set_info {
     z-index: 1;
     margin-bottom: 100px;
+    padding-bottom: 30px;
     right: 0;
     left: 0;
     position: absolute;
