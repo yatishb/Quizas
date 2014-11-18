@@ -47,12 +47,13 @@ $(document).ready(function() {
     // the data is displayed in the "Received" section of the page
     socket.on('game request', function(msg) {
         content = JSON.parse(msg.data);
-        console.log("Request info is ")
+        console.log("Request info is ");
         console.log(content);
 
         pupup_mode = "request";
 
-        showPopup("User " + content.requestfrom + " is inviting you to compete set " + content.set);
+        showPopup(content.requestfrom, content.set);
+        // showPopup("User " + content.requestfrom + " is inviting you to compete set " + content.set);
     });
 
     // event handler for rejected request
@@ -63,7 +64,8 @@ $(document).ready(function() {
 
         pupup_mode = "rejected";
 
-        showPopup("Your request was rejected by " + content.rejectedby);
+        showPopup(content.rejectedby,"nothing");
+        // showPopup("Your request was rejected by " + content.rejectedby);
     });
 
     // event handler for when user not online
@@ -74,7 +76,8 @@ $(document).ready(function() {
 
         pupup_mode = "offline";
 
-        showPopup("The user " + content.rejectedby + " is not online");
+        showPopup(content.rejectedby, "nothing");
+        // showPopup("The user " + content.rejectedby + " is not online");
     });
 
     // event handler for when user does not exist
@@ -85,7 +88,7 @@ $(document).ready(function() {
 
         pupup_mode = "non-existent";
 
-        showPopup("The user " + content.rejectedby + " does not exist");
+        showPopup(content.rejectedby);
     });
 
     // event handler for accepted request
@@ -225,9 +228,8 @@ $('#challenge').on("click", function(){
 
 $('#practice').on("click", function(){
     next_page = "s";
-    // $('.friend_window').show();
-    // $('.friend_window').addClass('fadeIn');
-    // $('.list_search').focus();
+
+    initializePracticeGame(selected_set_id, quizas_user_id());
 });
 
 $('.friend_list').on("click", '.simple_friend', function () {
@@ -288,28 +290,38 @@ $(document.body).on("click", '.popup_button.ok', function() {
     $('.popup_window').remove();
 });
 
-function showPopup(message) {
+function showPopup(userid, setid) {
+    // request  rejected  offline  non-existent  accepted
     if(pupup_mode == "request") {
-        $(document.body).append(
-            "<div class='popup_window noselect'>" +
-            "<div class='popup_message'><span>" +
-            message +
-            "</span></div>" +
-            "<div class='popup_buttons'>" +
-            "<div class='popup_button cancel'>Reject</div>" +
-            "<div class='popup_button accept'>Accept</div>" +
-            "</div></div>"
-        );
+        quizas_get_profile_for(userid, function (p) {
+            var message = "User " + p.name + " is inviting you to compete set " + setid;
+            $(document.body).append(
+                "<div class='popup_window noselect'>" +
+                "<div class='popup_message'><span>" +
+                message +
+                "</span></div>" +
+                "<div class='popup_buttons'>" +
+                "<div class='popup_button cancel'>Reject</div>" +
+                "<div class='popup_button accept'>Accept</div>" +
+                "</div></div>"
+            );
+        });
     } else {
-        $(document.body).append(
-            "<div class='popup_window noselect'>" +
-            "<div class='popup_message'><span>" +
-            message +
-            "</span></div>" +
-            "<div class='popup_buttons'>" +
-            "<div class='popup_button ok'>Ok</div>" +
-            "</div></div>"
-        );
+        quizas_get_profile_for(userid, function (p) {
+            if(popup_mode == "rejected") message = "Your request was rejected by " + p.name;
+            else if(popup_mode == "offline") message = "The user " + p.name + " does not exist";
+            else if(popup_mode == "non-existent") message = "The user " + p.name + " is not online";
+
+            $(document.body).append(
+                "<div class='popup_window noselect'>" +
+                "<div class='popup_message'><span>" +
+                message +
+                "</span></div>" +
+                "<div class='popup_buttons'>" +
+                "<div class='popup_button ok'>Ok</div>" +
+                "</div></div>"
+            );
+        });
     }
 }
 
@@ -327,6 +339,12 @@ function initializeMultiplayerGame(content) {
     //total
     sessionStorage.setItem("initialization", JSON.stringify(content));
     window.location.href="example3.html";
+}
+
+function initializePracticeGame(set_id, user_id) {
+    sessionStorage.setItem("set_id", JSON.stringify(set_id));
+    sessionStorage.setItem("user_id", JSON.stringify(user_id));
+    window.location.href="singlePlayer.html";
 }
 
 function getSetContent() {
@@ -476,6 +494,8 @@ function outputFriends(friends) {
             "</span></div>"
         );
 
+        console.log("test");
+
         quizas_get_profile_for(f.userid, function (p) {
             var address;
 
@@ -495,12 +515,10 @@ function outputFriends(friends) {
 
 function splitFriend(listOnlineUsers) {
     var offlineList = $('.list_offline');
-    console.log("gets in here");
 
     $('.list_online .simple_friend').each(function() {
         var flag = false;
         var userid = $(this).attr('id');
-        console.log("obtained friends");
 
         for (var i = 0; i < listOnlineUsers.length; i++) {
             console.log(listOnlineUsers[i]);
