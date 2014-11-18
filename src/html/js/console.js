@@ -23,7 +23,7 @@ function displayContent() {
 						else if(i == 2) extraClass = "second";
 						else if(i == 3) extraClass = "third";
 
-						quizas_get_profile_for(userid, function(profile) {
+						quizas_get_profile_for(id, function(profile) {
 								element.append(
 								               		"<div class='simple_leader'>" +
 											            "<div class='rank font-effect-shadow-multiple " +
