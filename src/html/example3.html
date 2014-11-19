@@ -17,13 +17,7 @@
 </head>
 
 <body>
-<script>
-		INITIATING_FORM = sessionStorage.getItem("initialization");
-		initiatingJSON = JSON.parse(INITIATING_FORM);
-		gameroom = initiatingJSON.room;
-		console.log(gameroom);
-		socket.emit('gameinitialised', {"room":gameroom});
-</script>
+
 <script>	
 		console.log("into the body");
 		// helper functions
@@ -1516,5 +1510,12 @@
 </body>
  
 <footer>
+<script>
+		INITIATING_FORM = sessionStorage.getItem("initialization");
+		initiatingJSON = JSON.parse(INITIATING_FORM);
+		gameroom = initiatingJSON.room;
+		console.log(gameroom);
+		socket.emit('gameinitialised', {"room":gameroom});
+</script>	
 </footer>
 </html>

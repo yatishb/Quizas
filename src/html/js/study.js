@@ -244,12 +244,16 @@ $('#challenge').on("click", function(){
     $('.friend_window').addClass('fadeIn');
     $('.list_search').focus();
 
+
+});
+
+function getUserPicture() {
     quizas_get_profile(function(profile) {
         myname = profile.name;
         myurl = profile.picture;
         console.log(myurl);
     });
-});
+}
 
 $('#practice').on("click", function(){
     next_page = "s";
