@@ -68,7 +68,7 @@ $(document).ready(function() {
     socket.on('user not online', function(msg) {
         content = JSON.parse(msg.data);
 
-        pupup_mode = "offline";
+        popup_mode = "offline";
 
         showPopup(content.rejectedby, "nothing");
         // showPopup("The user " + content.rejectedby + " is not online");
@@ -78,7 +78,7 @@ $(document).ready(function() {
     socket.on('user non-existent', function(msg) {
         content = JSON.parse(msg.data);
 
-        pupup_mode = "non-existent";
+        popup_mode = "non-existent";
 
         showPopup(content.rejectedby,"nothing");
     });
@@ -87,7 +87,7 @@ $(document).ready(function() {
     socket.on('game accepted', function(msg) {
         content = JSON.parse(msg.data);
 
-        pupup_mode = "accepted";
+        popup_mode = "accepted";
         
         quizas_get_profile_for(content.enemyID, function (p) {
             var newInit = {
