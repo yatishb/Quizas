@@ -60,9 +60,14 @@ $('.page_friend').on('click', '.simple_friend', function() {
 });
 
 $('.page_friend').on('click', '.game_button.me', function() {
-    var gameid = $(this).attr('id');
-    $('#line_graph_me').empty();
-    outputStatsForGame(userid , gameid, 'line_graph_me');
+    if(!$(this).hasClass('active')) {
+        $('.game_button.active').removeClass('active');
+        $(this).addClass('active');
+        
+        var gameid = $(this).attr('id');
+        $('#line_graph_me').empty();
+        outputStatsForGame(userid , gameid, 'line_graph_me');
+    }
 });
 
 // $('.page_friend').on('click', '.game_button.friend', function() {
@@ -173,9 +178,14 @@ function getUserStats() {
         var response = JSON.parse(data);
         
         var j = 1;
+        var extraClass= " ";
         response.forEach(function (gameId) {
+            if (j == 1) extraClass = 'active';
+            else extraClass = ' ';
             $('.game_buttons.me').append(
-                "<div class='game_button' id='" +
+                "<div class='game_button " +
+                extraClass +
+                "' id='" +
                 gameId +
                 "'>" +
                 j +

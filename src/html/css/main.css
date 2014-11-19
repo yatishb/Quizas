@@ -1912,6 +1912,11 @@ i.rotate {
     background-color: #BDC3C7;
     line-height: 30px;
     color: #2C3E50;
+    cursor: pointer;
+}
+
+.game_button.active {
+    background-color: #95A5A6;
 }
 
 .line_graph {
