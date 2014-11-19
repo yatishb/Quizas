@@ -642,7 +642,11 @@
 				var ceilSec = Math.ceil(sec);
 				var incCS = cdSec - ceilSec;
 				loadBox[midNum + incCS].p.fill = "green";
+				loadBox[midNum + incCS + 1].p.fill = "green";
+				loadBox[midNum + incCS + 2].p.fill = "green";
 				loadBox[midNum - incCS].p.fill = "green";
+				loadBox[midNum - incCS - 1].p.fill = "green";
+				loadBox[midNum - incCS - 2].p.fill = "green";
 				timerCD.p.label = ceilSec + "";
 			},
 			onCounterEnd: function() {
