@@ -247,7 +247,7 @@
 	window.addEventListener("load",function() {
 		console.log("load");
 	
-	var Q = window.Q = Quintus({audioSupported: ['mp3', 'wav']})
+	var Q = window.Q = Quintus({audioSupported: ['mp3']})
     .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI, Audio")
     .setup({
 		maximize: true
@@ -963,15 +963,15 @@
 				if (remainingQ > 0) {
 					if (scoreDiff <= remainingQ) {
 						bomb.p.x = (160 + ((scoreDiff/remainingQ)*100)) * qx;
-					} else if (scoreDiff > remainingQ) {
+					} else if (Math.abs(scoreDiff) > remainingQ) {
 						if (isPhaseOne) {
 							// initiate Phase 2
 							bomb.destroy();
 							console.log("PHASE TWO");
 							isPhaseOne = false, midNuke = true;
 							setTimeout(function() {
-								var whiteScreen = stage.insert(new Q.UI.WhiteOut());
 								var nuclearExplosion = stage.insert(new Q.Nuke());
+								var whiteScreen = stage.insert(new Q.UI.WhiteOut());
 							}, 1000);
 						}
 					}
