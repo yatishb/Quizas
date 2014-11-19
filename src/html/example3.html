@@ -247,7 +247,7 @@
 	window.addEventListener("load",function() {
 		console.log("load");
 	
-	var Q = window.Q = Quintus({audioSupported: ['mp3', 'wav']})
+	var Q = window.Q = Quintus({audioSupported: ['mp3']})
     .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI, Audio")
     .setup({
 		maximize: true
@@ -266,13 +266,13 @@
 	playerName = initiatingJSON.playerName;
 	playerSprite = initiatingJSON.playerSprite;
 	playerPoints = initiatingJSON.playerPoints;
-	playerWin = initiatingJSON.playerWin;
-	playerTotal = initiatingJSON.playerTotal;
+	playerWin = 1/*initiatingJSON.playerWin*/;
+	playerTotal = 1/*initiatingJSON.playerTotal*/;
 	enemyName = initiatingJSON.enemyName;
 	enemySprite = initiatingJSON.enemySprite;
 	enemyPoints = initiatingJSON.enemyPoints;
-	enemyWin = initiatingJSON.enemyWin;
-	enemyTotal = initiatingJSON.enemyTotal;
+	enemyWin = 1/*initiatingJSON.enemyWin*/;
+	enemyTotal = 1/*initiatingJSON.enemyTotal*/;
 	encounterTotal = initiatingJSON.encounterTotal;
 	encounterWin = initiatingJSON.encounterWin;
 	matchName = initiatingJSON.matchName;
@@ -963,15 +963,15 @@
 				if (remainingQ > 0) {
 					if (scoreDiff <= remainingQ) {
 						bomb.p.x = (160 + ((scoreDiff/remainingQ)*100)) * qx;
-					} else if (scoreDiff > remainingQ) {
+					} else if (Math.abs(scoreDiff) > remainingQ) {
 						if (isPhaseOne) {
 							// initiate Phase 2
 							bomb.destroy();
 							console.log("PHASE TWO");
 							isPhaseOne = false, midNuke = true;
 							setTimeout(function() {
-								var whiteScreen = stage.insert(new Q.UI.WhiteOut());
 								var nuclearExplosion = stage.insert(new Q.Nuke());
+								var whiteScreen = stage.insert(new Q.UI.WhiteOut());
 							}, 1000);
 						}
 					}
@@ -1499,7 +1499,6 @@
 	// stage scene
 	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE, playerSprite, enemySprite, NUKE_SPRITE, NUKE_SOUND], function() {
 		Q.stageScene("scene0");
-		Q.audio.play(NUKE_SOUND);
 	});
      
 });

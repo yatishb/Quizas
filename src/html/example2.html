@@ -669,7 +669,7 @@
 		var matchDetails = stage.insert(new Q.UI.Text({size: 28}), matchContainer);
 		matchDetails.p.label = expressMatch(matchName, totalQuestions, encounterTotal, encounterWin);
 		
-		var cdSec = 10;
+		var cdSec = 3;
 		var cdTimer = new Countdown({
 			seconds: cdSec,
 			onUpdateStatus: function(sec) {
@@ -1590,8 +1590,8 @@
 		Q.state.on("change.nuke", function() {
 			if (Q.state.get("nuke")) {
 			// -------------------------------------------------------start
-				var whiteScreen = stage.insert(new Q.UI.WhiteOut());
 				var nuclearExplosion = stage.insert(new Q.Nuke());
+				var whiteScreen = stage.insert(new Q.UI.WhiteOut());
 			// ---------------------------------------------------------end
 				Q.state.set("nuke", false);
 			}			
@@ -1600,7 +1600,7 @@
 	
 	// stage scene
 	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE, playerSprite, enemySprite, NUKE_SPRITE], function() {
-		Q.stageScene("scene0");
+		Q.stageScene("testScene");
 	});
 	 //setTimeout(function(){Q.state.inc("currentIndex", 1);}, 5000);
 });
