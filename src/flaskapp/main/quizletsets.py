@@ -120,6 +120,16 @@ def get_flashset(set_id):
 		return json.dumps(set_json)
 
 
+def get_flashset_name(set_id):
+	set_json = get_flashset_json(set_id)
+
+	if "error" in set_json:
+		return set_json
+	else:
+		set_name = set_json['title']
+		return set_name
+
+
 
 # Shuffled Quizset.
 def shuffled_flashset_json(set_id, n):

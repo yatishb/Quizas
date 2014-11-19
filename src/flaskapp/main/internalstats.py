@@ -294,7 +294,7 @@ def getGameStats(userid, gameidForStats):
 
 	noOfQuestionsCorrectUser, noOfQuestionsCorrectOpponent = findNumOfQuesEachUserInGameGotCorrect(
 																		questionsInGame, userid)
-	pointsUser, pointsOpponent = findPointsEachUser(allQuestionsInGame, userid)
+	pointsUser, pointsOpponent = findPointsEachUser(questionsInGame, userid)
 
 	if pointsUser > pointsOpponent:
 		gameResult = "Won"
@@ -390,3 +390,11 @@ def populateLeaderboard():
 		leader['id'] = authhelper.lookupInternalFacebook(person.id)
 		leaderboardData.append(leader)
 	return leaderboardData
+
+
+def getPointsPlayer(user):
+	pointsRow = PT.query.filter(PT.id == user)
+	if pointsRow == None:
+		return 0
+	else:
+		return pointsRow.points
