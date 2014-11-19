@@ -33,6 +33,8 @@ $(document).ready(function() {
         });
     });
 
+    setInterval(getNotification(), 180000);
+
     /*namespace = '/test'; // change to an empty string to use the global namespace
 
     // the socket.io documentation recommends sending an explicit package upon connection
@@ -463,10 +465,10 @@ function getNotification() {
         var list_done = $('.info_done');
         for (var i = 0; i < result_pending.length; i++) {
             quizas_get_profile_for(
-                    result_pending[i].receipientUserId,
+                    result_pending[i].recipientUserId,
                     (function(i) {
                         return function(profile) {
-                            var message = result_pending[i].receipientUserId + ' has challenged you on ' + result_pending[i].setName;
+                            var message = profile.name + ' has challenged you on ' + result_pending[i].setName;
                             list_pending.append(
                                 "<div class='simple_info id='" +
                                 result_pending[i].setId +
@@ -487,24 +489,26 @@ function getNotification() {
 
         for (var i = 0; i < result_done.length; i++) {
             quizas_get_profile_for(
-                    result_pending[i].receipientUserId,
-                    function(profile) {
-                        var message = result_pending[i].receipientUserId + ' has completed ' + result_pending[i].setName;
-                        list_done.append(
-                            "<div class='simple_info id='" +
-                            result_pending[i].setId +
-                            "' name='" +
-                            profile.name +
-                            "'>" +
-                            "<div class='info_content'><span>" +
-                            message +
-                            "</span></div>" +
-                            "<div class='action_set'>" +
-                            "<div class='button_accept'><i class='fa fa-check fa-2x'></i></div>" +
-                            "<div class='button_reject'><i class='fa fa-plus rotate fa-2x'></i></div>" +
-                            "</div></div>"
-                        );
-            });
+                    result_done[i].recipientUserId,
+                    (function(i) {
+                        return function(profile) {
+                            var message = profile.name + ' has completed ' + result_pending[i].setName;
+                            list_done.append(
+                                "<div class='simple_info id='" +
+                                result_pending[i].setId +
+                                "' name='" +
+                                profile.name +
+                                "'>" +
+                                "<div class='info_content'><span>" +
+                                message +
+                                "</span></div>" +
+                                "<div class='action_set'>" +
+                                "<div class='button_accept'><i class='fa fa-check fa-2x'></i></div>" +
+                                "<div class='button_reject'><i class='fa fa-plus rotate fa-2x'></i></div>" +
+                                "</div></div>"
+                            );
+                        };
+                    })(i));
         }
     })
     .fail(function() {
