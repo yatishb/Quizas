@@ -965,7 +965,7 @@
 				var remainingQ = (totalQuestions - Q.state.get("currentIndex") + 1) * 10000;
 				var scoreDiff = Q.state.get("playerScore") - Q.state.get("enemyScore");
 				if (remainingQ > 0) {
-					if (scoreDiff <= remainingQ) {
+					if (Math.abs(scoreDiff) <= remainingQ) {
 						bomb.p.x = (160 + ((scoreDiff/remainingQ)*100)) * qx;
 					} else if (Math.abs(scoreDiff) > remainingQ) {
 						if (isPhaseOne) {
