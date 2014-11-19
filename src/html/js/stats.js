@@ -59,7 +59,7 @@ $('.page_friend').on('click', '.simple_friend', function() {
     // test();
 });
 
-$('.page_friend').on('click', '.game_button.me', function() {
+$('.page_me').on('click', '.game_button', function() {
     if(!$(this).hasClass('active')) {
         $('.game_button.active').removeClass('active');
         $(this).addClass('active');
