@@ -266,13 +266,13 @@
 	playerName = initiatingJSON.playerName;
 	playerSprite = initiatingJSON.playerSprite;
 	playerPoints = initiatingJSON.playerPoints;
-	playerWin = initiatingJSON.playerWin;
-	playerTotal = initiatingJSON.playerTotal;
+	playerWin = 1/*initiatingJSON.playerWin*/;
+	playerTotal = 1/*initiatingJSON.playerTotal*/;
 	enemyName = initiatingJSON.enemyName;
 	enemySprite = initiatingJSON.enemySprite;
 	enemyPoints = initiatingJSON.enemyPoints;
-	enemyWin = initiatingJSON.enemyWin;
-	enemyTotal = initiatingJSON.enemyTotal;
+	enemyWin = 1/*initiatingJSON.enemyWin*/;
+	enemyTotal = 1/*initiatingJSON.enemyTotal*/;
 	encounterTotal = initiatingJSON.encounterTotal;
 	encounterWin = initiatingJSON.encounterWin;
 	matchName = initiatingJSON.matchName;
@@ -1499,7 +1499,6 @@
 	// stage scene
 	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE, playerSprite, enemySprite, NUKE_SPRITE, NUKE_SOUND], function() {
 		Q.stageScene("scene0");
-		Q.audio.play(NUKE_SOUND);
 	});
      
 });
