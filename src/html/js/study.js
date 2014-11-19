@@ -463,9 +463,9 @@ function getNotification() {
         var list_done = $('.info_done');
         for (var i = 0; i < result_pending.length; i++) {
             quizas_get_profile_for(
-                    result_pending[i].receipientUserId,
+                    result_pending[i].recipientUserId,
                     function(profile) {
-                        var message = result_pending[i].receipientUserId + ' has challenged you on ' + result_pending[i].setName;
+                        var message = profile.name + ' has challenged you on ' + result_pending[i].setName;
                         list_pending.append(
                             "<div class='simple_info id='" +
                             result_pending[i].setId +
@@ -485,9 +485,9 @@ function getNotification() {
 
         for (var i = 0; i < result_done.length; i++) {
             quizas_get_profile_for(
-                    result_pending[i].receipientUserId,
+                    result_pending[i].recipientUserId,
                     function(profile) {
-                        var message = result_pending[i].receipientUserId + ' has completed ' + result_pending[i].setName;
+                        var message = result_pending[i].recipientUserId + ' has completed ' + result_pending[i].setName;
                         list_done.append(
                             "<div class='simple_info id='" +
                             result_pending[i].setId +
