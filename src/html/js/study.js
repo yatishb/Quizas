@@ -480,7 +480,7 @@ function getNotification() {
 
         var list_pending = $('.info_pending');
         var list_done = $('.info_done');
-        list_pending.empty().append("<h3>Panding</h3>");
+        list_pending.empty().append("<h3>Pending</h3>");
         list_done.empty().append("<h3>Done</h3>");
 
         for (var i = 0; i < result_pending.length; i++) {

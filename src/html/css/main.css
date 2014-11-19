@@ -1878,22 +1878,39 @@ i.rotate {
     margin: 20px auto;
 }
 
-.game_details {
-
+.game_details.me {
+    text-align: center;
+    display: none;
 }
 
-.game_buttons {
+.game_buttons.me {
     width: 90%;
     height: 20%;
     margin: 20px auto;
     text-align: center;
 }
 
+.game_details.friend {
+    text-align: center;
+    position: relative;
+}
+
+.game_buttons.friend {
+    width: 90%;
+    height: 30%;
+    margin: 20px auto;
+    text-align: center;
+    position: relative;
+}
+
 .game_button {
     display: inline-block;
     height: 30px;
     width: 19%;
-    box-shadow: -1px 1px 2px #888888;
+    box-shadow: -1px 1px 2px #BDC3C7;
+    background-color: #BDC3C7;
+    line-height: 30px;
+    color: #2C3E50;
 }
 
 .line_graph {
