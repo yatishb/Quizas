@@ -126,6 +126,16 @@
       }
     });
     
+	Q.UI.TimeCounter = Q.UI.Text.extend("UI.TimeCounter", { 
+		init: function(p) {
+			this._super({
+			  label: "n/a",
+			  x: 160 * qx,
+			  y: 30 * qy,
+			});
+		},
+	});
+	
     Q.UI.QuestionCounter = Q.UI.Text.extend("UI.QuestionCounter", { 
       init: function(p) {
         this._super({
@@ -200,12 +210,13 @@
     
       var leScore = stage.insert(new Q.UI.Score());
       var leQC = stage.insert(new Q.UI.QuestionCounter());
+	  var leTC = stage.insert(new Q.UI.TimeCounter());
       var ansDeck ;
       var timeTakenCurrent = 0;
       var timeOutTimer, gameOverTimer;
       
       function generateAnswers() {
-        Q.state.set("waiting", false);
+        //Q.state.set("waiting", false);
         ansDeck = answersDeck[Q.state.get("currentQuestion") - 1];
 
         var aBtns = [];
@@ -232,10 +243,10 @@
               name: k
               }, function() {
                 // do something
-                if (!Q.state.get("waiting")) {
+               // if (!Q.state.get("waiting")) {
                   console.log(TIMER);
                   timeTakenCurrent = TIMER.getTime();
-                  Q.state.set("waiting", true);
+                 // Q.state.set("waiting", true);
                 
                   answersChosen.push( ansDeck[this.p.name].id );
                   if (quesDeck[Q.state.get("currentQuestion") - 1].id == ansDeck[this.p.name].id) {
@@ -253,7 +264,7 @@
                   if (Q.state.get("currentQuestion") <= Q.state.get("totalQuestions")) {
                     Q.state.inc("currentQuestion", 1);
                   }
-                }
+               // }
               }));
               k = k + 1;
           }

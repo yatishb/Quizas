@@ -12,6 +12,56 @@
  
  <body>
   <script>
+  
+  var TIMER;
+  
+  function convertPoints(timeMils, maxTime) { // all in milliseconds
+      var resultPoints = ((maxTime - timeMils) / maxTime) * 10000;
+      return Math.round(resultPoints);
+    }
+	
+	function Countdown(options) {
+      var timer,
+        instance = this,
+        seconds = options.seconds || 10,
+        updateStatus = options.onUpdateStatus || function () {},
+        counterEnd = options.onCounterEnd || function () {},
+        offset, max;
+        
+      function decrementCounter() {
+        d = delta();
+        seconds = (seconds >= d) ? seconds -= d : 0;
+        updateStatus((seconds/1000).toFixed(2));
+        if (seconds <= 0) {
+          counterEnd();
+          instance.stop();
+        }
+      }
+      
+      function delta() {
+        var now = Date.now(),
+          d = now - offset;
+        offset = now;
+        return d;
+      }
+      
+      this.getTime = function() {
+        return (max - seconds);
+      };
+
+      this.start = function () {
+        clearInterval(timer);
+        timer = 0;
+        offset = Date.now();
+        max = options.seconds * 1000;
+        seconds = options.seconds * 1000;
+        timer = setInterval(decrementCounter, 10);
+      };
+
+       this.stop = function () {
+        clearInterval(timer);
+      };
+    }
 
     // Read session storage
     var friend_id = JSON.parse(sessionStorage.getItem("friend_id"));
@@ -26,7 +76,9 @@
     var answersChosen = [];
     var TOTAL_QUESTIONS ;
 
-
+	var playerCounters = [];
+    var maxTimeAllowed = 10;
+	
   window.addEventListener("load",function() {
     // Get questions and answers for the chosen set id.
     setQuestions = $.get("/api/user/"+ user_id + "/challenges/questions/" + game_id, function (data) {
@@ -41,6 +93,7 @@
 
       TOTAL_QUESTIONS = obj.questions.length;
 
+
  
     var Q = window.Q = Quintus()
       .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI")
@@ -50,6 +103,9 @@
   	scaleToFit: true
   	//maximize: "touch"
     }).touch();
+	
+	 var qx = Q.width/320;
+    var qy = Q.height/568;
     
     Q.state.set({score: 0, totalQuestions: TOTAL_QUESTIONS, currentQuestion: 1});
     
@@ -57,23 +113,33 @@
       init: function(p) {
         this._super({
           label: "[score: " + Q.state.get('score') + "]",
-          x: 90,
-          y: 20
+          x: 90 * qx,
+          y: 20 * qy
         });
         Q.state.on("change.score",this,"score");
       },
 
       score: function(score) {
-        this.p.label = "[score: " + score + "]";
+        this.p.label = "[score: " + Math.floor(score/1000) + "]";
       }
     });
+	
+	Q.UI.TimeCounter = Q.UI.Text.extend("UI.TimeCounter", { 
+		init: function(p) {
+			this._super({
+			  label: "n/a",
+			  x: 160 * qx,
+			  y: 30 * qy,
+			});
+		},
+	});
     
     Q.UI.QuestionCounter = Q.UI.Text.extend("UI.QuestionCounter", { 
       init: function(p) {
         this._super({
           label: "[Q: 1/" + Q.state.get("totalQuestions") + "]",
-          x: 240,
-          y: 20
+          x: 240 * qx,
+          y: 20 * qy
         });
         Q.state.on("change.currentQuestion",this,"qc");
       },
@@ -123,8 +189,8 @@
           border: 2,
           shadow: 3,
           shadowColor: "rgba(0,0,0,0.5)",
-          w: 40,
-          h: 40
+          w: 40 * qx,
+          h: 40 * qy
         }),                     
         function() {
             
@@ -142,7 +208,10 @@
     
       var leScore = stage.insert(new Q.UI.Score());
       var leQC = stage.insert(new Q.UI.QuestionCounter());
-      var ansDeck ;
+	  var leTC = stage.insert(new Q.UI.TimeCounter());
+      var ansDeck;
+	  var timeTakenCurrent = 0;
+      var timeOutTimer, gameOverTimer;
       
       function generateAnswers() {
         ansDeck = answersDeck[Q.state.get("currentQuestion") - 1];
@@ -160,28 +229,39 @@
               fill: "gray",
               highlight: ansColor,
               fontColor: "white",
-              x: 90 + (140*j),
-              y: 290 + (110*i),
+              x: (90 + (140*j)) * qx,
+              y: (320 + (120*i)) * qy,
               border: 2,
               shadow: 3,
               shadowColor: "rgba(0,0,0,0.5)",
-              w: 110,
-              h: 100,
+              w: 110 * qx,
+              h: 100 * qy,
               label: fcAns,
               name: k
               }, function() {
                 // do something
-                answersChosen.push( ansDeck[this.p.name].id );
-                if (quesDeck[Q.state.get("currentQuestion") - 1].id == ansDeck[this.p.name].id) {
-                  console.log("Placeholder Trigger: Correct");
-                  Q.state.inc("score", 1);
-                } else {
-                  console.log("Placeholder Trigger: Wrong");
-                }
+               // if (!Q.state.get("waiting")) {
+                  console.log(TIMER);
+                  timeTakenCurrent = TIMER.getTime();
+                 // Q.state.set("waiting", true);
                 
-                if (Q.state.get("currentQuestion") <= Q.state.get("totalQuestions")) {
-                  Q.state.inc("currentQuestion", 1);
-                }
+                  answersChosen.push( ansDeck[this.p.name].id );
+                  if (quesDeck[Q.state.get("currentQuestion") - 1].id == ansDeck[this.p.name].id) {
+                    playerCounters[Q.state.get("currentQuestion") - 1].p.fill = "green";
+                    this.p.fill = "green";
+                    console.log("Placeholder Trigger: Correct");
+                    Q.state.inc("score", convertPoints(timeTakenCurrent, maxTimeAllowed * 1000));
+                    //Q.state.inc("score", 1);
+                  } else {
+                    console.log("Placeholder Trigger: Wrong");
+                    playerCounters[Q.state.get("currentQuestion") - 1].p.fill = "red";
+                    this.p.fill = "red";
+                  }
+                  
+                  if (Q.state.get("currentQuestion") <= Q.state.get("totalQuestions")) {
+                    Q.state.inc("currentQuestion", 1);
+                  }
+               // }
             }));
             k = k + 1;
           }
@@ -198,13 +278,36 @@
       //current question
       var qContainer = stage.insert(new Q.UI.Container({
         fill: "gray",
-        x: 160,
-        y: 140,
+        x: 160 * qx,
+        y: 160 * qy,
         border: 2,
         shadow: 3,
         shadowColor: "rgba(0,0,0,0.5)",
-        w: 250,
-        h: 180
+        w: 250 * qx,
+        h: 180 * qy
+      }));
+	  
+	  for (i=0;i<TOTAL_QUESTIONS;i++) {
+        playerCounters[i] = stage.insert(new Q.UI.Container({
+          fill: "white",
+          x: 15 * qx,
+          w: 15 * qx,
+          border: 2,
+          y: (490 - (210/TOTAL_QUESTIONS) - (i*(420/TOTAL_QUESTIONS))) * qy,
+          h: (420/TOTAL_QUESTIONS) * qy
+        }));
+      }
+    
+      //current question
+      var qContainer = stage.insert(new Q.UI.Container({
+        fill: "gray",
+        x: 160 * qx,
+        y: 160 * qy,
+        border: 2,
+        shadow: 3,
+        shadowColor: "rgba(0,0,0,0.5)",
+        w: 250 * qx,
+        h: 180 * qy
       }));
 
       
@@ -265,13 +368,13 @@
       var ReplayBtn = stage.insert(new Q.UI.Button({
         fill: "gray",
         fontColor: "white",
-        x: 160,
-        y: 160,
+        x: 160 * qx,
+        y: 160 * qy,
         border: 2,
         shadow: 3,
         shadowColor: "rgba(0,0,0,0.5)",
-        w: 110,
-        h: 100,
+        w: 110 * qx,
+        h: 100 * qy,
         label: 'Replay',
       }, function() {
         Q.stageScene("scene1");
@@ -280,13 +383,13 @@
       var BackBtn = stage.insert(new Q.UI.Button({
         fill: "gray",
         fontColor: "white",
-        x: 160,
-        y: 320,
+        x: 160 * qx,
+        y: 320 * qy,
         border: 2,
         shadow: 3,
         shadowColor: "rgba(0,0,0,0.5)",
-        w: 110,
-        h: 100,
+        w: 110 * qx,
+        h: 100 * qy,
         label: 'Back',
       }, function() {
         window.location.href="study.html";
