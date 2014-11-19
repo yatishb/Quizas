@@ -23,8 +23,12 @@ function outputStatsForGame(user_id, gameId, graphDivId) {
 
 function outputGameResultsLineChart(lineGraphId, gameResults) {
     // constraints: two opponents. (gameResults makes this constraint, also).
-    var graphWidth = 1000;
-    var graphHeight = 400;
+
+    // Compute the Div width/height based on the div size.
+    var divWidth = $("#" + lineGraphId).width();
+    var divHeight = $("#" + lineGraphId).height();
+    var graphWidth = divWidth;
+    var graphHeight = divHeight || (graphWidth * 0.75);
 
     // againstUser : userid
     // result
