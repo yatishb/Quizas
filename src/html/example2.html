@@ -37,6 +37,7 @@
 		
 	
 		// helper functions
+				
 		function insertString(a, position, b) {
 			return output = a.substr(0, position) + b + a.substr(position);
 		}
@@ -228,12 +229,12 @@
 		
 		var TestInitiatingForm = JSON.stringify({
 			playerName: "John Smith",
-			playerSprite: "smiley.png",
+			playerSprite: "http://www.gamedevacademy.org/wp-content/uploads/2014/10/crashthedrone1-170x80.png",
 			playerPoints: 300*50000,
 			playerWin: 120,
 			playerTotal: 300,
 			enemyName: "Darth Vader",
-			enemySprite: "smiley.png",
+			enemySprite: "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xfa1/v/t1.0-1/p100x100/10624735_10154690559390417_2870427952069110535_n.jpg?oh=07d4469d6b72d8f2f1054c08e94d32dc&oe=550F335E&__gda__=1428092526_48a8093944904d6de6299272d83ced04",
 			enemyPoints: 750*64000,
 			enemyWin: 800,
 			enemyTotal: 1000,
@@ -575,14 +576,14 @@
 		var playerPortrait = stage.insert(new Q.PlayerPortrait({
 			x: qx * 65, 
 			y: qy * 90, 
-			scale: 0.05, 
+			scale: 1, 
 			asset: playerSprite,
 		}));
 		
 		var enemyPortrait = stage.insert(new Q.EnemyPortrait({
 			x: qx * 65, 
 			y: qy * 478, 
-			scale: 0.05, 
+			scale: 1, 
 			asset: enemySprite,
 		}));
 		
@@ -1599,7 +1600,7 @@
 	
 	// stage scene
 	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE, playerSprite, enemySprite, NUKE_SPRITE], function() {
-		Q.stageScene("scene3");
+		Q.stageScene("scene0");
 	});
 	 //setTimeout(function(){Q.state.inc("currentIndex", 1);}, 5000);
 });
