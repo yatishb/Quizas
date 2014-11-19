@@ -59,6 +59,18 @@ $('.page_friend').on('click', '.simple_friend', function() {
     // test();
 });
 
+$('.page_friend').on('click', '.game_button.me', function() {
+    var gameid = $(this).attr('id');
+    $('#line_graph_me').empty();
+    outputStatsForGame(userid , gameid, 'line_graph_me');
+});
+
+// $('.page_friend').on('click', '.game_button.friend', function() {
+//     var gameid = $(this).attr('id');
+//     $('#line_graph_friend').empty();
+//     outputStatsForGame(userid , gameid, 'line_graph_friend');
+// });
+
 $(document).on('click', '.button_close', function() {
     $('.friendTitle').empty();
     $('.chartContainer').empty();
@@ -88,6 +100,7 @@ function getUserStats() {
         if(result.played == 0) {
             $('.chartTitle').append("No statistics to show!<br><span style='color:red'>START PLAYING!</span>");
         } else {
+            $('.game_details').show();
             $('.myChart').show();
 
             $('.chartTitle').append("Your statistics!<br><span style='color:red'>Play MORE!</span>");
@@ -154,50 +167,26 @@ function getUserStats() {
     // Line Graphs for Each Game the user has played.
     // (A Combo Box to select a particular game would make
     //  more sense).
-    // $.get("/api/user/" + user_id + "/stats/games", function (data) {
-    //     $("#stats_games").text(data);
-    //
-    //     // Call on for-each game.
-    //     var response = JSON.parse(data);
-    //     response.forEach(function (gameId) {
-    //         outputStatsForGame(???, gameId, ???);
-    //     });
-    // });
-}
+    $.get("/api/user/" + userid + "/stats/games", function (data) {
+        //$("#line_graph_me").text(data);
+        // Call on for-each game.
+        var response = JSON.parse(data);
+        
+        var j = 1;
+        response.forEach(function (gameId) {
+            $('.game_buttons.me').append(
+                "<div class='game_button' id='" +
+                gameId +
+                "'>" +
+                j +
+                "</div>"
+            );
+        });
 
-function test() {
-    $('.friendChart').show();
-
-    $('.friendTitle').append("Your statistics!<br><span style='color:red'>Play MORE!</span>");
-
-    var result = {wins: 5, draws: 3, losses: 2, total: 10};
-
-    var data = [
-        {
-            value: result.wins,
-            color:"#F7464A",
-            highlight: "#FF5A5E",
-            label: "Wins"
-        },
-        {
-            value: result.draws,
-            color: "#46BFBD",
-            highlight: "#5AD3D1",
-            label: "Draws"
-        },
-        {
-            value: result.losses,
-            color: "#FDB45C",
-            highlight: "#FFC870",
-            label: "Losses"
+        if(response != "") {
+            outputStatsForGame(userid , response[0], 'line_graph_me');
         }
-    ];
-
-    // Get context with jQuery - using jQuery's .get() method.
-    var ctx = $(".friendChart").get(0).getContext("2d");
-
-    // For a pie chart
-    window.myNewChart = new Chart(ctx).Pie(data);
+    });
 }
 
 function getFriendStats(friend_id) {
@@ -242,6 +231,24 @@ function getFriendStats(friend_id) {
             // For a pie chart
             window.myNewChart = new Chart(ctx).Pie(data);
         }
+
+        // for(var i = 0; i < result.commongames.length; i++) {
+        //     var number = i + 1;
+
+        //     $('.game_buttons.friend').append(
+        //         "<div class='game_button' id='" +
+        //         result.commongames[i] +
+        //         "'>" +
+        //         number +
+        //         "</div>"
+        //     );
+        // }
+
+        // $.get("/api/user/" + userid + "/stats/game/" + result.commongames[0], function(data) {
+        //     // $("#line_graph_friend").text(data);
+        //     // Call on for-each game.
+        //     var response = JSON.parse(data);
+        // });
     })
     .fail(function() {
         console.log("error in getFriendStats function");
