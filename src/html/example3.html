@@ -5,6 +5,7 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no" />
 
 		<title>Quizas - Practice</title>
+		<script>console.log("head");</script>
 
 	  <script src='http://cdn.html5quintus.com/v0.2.0/quintus-all.js'></script>
 		<script src='http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js'></script>
@@ -12,10 +13,19 @@
 
 		<link rel="stylesheet" type="text/css" href="css/multiPlayer.css">
 		<script src="js/socketinit.js" />
+		<script>console.log("head loaded completely");</script>
 </head>
 
 <body>
+<script>
+		INITIATING_FORM = sessionStorage.getItem("initialization");
+		initiatingJSON = JSON.parse(INITIATING_FORM);
+		gameroom = initiatingJSON.room;
+		console.log(gameroom);
+		socket.emit('gameinitialised', {"room":gameroom});
+</script>
 <script>	
+		console.log("into the body");
 		// helper functions
 		
 		function wordWrap(iStr, cardWidth, pixelPerChar) {
@@ -191,17 +201,15 @@
 		
 		// fetching info from server
 		var INITIATING_FORM, SERVER_FORM;
-		console.log("abc");
 		// Start load test
 			INITIATING_FORM = sessionStorage.getItem("initialization");
 			console.log(INITIATING_FORM);
-			//socket = CircularJSON.parse(sessionStorage.getItem("socket"));
 			console.log(socket);
 		// End load test
 
-		var FLASH_SET = TestFlashSet;
+		/*var FLASH_SET = TestFlashSet;
 		var DECK_SIZE = getDeckSize(FLASH_SET);
-		var TOTAL_QUESTIONS = TestTotalQuestions;
+		var TOTAL_QUESTIONS = TestTotalQuestions;*/
 		var PLAYER_SPRITE = "smiley.png";
 		var ENEMY_SPRITE = "smiley.png";
 		var BOMB_SPRITE = "bomb.png";
@@ -238,9 +246,12 @@
 		
 		var qppc = 10, appc = 10;
 		var globalPlayerScore, globalEnemyScore;
+
+		console.log("before load");
 		
 //HERE********************************************************************************************
 	window.addEventListener("load",function() {
+		console.log("load");
 	
 	var Q = window.Q = Quintus({audioSupported: ['mp3', 'wav']})
     .include("Sprites, Scenes, Input, 2D, Anim, Touch, UI, Audio")
@@ -272,6 +283,7 @@
 	encounterWin = initiatingJSON.encounterWin;
 	matchName = initiatingJSON.matchName;
 	totalQuestions = initiatingJSON.totalQuestions;	  
+	console.log("retrieve everything");
 	  
 	//PLAYER_NAME = "John Smith", ENEMY_NAME = "Darth Vader";
 	
@@ -481,6 +493,8 @@
 			}
 		}
 	});
+
+	console.log("before scene0");
 		
 	// versus screen with countdown
 	Q.scene("scene0", function(stage) {
@@ -640,6 +654,7 @@
 		});
 		
 		cdTimer.start();
+	console.log("scene0 complete");
 	});
 	
 	// set scene
@@ -1489,16 +1504,6 @@
      
 });
 </script>
-</body>
- 
-<footer>
-<script>
-		INITIATING_FORM = sessionStorage.getItem("initialization");
-		initiatingJSON = JSON.parse(INITIATING_FORM);
-		gameroom = initiatingJSON.room;
-		console.log(gameroom);
-		socket.emit('gameinitialised', {"room":gameroom});
-</script>
 <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -1508,5 +1513,8 @@
     ga('create', 'UA-46324526-3', 'auto');
     ga('send', 'pageview');
 </script>
+</body>
+ 
+<footer>
 </footer>
 </html>

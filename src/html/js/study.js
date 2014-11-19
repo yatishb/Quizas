@@ -92,7 +92,7 @@ $(document).ready(function() {
         quizas_get_profile_for(content.enemyID, function (p) {
             var newInit = {
                 playerName: myname,
-                playerSprite: myrul,
+                playerSprite: myurl,
                 playerPoints: content.playerPoints,
                 playerWin: content.playerWin,
                 playerTotal: content.playerTotal,
@@ -246,7 +246,8 @@ $('#challenge').on("click", function(){
 
     quizas_get_profile(function(profile) {
         myname = profile.name;
-        myurl = profile.practice;
+        myurl = profile.picture;
+        console.log(myurl);
     });
 });
 
@@ -356,6 +357,7 @@ function initializeMultiplayerGame(content) {
     //encounter
     //encounterwin
     //total
+    console.log(content);
     sessionStorage.setItem("initialization", JSON.stringify(content));
     window.location.href="example3.html";
 }

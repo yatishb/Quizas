@@ -178,13 +178,13 @@ def getGameInit(user, user1, user2, room, flashset):
 	if oppoStats['played'] == 0:
 		winpercent = 0
 	else:
-		winpercent = oppoStats['wins']*1.0 / oppoStats['played']
+		winpercent = oppoStats['wins']
 
 	userStats = json.loads( internalstats.getIndividualUserGameStats(user) )
 	if userStats['played'] == 0:
 		userwinpercent = 0
 	else:
-		userwinpercent = userStats['wins']*1.0 / userStats['played']
+		userwinpercent = userStats['wins']
 
 	playerPoints = internalstats.getPointsPlayer(user)
 	oppoPoints = internalstats.getPointsPlayer(opponent)
@@ -194,7 +194,7 @@ def getGameInit(user, user1, user2, room, flashset):
 	if encounter == 0:
 		encounterwin = 0
 	else:
-		encounterwin = headToHead['wins'] * 1.0 / encounter
+		encounterwin = headToHead['wins']
 
 	setName = quizletsets.get_flashset_name(flashset)
 

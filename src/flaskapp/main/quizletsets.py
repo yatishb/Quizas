@@ -126,7 +126,7 @@ def get_flashset_name(set_id):
 	if "error" in set_json:
 		return set_json
 	else:
-		set_name = set_json['title']
+		set_name = set_json['name']
 		return set_name
 
 

@@ -393,7 +393,7 @@ def populateLeaderboard():
 
 
 def getPointsPlayer(user):
-	pointsRow = PT.query.filter(PT.id == user)
+	pointsRow = PT.query.filter(PT.id == user).first()
 	if pointsRow == None:
 		return 0
 	else:
