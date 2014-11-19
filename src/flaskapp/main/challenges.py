@@ -12,7 +12,7 @@ import quizletsets
 import internalstats
 
 from flask import request, redirect, make_response
-from models import UserChallenge, QuestionsChallenge
+from models import UserChallenge, QuestionsChallenge, FlashGame
 from . import main
 from .. import db
 
@@ -87,14 +87,14 @@ def get_challenges(challengerId):
 		return FlashGame.query.filter_by(user = chgr_id,
 		                                 gameId = gameId).first()
 
-	to_play_dict = [{recipientUserId: authhelper.lookupInternal(challenge.recipientId),
-	                 gameId: challenge.gameId,
-	                 setId: lookupSetForGameId(challenge.gameId)}
+	to_play_dict = [{'recipientUserId': authhelper.lookupInternal(challenge.recipientId),
+	                 'gameId': challenge.gameId,
+	                 'setId': lookupSetForGameId(challenge.gameId)}
 	                for challenge in to_play]
 
-	to_see_dict = [{recipientUserId: authhelper.lookupInternal(challenge.recipientId),
-	                gameId: challenge.gameId,
-	                setId: lookupSetForGameId(challenge.gameId)}
+	to_see_dict = [{'recipientUserId': authhelper.lookupInternal(challenge.recipientId),
+	                'gameId': challenge.gameId,
+	                'setId': lookupSetForGameId(challenge.gameId)}
 	               for challenge in to_play]
 
 	# TODO: How get win/loss/draw?
