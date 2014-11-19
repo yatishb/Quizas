@@ -193,6 +193,10 @@
 			return clientJSON;
 		}
 		
+		function getLevel(accumPoints) {
+			return Math.floor(accumPoints/50000);
+		}
+		
 		// some global variables
 		var playerCounters = [];
 		var enemyCounters = [];
@@ -520,19 +524,15 @@
 		
 		function expressStats(iName, iLevel, iTitle, iWinRate, iTotalMatches) {
 			var labelStr = "[" + iName + "]" + "\n" +
-			  "Level " + iLevel + " " + iTitle + "\n" +
-			  "Winrate: " + iWinRate + "%" + "\n" +
-			  "Total Matches: " + iTotalMatches;
+			  "Level " + iLevel + " " + iTitle; // + "\n" +
+			  //"Winrate: " + iWinRate + "%" + "\n" +
+			  //"Total Matches: " + iTotalMatches;
 			return labelStr;
 		}
 		
 		function getWinRate(wins, total) {
 			return ((wins/total)*100).toFixed(1);
-		}
-		
-		function getLevel(accumPoints) {
-			return Math.floor(accumPoints/100000);
-		}
+		}	
 		
 		var playerStats = stage.insert(new Q.UI.Text({size: 32}), playerContainer);
 		var enemyStats = stage.insert(new Q.UI.Text({size: 32}), enemyContainer);
@@ -1135,7 +1135,7 @@
 		}));
 		
 		// --------------------- text results and richard's graph here -------------------------------->
-		/*
+		
 		var TextResultsContainer = stage.insert(new Q.UI.Container({
 			fill: "yellow",
 			opacity: 0.5,
@@ -1146,9 +1146,10 @@
 		}));
 		
 		var TextResults = stage.insert(new Q.UI.Text({label: ""}), TextResultsContainer);
-		TextResults.p.label = "XP: +50" + "\n" + "Avg W/R: +8.75%";
+		TextResults.p.label = "You gained " + Math.floor(globalPlayerScore/1000) + " XP\n" +
+		  "You are currently Level " + getLevel(playerPoints + globalPlayerScore) + ".";
 		
-		var GraphResultsContainer = stage.insert(new Q.UI.Container({
+		/*var GraphResultsContainer = stage.insert(new Q.UI.Container({
 			fill: "blue",
 			opacity: 0.5,
 			x: (160) * qx,
