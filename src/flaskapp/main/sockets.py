@@ -160,7 +160,8 @@ def assignRoom(message):
 		# Contains information about the enemy name, pic, total num questions
 		for client in clients:
 			if (client.session['id'] == user1) or (client.session['id'] == user2):
-				gameInitData = getGameInit(client.session['id'], user1, user2, room, flashset)
+				setName = quizletsets.get_flashset_name(flashset)
+				gameInitData = getGameInit(client.session['id'], user1, user2, room, setName)
 				client.base_emit('game accepted', {'data': json.dumps(gameInitData)})
 
 
@@ -168,23 +169,23 @@ def assignRoom(message):
 		emit('my response', {'data': 'Either user(s) or flashset is incorrect'})
 
 
-def getGameInit(user, user1, user2, room, flashset):
+def getGameInit(user, user1, user2, room, setName):
 	if user == user1:
 		opponent = user2
 	else:
 		opponent = user1
 
-	oppoStats = json.loads( internalstats.getIndividualUserGameStats(opponent) )
-	if oppoStats['played'] == 0:
-		winpercent = 0
-	else:
-		winpercent = oppoStats['wins']
+	# oppoStats = json.loads( internalstats.getIndividualUserGameStats(opponent) )
+	# if oppoStats['played'] == 0:
+	# 	winpercent = 0
+	# else:
+	# 	winpercent = oppoStats['wins']
 
-	userStats = json.loads( internalstats.getIndividualUserGameStats(user) )
-	if userStats['played'] == 0:
-		userwinpercent = 0
-	else:
-		userwinpercent = userStats['wins']
+	# userStats = json.loads( internalstats.getIndividualUserGameStats(user) )
+	# if userStats['played'] == 0:
+	# 	userwinpercent = 0
+	# else:
+	# 	userwinpercent = userStats['wins']
 
 	playerPoints = internalstats.getPointsPlayer(user)
 	oppoPoints = internalstats.getPointsPlayer(opponent)
@@ -196,20 +197,17 @@ def getGameInit(user, user1, user2, room, flashset):
 	else:
 		encounterwin = headToHead['wins']
 
-	setName = quizletsets.get_flashset_name(flashset)
-
 	gameInitData = { "totalQuestions": NUMQUES, 
 					 "encounterTotal": encounter, 
 					 "encounterWin": encounterwin, 
 					 "room":room,
-					 "playerID": authhelper.lookupInternalFacebook(user),
 					 "playerPoints": playerPoints,
-					 "playerWin": userwinpercent,
-					 "playerTotal": userStats['played'],
+					 # "playerWin": userwinpercent,
+					 # "playerTotal": userStats['played'],
 					 "enemyID": authhelper.lookupInternalFacebook(opponent),
 					 "enemyPoints": oppoPoints,
-					 "enemyWin": winpercent,
-					 "enemyTotal": oppoStats['played'],
+					 # "enemyWin": winpercent,
+					 # "enemyTotal": oppoStats['played'],
 					 "matchName":setName}
 	print gameInitData
 	return gameInitData

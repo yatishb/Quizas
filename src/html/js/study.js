@@ -94,13 +94,13 @@ $(document).ready(function() {
                 playerName: myname,
                 playerSprite: myurl,
                 playerPoints: content.playerPoints,
-                playerWin: content.playerWin,
-                playerTotal: content.playerTotal,
+                /*playerWin: content.playerWin,
+                playerTotal: content.playerTotal,*/
                 enemyName: p.name,
                 enemySprite: p.picture,
                 enemyPoints: content.enemyPoints,
-                enemyWin: content.enemyWin,
-                enemyTotal: content.enemyTotal,
+                /*enemyWin: content.enemyWin,
+                enemyTotal: content.enemyTotal,*/
                 encounterTotal: content.encounterTotal,
                 encounterWin: content.encounterWin,
                 matchName: content.matchName,
