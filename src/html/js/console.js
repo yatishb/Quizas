@@ -1,6 +1,7 @@
 $(document).ready(function() {
 		displayContent();
 		setInterval(displayContent, 60000);
+		setInterval(getName(), 10000);
 });
 
 function displayContent() {
@@ -52,12 +53,15 @@ function displayContent() {
 }
 
 function getName() {
+		console.log($('.simple_leader'));
 		$('.simple_leader').each(function() {
 				var userid = $(this).find('.name').text();
-				quizas_get_profile_for(userid, function(profile) {
-						var element = $(this).find('.name');
-						element.text(profile.name);
-						element.attr('title', profile.name);
-				});
+				if(userid.indexOf('facebook:') >= 0) {
+						quizas_get_profile_for(userid, function(profile) {
+								var element = $(this).find('.name');
+								element.text(profile.name);
+								element.attr('title', profile.name);
+						});
+				}
 		});
 }
