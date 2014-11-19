@@ -464,23 +464,25 @@ function getNotification() {
         for (var i = 0; i < result_pending.length; i++) {
             quizas_get_profile_for(
                     result_pending[i].receipientUserId,
-                    function(profile) {
-                        var message = result_pending[i].receipientUserId + ' has challenged you on ' + result_pending[i].setName;
-                        list_pending.append(
-                            "<div class='simple_info id='" +
-                            result_pending[i].setId +
-                            "' name='" +
-                            profile.name +
-                            "'>" +
-                            "<div class='info_content'><span>" +
-                            message +
-                            "</span></div>" +
-                            "<div class='action_set'>" +
-                            "<div class='button_accept'><i class='fa fa-check fa-2x'></i></div>" +
-                            "<div class='button_reject'><i class='fa fa-plus rotate fa-2x'></i></div>" +
-                            "</div></div>"
-                        );
-            });
+                    (function(i) {
+                        return function(profile) {
+                            var message = result_pending[i].receipientUserId + ' has challenged you on ' + result_pending[i].setName;
+                            list_pending.append(
+                                "<div class='simple_info id='" +
+                                result_pending[i].setId +
+                                "' name='" +
+                                profile.name +
+                                "'>" +
+                                "<div class='info_content'><span>" +
+                                message +
+                                "</span></div>" +
+                                "<div class='action_set'>" +
+                                "<div class='button_accept'><i class='fa fa-check fa-2x'></i></div>" +
+                                "<div class='button_reject'><i class='fa fa-plus rotate fa-2x'></i></div>" +
+                                "</div></div>"
+                            );
+                        };
+                    })(i));
         }
 
         for (var i = 0; i < result_done.length; i++) {
