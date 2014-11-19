@@ -84,8 +84,7 @@ def get_challenges(challengerId):
 	# and score/result, also.
 
 	def lookupSetForGameId(gameId):
-		return FlashGame.query.filter_by(user = chgr_id,
-		                                 gameId = gameId).first()
+		return FlashGame.query.filter_by(gameId = gameId).first()
 
 	# quizletsets.get_flashset_name(set_id)
 	to_play_dict = [{'recipientUserId': authhelper.lookupInternal(challenge.recipientId),
