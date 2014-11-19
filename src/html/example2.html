@@ -1605,7 +1605,9 @@
 					label: "",
 				}));
 				var noticeMsg = stage.insert(new Q.UI.Text(), noticeScreen);
-				noticeMsg.p.label = "REKT \n fyi";
+				noticeMsg.p.label = "-~= OWNAGE =~-" + "\n\n" + 
+					"You already won,\nbut finish them off!" + "\n\n" +
+					"Press to continue...";
 				var noticeButton = stage.insert(new Q.UI.Button({
 					fill: "white",
 					opacity: 0,
@@ -1626,7 +1628,7 @@
 	
 	// stage scene
 	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE, playerSprite, enemySprite, NUKE_SPRITE], function() {
-		Q.stageScene("scene2");
+		Q.stageScene("testScene");
 	});
 	 //setTimeout(function(){Q.state.inc("currentIndex", 1);}, 5000);
 });
