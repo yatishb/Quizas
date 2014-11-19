@@ -1549,10 +1549,20 @@
 		setTimeout(function() {
 			canvasDOM = $('#quintus');
 			canvasStyle = $('#quintus').attr('style');
-			graphDiv = $('<div />').attr('id', 'overlay').attr('style', 'position:relative;top:300px;left:140px');
+			var overlayId = 'overlay';
+
+			// Parent needs to be relative, Child needs to be *absolute*
+			// See: http://stackoverflow.com/questions/104953/position-an-html-element-relative-to-its-container-using-css
+			// n.b. Div needs to be sized/aligned BEFORE
+			// outputting the graph.
+			// btw, fuck this Quintas shit for not being able to
+			// sensibly interact with the DOM. >.<
+			// (or, fuck trying to have any DOM shit play nicely
+			//  with Quintas shit).
+			graphDiv = $('<div />').attr('id', overlayId).attr('style', 'position:absolute;top:110px;left:70px;width:580px; height:240px;');
 			graphDiv.insertBefore(canvasDOM);
 			canvasDOM.attr('style', canvasStyle + 'z-index: -1;');
-			outputStatsForGame(quizas_user_id(), gameRoom, 'overlay')
+			outputStatsForGame(quizas_user_id(), gameRoom, overlayId)
 		}, 1000);
 	}
 </script>

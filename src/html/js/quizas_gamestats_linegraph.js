@@ -15,7 +15,7 @@ function lineGraphIdFor(gameId) {
 function outputStatsForGame(user_id, gameId, graphDivId) {
     $.get("/api/user/" + user_id + "/stats/game/" + gameId, function (data) {
         // Line chart!
-        outputGameResultsLineChart(lineGraphIdFor(gameId), JSON.parse(data));
+        outputGameResultsLineChart(graphDivId, JSON.parse(data));
     });
 }
 
@@ -25,6 +25,7 @@ function outputGameResultsLineChart(lineGraphId, gameResults) {
     // constraints: two opponents. (gameResults makes this constraint, also).
 
     // Compute the Div width/height based on the div size.
+    console.log("Making graph for ID: '" + lineGraphId + "'");
     var divWidth = $("#" + lineGraphId).width();
     var divHeight = $("#" + lineGraphId).height();
     var graphWidth = divWidth;
@@ -42,7 +43,7 @@ function outputGameResultsLineChart(lineGraphId, gameResults) {
     // implementation heavily influenced by http://bl.ocks.org/1166403
 
     // define dimensions of graph
-    var m = [80, 80, 80, 80]; // margins
+    var m = [20, 20, 20, 20]; // margins
     var w = graphWidth  - m[1] - m[3]; // width
     var h = graphHeight - m[0] - m[2]; // height
 
