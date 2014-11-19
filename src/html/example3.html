@@ -9,6 +9,9 @@
 
 	  <script src='http://cdn.html5quintus.com/v0.2.0/quintus-all.js'></script>
 		<script src='http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js'></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="js/quizas_gamestats_linegraph.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/quizas_gamestats_linegraph.css"></link>
 		<script src='js/quizas_auth_helper.js'></script>
 
 		<link rel="stylesheet" type="text/css" href="css/multiPlayer.css">
@@ -218,7 +221,7 @@
 		console.log(initiatingJSON);
 		var playerName, playerSprite, playerPoints, playerWin, playerTotal;
 		var enemyName, enemySprite, enemyPoints, enemyWin, enemyTotal;
-		var encounterTotal, encounterWin, matchName, totalQuestions;
+		var encounterTotal, encounterWin, matchName, totalQuestions, gameRoom;
 		
 		var battleLibrary = []
 		function createBattle(fcQ, fcA, playerA, enemyA, playerTime, enemyTime) {
@@ -276,7 +279,8 @@
 	encounterTotal = initiatingJSON.encounterTotal;
 	encounterWin = initiatingJSON.encounterWin;
 	matchName = initiatingJSON.matchName;
-	totalQuestions = initiatingJSON.totalQuestions;	  
+	totalQuestions = initiatingJSON.totalQuestions;
+	gameRoom = initiatingJSON.room;
 	console.log("retrieve everything");
 	  
 	//PLAYER_NAME = "John Smith", ENEMY_NAME = "Darth Vader";
@@ -958,7 +962,7 @@
 			
 				
 			// result in bomb movement
-				var remainingQ = (totalQuestions - Q.state.get("currentIndex") + 1) * 1000;
+				var remainingQ = (totalQuestions - Q.state.get("currentIndex") + 1) * 10000;
 				var scoreDiff = Q.state.get("playerScore") - Q.state.get("enemyScore");
 				if (remainingQ > 0) {
 					if (scoreDiff <= remainingQ) {
@@ -1045,7 +1049,7 @@
 			y: 103.5 * qy,
 			w: 116 * qx,
 			h: 50 * qy,
-			label: globalPlayerScore.toFixed(2) + "",
+			label: (globalPlayerScore/1000).toFixed(2) + "",
 		}));
 		
 		var VersusBox = stage.insert(new Q.UI.Button({
@@ -1065,7 +1069,7 @@
 			y: 103.5 * qy,
 			w: 116 * qx,
 			h: 50 * qy,
-			label: globalEnemyScore.toFixed(2) + "",
+			label: (globalEnemyScore/1000).toFixed(2) + "",
 		}));
 		
 		if (globalPlayerScore > globalEnemyScore) {
@@ -1117,6 +1121,8 @@
 			h: 207 * qy,
 		}));
 		*/
+		
+		generateResultsGraph();
 	
 		var ReviewBtn = stage.insert(new Q.UI.Button({
 			fill: "white",
@@ -1502,6 +1508,17 @@
 	});
      
 });
+
+	function generateResultsGraph() {
+		setTimeout(function() {
+			canvasDOM = $('#quintus');
+			canvasStyle = $('#quintus').attr('style');
+			graphDiv = $('<div />').attr('id', 'overlay').attr('style', 'position:relative;top:300px;left:140px');
+			graphDiv.insertBefore(canvasDOM);
+			canvasDOM.attr('style', canvasStyle + 'z-index: -1;');
+			outputStatsForGame(quizas_user_id(), gameRoom, 'overlay')
+		}, 1000);
+	}
 </script>
 <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
