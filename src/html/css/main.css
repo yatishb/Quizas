@@ -902,6 +902,7 @@ i.rotate {
     -moz-border-radius: 50%;
     -webkit-border-radius: 50%;
     box-shadow: -1px 1px 3px #888888;
+    display: none;
 }
 
 /** Begin of page content **/
@@ -1453,8 +1454,8 @@ i.rotate {
 
 .challenge_info h3 {
     color: #BDC3C7;
-    margin-left: 10px;
     padding-left: 10px;
+    margin: 3px 10px;
 }
 
 .challenge_title {
@@ -1531,7 +1532,7 @@ i.rotate {
     height: 115%;
     width: 30%;
     overflow: hidden;
-    /*margin-top: 50px;*/
+    display: none;
 }
 
 .button_reject,

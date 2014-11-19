@@ -87,14 +87,17 @@ def get_challenges(challengerId):
 		return FlashGame.query.filter_by(user = chgr_id,
 		                                 gameId = gameId).first()
 
+	# quizletsets.get_flashset_name(set_id)
 	to_play_dict = [{'recipientUserId': authhelper.lookupInternal(challenge.recipientId),
 	                 'gameId': challenge.gameId,
-	                 'setId': lookupSetForGameId(challenge.gameId)}
+	                 'setId': lookupSetForGameId(challenge.gameId).flashsetId,
+	                 'setName': quizletsets.get_flashset_name(lookupSetForGameId(challenge.gameId).flashsetId)}
 	                for challenge in to_play]
 
 	to_see_dict = [{'recipientUserId': authhelper.lookupInternal(challenge.recipientId),
 	                'gameId': challenge.gameId,
-	                'setId': lookupSetForGameId(challenge.gameId)}
+	                'setId': lookupSetForGameId(challenge.gameId).flashsetId,
+	                'setName': quizletsets.get_flashset_name(lookupSetForGameId(challenge.gameId).flashsetId)}
 	               for challenge in to_play]
 
 	# TODO: How get win/loss/draw?
