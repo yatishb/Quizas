@@ -66,7 +66,7 @@ $('.page_me').on('click', '.game_button', function() {
         
         var gameid = $(this).attr('id');
         $('#line_graph_me').empty();
-        outputStatsForGame(userid , gameid, 'line_graph_me');
+        outputStatsForGame(quizas_user_id(), gameid, 'line_graph_me');
     }
 });
 
