@@ -1532,7 +1532,6 @@ i.rotate {
     height: 115%;
     width: 30%;
     overflow: hidden;
-    display: none;
 }
 
 .button_reject,

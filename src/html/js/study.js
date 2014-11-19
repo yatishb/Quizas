@@ -123,7 +123,7 @@ $('.notification').on("click", function() {
     $('.challenge_info').addClass('fadeIn');
 });
 
-$('.challenge_info').on('click', '.simple_info', function() {
+$('.challenge_info').on('click', '.info_pending .simple_info', function() {
     var element = $(this).find('.action_set');
     if(element.is(':visible')) {
         element.hide();
@@ -131,6 +131,24 @@ $('.challenge_info').on('click', '.simple_info', function() {
         element.show();
         element.addClass('stretchLeft');
     }
+});
+
+$('.challenge_info').on('click', '.button_accept', function() {
+    var grandparent = $(this).parent().parent();
+    var setid = grandparent.attr('id');
+    var friendid = grandparent.attr('name');
+    var gameid = grandparent.find('.info_content').attr('id');
+
+    sessionStorage.setItem("friend_id", JSON.stringify(friendid));
+    sessionStorage.setItem("set_id", JSON.stringify(setid));
+    sessionStorage.setItem("game_id", JSON.stringify(gameid));
+    sessionStorage.setItem("user_id", JSON.stringify(quizas_user_id()));
+
+    window.location.href="replyChallenge.html";
+});
+
+$('.challenge_info').on('click', '.button_reject', function() {
+    $(this).parent().parent().remove();
 });
 
 $('.friend_window .button_close').on("click", function() {
@@ -249,14 +267,6 @@ $('#challenge').on("click", function(){
 
 });
 
-function getUserPicture() {
-    quizas_get_profile(function(profile) {
-        myname = profile.name;
-        myurl = profile.picture;
-        console.log(myurl);
-    });
-}
-
 $('#practice').on("click", function(){
     next_page = "s";
 
@@ -374,6 +384,13 @@ function initializePracticeGame(set_id, user_id) {
     window.location.href="singlePlayer.html";
 }
 
+function getUserPicture() {
+    quizas_get_profile(function(profile) {
+        myname = profile.name;
+        myurl = profile.picture;
+    });
+}
+
 function getSetContent() {
     $.get("/api/user/" + quizas_user_id() + "/sets", function(data) {
         var set_ids = JSON.parse(data);
@@ -463,6 +480,9 @@ function getNotification() {
 
         var list_pending = $('.info_pending');
         var list_done = $('.info_done');
+        list_pending.empty().append("<h3>Panding</h3>");
+        list_done.empty().append("<h3>Done</h3>");
+
         for (var i = 0; i < result_pending.length; i++) {
             quizas_get_profile_for(
                     result_pending[i].recipientUserId,
@@ -470,12 +490,14 @@ function getNotification() {
                         return function(profile) {
                             var message = profile.name + ' has challenged you on ' + result_pending[i].setName;
                             list_pending.append(
-                                "<div class='simple_info id='" +
+                                "<div class='simple_info' id='" +
                                 result_pending[i].setId +
                                 "' name='" +
-                                profile.name +
+                                result_pending[i].recipientUserId +
                                 "'>" +
-                                "<div class='info_content'><span>" +
+                                "<div class='info_content' id='" +
+                                result_pending[i].gameId +
+                                "'><span>" +
                                 message +
                                 "</span></div>" +
                                 "<div class='action_set'>" +
@@ -492,20 +514,18 @@ function getNotification() {
                     result_done[i].recipientUserId,
                     (function(i) {
                         return function(profile) {
-                            var message = profile.name + ' has completed ' + result_pending[i].setName;
+                            var message = profile.name + ' has completed ' + result_done[i].setName;
                             list_done.append(
-                                "<div class='simple_info id='" +
-                                result_pending[i].setId +
+                                "<div class='simple_info' id='" +
+                                result_done[i].setId +
                                 "' name='" +
-                                profile.name +
+                                result_done[i].recipientUserId +
                                 "'>" +
-                                "<div class='info_content'><span>" +
+                                "<div class='info_content' id='" +
+                                result_done[i].gameId +
+                                "'><span>" +
                                 message +
-                                "</span></div>" +
-                                "<div class='action_set'>" +
-                                "<div class='button_accept'><i class='fa fa-check fa-2x'></i></div>" +
-                                "<div class='button_reject'><i class='fa fa-plus rotate fa-2x'></i></div>" +
-                                "</div></div>"
+                                "</span></div></div>"
                             );
                         };
                     })(i));
