@@ -453,7 +453,7 @@
 				h: Q.height,
 				opacity: 1,
 			});
-			//Q.audio.play(NUKE_SOUND);
+			Q.audio.play(NUKE_SOUND);
 		},
 		step: function(dt) {
 			var vt = dt / 3;
@@ -464,7 +464,7 @@
 				if (Q.state.get("phaseToggle")) {
 					Q.state.set("phaseToggle", false);
 				}
-				//Q.audio.stop(NUKE_SOUND);
+				Q.audio.stop(NUKE_SOUND);
 			}
 		}
 	});
@@ -632,7 +632,7 @@
 		var matchDetails = stage.insert(new Q.UI.Text({size: 28}), matchContainer);
 		matchDetails.p.label = expressMatch(matchName, totalQuestions, encounterTotal, encounterWin);
 		
-		var cdSec = 10;
+		var cdSec = 3;
 		var cdTimer = new Countdown({
 			seconds: cdSec,
 			onUpdateStatus: function(sec) {
@@ -681,7 +681,7 @@
 				alert("TIMEOUT");
     			window.location.href = "study.html";
 			}
-		}, 10000);
+		}, 20000);
 		
 		function generateAnswers() {
 			Q.state.set("waiting", false);
@@ -1497,7 +1497,7 @@
 	});
 	
 	// stage scene
-	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE, playerSprite, enemySprite, NUKE_SPRITE, /*NUKE_SOUND*/], function() {
+	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE, playerSprite, enemySprite, NUKE_SPRITE, NUKE_SOUND], function() {
 		Q.stageScene("scene0");
 	});
      
