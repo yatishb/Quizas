@@ -181,6 +181,7 @@ function getUserStats() {
                 j +
                 "</div>"
             );
+            j++;
         });
 
         if(response != "") {
