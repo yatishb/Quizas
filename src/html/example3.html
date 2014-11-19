@@ -465,9 +465,6 @@
 				this.p.opacity -= vt;
 			} else {
 				this.p.opacity = 0.1;
-				if (Q.state.get("phaseToggle")) {
-					Q.state.set("phaseToggle", false);
-				}
 				Q.audio.stop(NUKE_SOUND);
 			}
 		}
@@ -965,7 +962,7 @@
 				var remainingQ = (totalQuestions - Q.state.get("currentIndex") + 1) * 10000;
 				var scoreDiff = Q.state.get("playerScore") - Q.state.get("enemyScore");
 				if (remainingQ > 0) {
-					if (scoreDiff <= remainingQ) {
+					if (Math.abs(scoreDiff) <= remainingQ) {
 						bomb.p.x = (160 + ((scoreDiff/remainingQ)*100)) * qx;
 					} else if (Math.abs(scoreDiff) > remainingQ) {
 						if (isPhaseOne) {
@@ -973,9 +970,46 @@
 							bomb.destroy();
 							console.log("PHASE TWO");
 							isPhaseOne = false, midNuke = true;
+							TIMER.stop();
 							setTimeout(function() {
 								var nuclearExplosion = stage.insert(new Q.Nuke());
 								var whiteScreen = stage.insert(new Q.UI.WhiteOut());
+								var noticeScreen = stage.insert(new Q.UI.Container({
+									fill: "white",
+									opacity: 1,
+									x: Q.width / 2,
+									y: Q.height / 2,
+									w: 0.9 * Q.width,
+									h: 0.5 * Q.height,
+									label: "",
+								}));
+								var noticeMsg = stage.insert(new Q.UI.Text(), noticeScreen);
+								noticeMsg.p.label = "REKT";
+								if (Q.state.get("playerScore") > Q.state.get("enemyScore")) {
+									noticeMsg.p.label = "-~= OWNAGE =~-" + "\n\n" + 
+										"You already won, so\nfinish them off!" + "\n\n" +
+										"Press to continue...";
+								} else {
+									noticeMsg.p.label = "<-! REKT !->" + "\n\n" + 
+										"You already lost, but\nfight for glory!" + "\n\n" +
+										"Press to continue...";
+								}
+								var noticeButton = stage.insert(new Q.UI.Button({
+									fill: "white",
+									opacity: 0,
+									x: Q.width / 2,
+									y: Q.height / 2,
+									w: 0.9 * Q.width,
+									h: 0.5 * Q.height,
+								}, function() {
+									noticeScreen.destroy();
+									noticeMsg.destroy();
+									this.destroy();
+									
+									if (Q.state.get("phaseToggle")) {
+										Q.state.set("phaseToggle", false);
+									}
+								}));
 							}, 1000);
 						}
 					}
