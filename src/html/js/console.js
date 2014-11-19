@@ -1,67 +1,73 @@
-$(document).ready(function() {
-		displayContent();
-		setInterval(displayContent, 60000);
-		setInterval(getName(), 10000);
-});
-
 function displayContent() {
-		$.get("/api/leaderboard", function (data) {
-				var obj = JSON.parse(data);
-				leaderboard = obj.data;
-				console.log(obj);
-			
-				var element = $('.board_container');
-				element.empty();
+    $.get("/api/leaderboard", function (data) {
+        // Obj is of format:
+        // obj = { data: [{ id: "facebook:xyzw..", points: # }] }
+        var obj = JSON.parse(data);
+        leaderboard = obj.data;
+        console.log(obj);
 
-				for (i = 0; i < leaderboard.length; i++) {
-						var rank = i + 1;
-						var userid = leaderboard[i].id;
-						var id = userid.substring(9);
-						var pic = "http://graph.facebook.com/" + id + "/picture?type=square";
-						var points = leaderboard[i].points;
-						var extraClass = " ";
+        // Clear all children DOM elements from leaderboard,
+        // so we don't have any mess.
+        var leaderboardContainer = $('#board_container');
+        leaderboardContainer.empty();
 
-						if(i == 1) extraClass = "first";
-						else if(i == 2) extraClass = "second";
-						else if(i == 3) extraClass = "third";
+        for (i = 0; i < leaderboard.length; i++) {
+            var rank = i + 1;
+            var userid = leaderboard[i].id;
+            var fbid = userid.substring("facebook:".length);
+            var pic = "http://graph.facebook.com/" + fbid + "/picture?type=square";
+            var points = leaderboard[i].points;
+            var extraClass = " ";
 
-						$('.board_container').append(
-													               		"<div class='simple_leader'>" +
-																            "<div class='rank font-effect-shadow-multiple " +
-																            extraClass +
-																            " '>" +
-																            rank +
-																            "</div><div class='profile'><img src='" +
-																            pic +
-																            "'></div>" +
-																            "<div class='name' title='" +
-																            // profile.name +
-																            "'>" +
-																            userid +
-																            "</div><div class='score'>" +
-																            points +
-																            "</div></div>"
-																				);
+            // 1st, 2nd, 3rd get extra DOM class
+            if (1 <= rank && rank <= 3) {
+                extraClass = ["first", "second", "third"][rank - 1];
+            }
 
-						// quizas_get_profile_for(userid, function(profile) {
-						// 		console.log(rank + " *** " + pic + " *** " + profile.name + " *** " + points);
-								
-						// });
-				}
+            // For-each row in the leaderboard,
+            //  add a row div with a profile img, a div for name, and a score.
+            // Then, callback and update the divs with the name and img.
+            var rowEl = $("<div/>", { class: 'simple_leader' }).appendTo(leaderboardContainer);
+            $("<div/>", { class: 'rank font-effect-shadow-multiple ' + extraClass })
+                .appendTo(rowEl).text(rank);
+            var profileImg =
+                $("<img/>").appendTo($("<div/>", { class: "profile" })
+                                     .appendTo(rowEl))
+            var profileNameDiv =
+                $("<div/>", { class: "name" }).appendTo(rowEl);
+
+            $("<div/>", { class: "score" }).appendTo(rowEl).text(points);
+
+
+            // Due to nature of closures,
+            // we need to ensure our callback refers to the correct
+            // variable!
+            // (n.b. a leaderboard.forEach(function (r) { ... }) wouldn't suffer this).
+            var updateProfileCallback = (function(nameDiv, profileImg) {
+                return function(profile) {
+                    // profile = { name, picture }
+                    console.log("callback");
+                    nameDiv.text(profile.name);
+                    profileImg.attr("src", profile.picture);
+                };
+            })(profileNameDiv, profileImg);
+
+            // Get profile data, update the row <img/> and <div/> with these.
+            quizas_get_profile_for(userid, updateProfileCallback);
+        }
     });
-		getName();
 }
 
-function getName() {
-		console.log($('.simple_leader'));
-		$('.simple_leader').each(function() {
-				var userid = $(this).find('.name').text();
-				if(userid.indexOf('facebook:') >= 0) {
-						quizas_get_profile_for(userid, function(profile) {
-								var element = $(this).find('.name');
-								element.text(profile.name);
-								element.attr('title', profile.name);
-						});
-				}
-		});
-}
+// function getName() {
+//     console.log($('.simple_leader'));
+//     $('.simple_leader').each(function() {
+//         var userid = $(this).find('.name').text();
+//         if(userid.indexOf('facebook:') >= 0) {
+//             quizas_get_profile_for(userid, function(profile) {
+//                 var element = $(this).find('.name');
+//                 element.text(profile.name);
+//                 element.attr('title', profile.name);
+//             });
+//         }
+//     });
+// }

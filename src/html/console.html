@@ -34,6 +34,12 @@
                 xfbml      : true,
                 version    : 'v2.1'
             });
+
+            // FB API loaded,
+            // *now* we can load the leaderboard.
+            // (as it happens, leaderboard somewhat depends on FB API).
+            displayContent();
+            setInterval(displayContent, 60000);
         };
 
         (function(d, s, id){
@@ -49,7 +55,7 @@
     <h1  id='heading' class='font-effect-fire-animation'>World Leaderboard</h1>
     <h2 id='subtitle'>Quizas.me</h2>
 
-    <div class='board_container'>
+    <div id='board_container'>
         <!-- <div class='simple_leader'>
             <div class='rank first font-effect-shadow-multiple'>1</div>
             <div class='profile'><img src="http://graph.facebook.com/733712093384160/picture?type=square"></div>

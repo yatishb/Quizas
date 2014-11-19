@@ -1451,6 +1451,12 @@ i.rotate {
     display: none;
 }
 
+.challenge_info h3 {
+    color: #BDC3C7;
+    margin-left: 10px;
+    padding-left: 10px;
+}
+
 .challenge_title {
     width: 100%;
     left: 0;
@@ -1873,7 +1879,7 @@ i.rotate {
 }
 
 .game_details {
-    
+
 }
 
 .game_buttons {
