@@ -452,27 +452,38 @@ function getNotification() {
 
     $.get("/api/user/" + userid + "/challenges/", function(data) {
         var result = JSON.parse(data);
+        var result_pending = result.pending;
+        var result_done = result.done;
 
-        console.log(result);
+        var list_pending = $('.info_pending');
+        var list_done = $('.info_done');
+        for (var i = 0; i < result_pending.length; i++) {
+            var message = result_pending[i].receipientUserId + ' has challenged you on ' + result_pending[i].setId;
+            list_pending.append(
+                "<div class='simple_info'>" +
+                "<div class='info_content'><span>" +
+                message +
+                "</span></div>" +
+                "<div class='action_set'>" +
+                "<div class='button_accept'><i class='fa fa-check fa-2x'></i></div>" +
+                "<div class='button_reject'><i class='fa fa-plus rotate fa-2x'></i></div>" +
+                "</div></div>"
+            );
+        }
 
-        // var sets = $('.search_result');
-        // for (var i = 0; i < result.length; i++) {
-        //     sets.append(
-        //         "<div class='simple_set search " +
-        //         ("" + result[i].id).replace(":", "_") +
-        //         "' id='" +
-        //         result[i].id +
-        //         "'><div class='content_container'>" +
-        //         "<div class='set_content title search'><p>" +
-        //         result[i].name + ' [' + result[i].size + ']' +
-        //         "</div><div class='set_content description search'><p>" +
-        //         result[i].description +
-        //         "</div></div>" +
-        //         "<div class='action_container'>" +
-        //         "<div class='action add'><i class='fa fa-plus'></i></div>" +
-        //         "</div></div>"
-        //     );
-        // }
+        for (var i = 0; i < result_done.length; i++) {
+            var message = result_pending[i].receipientUserId + ' has completed ' + result_pending[i].setId;
+            list_done.append(
+                "<div class='simple_info'>" +
+                "<div class='info_content'><span>" +
+                message +
+                "</span></div>" +
+                "<div class='action_set'>" +
+                "<div class='button_accept'><i class='fa fa-check fa-2x'></i></div>" +
+                "<div class='button_reject'><i class='fa fa-plus rotate fa-2x'></i></div>" +
+                "</div></div>"
+            );
+        }
     })
     .fail(function() {
         console.log("error in getNotification call back function");
