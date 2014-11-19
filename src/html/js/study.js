@@ -134,11 +134,10 @@ $('.challenge_info').on('click', '.info_pending .simple_info', function() {
 });
 
 $('.challenge_info').on('click', '.button_accept', function() {
-    var parent = $(this).parent()
-    var grandparent = parent.parent();
+    var grandparent = $(this).parent().parent();
     var setid = grandparent.attr('id');
     var friendid = grandparent.attr('name');
-    var gameid = parent..attr('id');
+    var gameid = grandparent.find('.info_content').attr('id');
 
     sessionStorage.setItem("friend_id", JSON.stringify(friendid));
     sessionStorage.setItem("set_id", JSON.stringify(setid));
@@ -481,8 +480,8 @@ function getNotification() {
 
         var list_pending = $('.info_pending');
         var list_done = $('.info_done');
-        list_pending.empty();
-        list_done.empty();
+        list_pending.empty().append("<h3>Panding</h3>");
+        list_done.empty().append("<h3>Done</h3>");
 
         for (var i = 0; i < result_pending.length; i++) {
             quizas_get_profile_for(
@@ -491,7 +490,7 @@ function getNotification() {
                         return function(profile) {
                             var message = profile.name + ' has challenged you on ' + result_pending[i].setName;
                             list_pending.append(
-                                "<div class='simple_info id='" +
+                                "<div class='simple_info' id='" +
                                 result_pending[i].setId +
                                 "' name='" +
                                 result_pending[i].recipientUserId +
@@ -517,7 +516,7 @@ function getNotification() {
                         return function(profile) {
                             var message = profile.name + ' has completed ' + result_done[i].setName;
                             list_done.append(
-                                "<div class='simple_info id='" +
+                                "<div class='simple_info' id='" +
                                 result_done[i].setId +
                                 "' name='" +
                                 result_done[i].recipientUserId +
