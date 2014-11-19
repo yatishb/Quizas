@@ -653,6 +653,11 @@
 	
 	// set scene
 	Q.scene("scene1",function(stage) {
+		INITIATING_FORM = sessionStorage.getItem("initialization");
+		initiatingJSON = JSON.parse(INITIATING_FORM);
+		gameroom = initiatingJSON.room;
+		console.log(gameroom);
+		socket.emit('gameinitialised', {"room":gameroom});
 	
 		Q.state.reset({playerScore: 0, enemyScore: 0, currentIndex: 0, currentQuestion: "", waiting: true, isGameOver: false, phaseToggle: true});
 	
@@ -1511,11 +1516,11 @@
  
 <footer>
 <script>
-		INITIATING_FORM = sessionStorage.getItem("initialization");
+		/*INITIATING_FORM = sessionStorage.getItem("initialization");
 		initiatingJSON = JSON.parse(INITIATING_FORM);
 		gameroom = initiatingJSON.room;
 		console.log(gameroom);
-		socket.emit('gameinitialised', {"room":gameroom});
+		socket.emit('gameinitialised', {"room":gameroom});*/
 </script>	
 </footer>
 </html>
