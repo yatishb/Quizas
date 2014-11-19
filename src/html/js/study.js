@@ -1,6 +1,6 @@
 var content;
 var next_page;
-var pupup_mode;
+var popup_mode;
 var myname;
 var myurl;
 var selected_set_id;
@@ -48,7 +48,7 @@ $(document).ready(function() {
     socket.on('game request', function(msg) {
         content = JSON.parse(msg.data);
 
-        pupup_mode = "request";
+        popup_mode = "request";
 
         showPopup(content.requestfrom, content.set);
         // showPopup("User " + content.requestfrom + " is inviting you to compete set " + content.set);
@@ -58,7 +58,7 @@ $(document).ready(function() {
     socket.on('game rejected', function(msg) {
         content = JSON.parse(msg.data);
 
-        pupup_mode = "rejected";
+        popup_mode = "rejected";
 
         showPopup(content.rejectedby,"nothing");
         // showPopup("Your request was rejected by " + content.rejectedby);
@@ -316,7 +316,7 @@ $(document.body).on("click", '.popup_button.ok', function() {
 
 function showPopup(userid, setid) {
     // request  rejected  offline  non-existent  accepted
-    if(pupup_mode == "request") {
+    if(popup_mode == "request") {
         quizas_get_profile_for(userid, function (p) {
             var message = "User " + p.name + " is inviting you to compete set " + setid;
             $(document.body).append(
@@ -455,34 +455,54 @@ function getNotification() {
         var result_pending = result.pending;
         var result_done = result.done;
 
+        if (result_pending.length > 0) {
+            $('.notice_bubble').show().text(result_pending.length);
+        }
+
         var list_pending = $('.info_pending');
         var list_done = $('.info_done');
         for (var i = 0; i < result_pending.length; i++) {
-            var message = result_pending[i].receipientUserId + ' has challenged you on ' + result_pending[i].setId;
-            list_pending.append(
-                "<div class='simple_info'>" +
-                "<div class='info_content'><span>" +
-                message +
-                "</span></div>" +
-                "<div class='action_set'>" +
-                "<div class='button_accept'><i class='fa fa-check fa-2x'></i></div>" +
-                "<div class='button_reject'><i class='fa fa-plus rotate fa-2x'></i></div>" +
-                "</div></div>"
-            );
+            quizas_get_profile_for(
+                    result_pending[i].receipientUserId,
+                    function(profile) {
+                        var message = result_pending[i].receipientUserId + ' has challenged you on ' + result_pending[i].setName;
+                        list_pending.append(
+                            "<div class='simple_info id='" +
+                            result_pending[i].setId +
+                            "' name='" +
+                            profile.name +
+                            "'>" +
+                            "<div class='info_content'><span>" +
+                            message +
+                            "</span></div>" +
+                            "<div class='action_set'>" +
+                            "<div class='button_accept'><i class='fa fa-check fa-2x'></i></div>" +
+                            "<div class='button_reject'><i class='fa fa-plus rotate fa-2x'></i></div>" +
+                            "</div></div>"
+                        );
+            });
         }
 
         for (var i = 0; i < result_done.length; i++) {
-            var message = result_pending[i].receipientUserId + ' has completed ' + result_pending[i].setId;
-            list_done.append(
-                "<div class='simple_info'>" +
-                "<div class='info_content'><span>" +
-                message +
-                "</span></div>" +
-                "<div class='action_set'>" +
-                "<div class='button_accept'><i class='fa fa-check fa-2x'></i></div>" +
-                "<div class='button_reject'><i class='fa fa-plus rotate fa-2x'></i></div>" +
-                "</div></div>"
-            );
+            quizas_get_profile_for(
+                    result_pending[i].receipientUserId,
+                    function(profile) {
+                        var message = result_pending[i].receipientUserId + ' has completed ' + result_pending[i].setName;
+                        list_done.append(
+                            "<div class='simple_info id='" +
+                            result_pending[i].setId +
+                            "' name='" +
+                            profile.name +
+                            "'>" +
+                            "<div class='info_content'><span>" +
+                            message +
+                            "</span></div>" +
+                            "<div class='action_set'>" +
+                            "<div class='button_accept'><i class='fa fa-check fa-2x'></i></div>" +
+                            "<div class='button_reject'><i class='fa fa-plus rotate fa-2x'></i></div>" +
+                            "</div></div>"
+                        );
+            });
         }
     })
     .fail(function() {
