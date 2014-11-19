@@ -1716,6 +1716,16 @@ i.rotate {
         margin: 20px auto;
     }
 
+    .game_buttons {
+        width: 80vw;
+        height: 10vh;
+    }
+
+    .line_graph {
+        width: 80vw;
+        height: 50vh;
+    }
+
     .page_me, .page_friend {
         margin-top: 35px;
         margin-bottom: 100px;
@@ -1764,6 +1774,19 @@ i.rotate {
     .chartTitle {
         font-size: 18pt;
         font-weight: 900;
+    }
+
+    .game_buttons {
+        width: 80vw;
+        max-width: 600px;
+        height: 80px;
+    }
+
+    .line_graph {
+        width: 80vw;
+        max-width: 600px;
+        height: 50vh;
+        max-height: 600px;
     }
 
     .page_me, .page_friend {
@@ -1847,6 +1870,29 @@ i.rotate {
 
 .chartTable {
     margin: 20px auto;
+}
+
+.game_details {
+    
+}
+
+.game_buttons {
+    width: 90%;
+    height: 20%;
+    margin: 20px auto;
+    text-align: center;
+}
+
+.game_button {
+    display: inline-block;
+    height: 30px;
+    width: 19%;
+    box-shadow: -1px 1px 2px #888888;
+}
+
+.line_graph {
+    margin: 5px auto 100px auto;
+    position: relative;
 }
 
 .number {
