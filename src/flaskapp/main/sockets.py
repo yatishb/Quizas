@@ -159,7 +159,7 @@ def assignRoom(message):
 		# Contains information about the enemy name, pic, total num questions
 		for client in clients:
 			if (client.session['id'] == user1) or (client.session['id'] == user2):
-				gameInitData = getGameInit(client.session['id'], user1, user2, room)
+				gameInitData = getGameInit(client.session['id'], user1, user2, room, flashset)
 				client.base_emit('game accepted', {'data': json.dumps(gameInitData)})
 
 
@@ -167,7 +167,7 @@ def assignRoom(message):
 		emit('my response', {'data': 'Either user(s) or flashset is incorrect'})
 
 
-def getGameInit(user, user1, user2, room):
+def getGameInit(user, user1, user2, room, flashset):
 	if user == user1:
 		opponent = user2
 	else:
@@ -179,6 +179,15 @@ def getGameInit(user, user1, user2, room):
 	else:
 		winpercent = oppoStats['wins']*1.0 / oppoStats['played']
 
+	userStats = json.loads( internalstats.getIndividualUserGameStats(user) )
+	if userStats['played'] == 0:
+		userwinpercent = 0
+	else:
+		userwinpercent = userStats['wins']*1.0 / userStats['played']
+
+	playerPoints = internalstats.getPointsPlayer(user)
+	oppoPoints = internalstats.getPointsPlayer(opponent)
+
 	headToHead = json.loads( internalstats.getCommonGamesStats(user, opponent) )
 	encounter = headToHead['played']
 	if encounter == 0:
@@ -186,7 +195,21 @@ def getGameInit(user, user1, user2, room):
 	else:
 		encounterwin = headToHead['wins'] * 1.0 / encounter
 
-	gameInitData = { "total": str(NUMQUES), "win": winpercent, "encounter": encounter, "encounterwin": encounterwin, "room":room}
+	setName = quizletsets.get_flashset_name(flashset)
+
+	gameInitData = { "totalQuestions": NUMQUES, 
+					 "encounterTotal": encounter, 
+					 "encounterWin": encounterwin, 
+					 "room":room,
+					 "playerID": authhelper.lookupInternalFacebook(user),
+					 "playerPoints": playerPoints,
+					 "playerWin": userwinpercent,
+					 "playerTotal": userStats['played'],
+					 "enemyID": authhelper.lookupInternalFacebook(opponent),
+					 "enemyPoints": oppoPoints,
+					 "enemyWin": winpercent,
+					 "enemyTotal": oppoStats['played'],
+					 "matchName":setName}
 	print gameInitData
 	return gameInitData
 
