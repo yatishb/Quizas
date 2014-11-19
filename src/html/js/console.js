@@ -1,4 +1,5 @@
 $(document).ready(function() {
+		displayContent();
 		setInterval(displayContent, 60000);
 });
 
@@ -47,6 +48,7 @@ function displayContent() {
 						// });
 				}
     });
+		getName();
 }
 
 function getName() {
