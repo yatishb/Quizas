@@ -115,14 +115,14 @@
       init: function(p) {
         this._super({
           label: "[score: " + Q.state.get('score') + "]",
-          x: 90,
-          y: 20
+          x: 90 * qx,
+          y: 20 * qy
         });
         Q.state.on("change.score",this,"score");
       },
 
       score: function(score) {
-        this.p.label = "[score: " + score + "]";
+        this.p.label = "[score: " + Math.floor(score/1000) + "]";
       }
     });
     
@@ -130,8 +130,8 @@
       init: function(p) {
         this._super({
           label: "[Q: 1/" + Q.state.get("totalQuestions") + "]",
-          x: 240,
-          y: 20
+          x: 240 * qx,
+          y: 20 * qy
         });
         Q.state.on("change.currentQuestion",this,"qc");
       },
@@ -181,8 +181,8 @@
           border: 2,
           shadow: 3,
           shadowColor: "rgba(0,0,0,0.5)",
-          w: 40,
-          h: 40
+          w: 40 * qx,
+          h: 40 * qy
         }),                     
         function() {
             
@@ -221,13 +221,13 @@
               fill: "gray",
               highlight: ansColor,
               fontColor: "white",
-              x: 90 + (140*j),
-              y: 290 + (110*i),
+              x: (90 + (140*j)) * qx,
+              y: (320 + (120*i)) * qy,
               border: 2,
               shadow: 3,
               shadowColor: "rgba(0,0,0,0.5)",
-              w: 110,
-              h: 100,
+              w: 110 * qx,
+              h: 100 * qy,
               label: fcAns,
               name: k
               }, function() {
@@ -289,13 +289,13 @@
       //current question
       var qContainer = stage.insert(new Q.UI.Container({
         fill: "gray",
-        x: 160,
-        y: 140,
+        x: 160 * qx,
+        y: 160 * qy,
         border: 2,
         shadow: 3,
         shadowColor: "rgba(0,0,0,0.5)",
-        w: 250,
-        h: 180
+        w: 250 * qx,
+        h: 180 * qy
       }));
 
       
@@ -317,11 +317,11 @@
         } 
         clearTimeout(timeOutTimer);
         qCard.generate(Q.state.get("currentQuestion") - 1);
-        destroyAnswers(aBtns);
+        if (aBtns != null) {destroyAnswers(aBtns)};
         aBtns = generateAnswers();
         
-        if (Q.state.get("currentIndex") > 1) {TIMER.stop();}
-        if (Q.state.get("currentIndex") > 0 && Q.state.get("currentIndex") <= TOTAL_QUESTIONS) {
+        if (Q.state.get("currentQuestion") > 1) {TIMER.stop();}
+        if (Q.state.get("currentQuestion") > 0 && Q.state.get("currentQuestion") <= TOTAL_QUESTIONS) {
           TIMER = new Countdown({
             seconds: maxTimeAllowed,
             onUpdateStatus: function(sec) {leTC.p.label = sec + "";},
@@ -377,13 +377,13 @@
       var ReplayBtn = stage.insert(new Q.UI.Button({
         fill: "gray",
         fontColor: "white",
-        x: 160,
-        y: 160,
+        x: 160 * qx,
+        y: 160 * qy,
         border: 2,
         shadow: 3,
         shadowColor: "rgba(0,0,0,0.5)",
-        w: 110,
-        h: 100,
+        w: 110 * qx,
+        h: 100 * qy,
         label: 'Replay',
       }, function() {
         Q.stageScene("scene1");
@@ -392,13 +392,13 @@
       var BackBtn = stage.insert(new Q.UI.Button({
         fill: "gray",
         fontColor: "white",
-        x: 160,
-        y: 320,
+        x: 160 * qx,
+        y: 320 * qy,
         border: 2,
         shadow: 3,
         shadowColor: "rgba(0,0,0,0.5)",
-        w: 110,
-        h: 100,
+        w: 110 * qx,
+        h: 100 * qy,
         label: 'Back',
       }, function() {
         window.location.href="study.html";
