@@ -1499,6 +1499,7 @@
 	// stage scene
 	Q.load([PLAYER_SPRITE, ENEMY_SPRITE, BOMB_SPRITE, playerSprite, enemySprite, NUKE_SPRITE, NUKE_SOUND], function() {
 		Q.stageScene("scene0");
+		Q.audio.play(NUKE_SOUND);
 	});
      
 });
