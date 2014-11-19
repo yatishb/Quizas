@@ -23,26 +23,39 @@ function displayContent() {
 						else if(i == 2) extraClass = "second";
 						else if(i == 3) extraClass = "third";
 
-						quizas_get_profile_for(userid, function(profile) {
-								console.log(rank + " *** " + pic + " *** " + profile.name + " *** " + points);
-								$('.board_container').append(
-															               		"<div class='simple_leader'>" +
-																		            "<div class='rank font-effect-shadow-multiple " +
-																		            extraClass +
-																		            " '>" +
-																		            rank +
-																		            "</div><div class='profile'><img src='" +
-																		            pic +
-																		            "'></div>" +
-																		            "<div class='name' title='" +
-																		            profile.name +
-																		            "'>" +
-																		            profile.name +
-																		            "</div><div class='score'>" +
-																		            points +
-																		            "</div></div>"
-																						);
-						});
+						$('.board_container').append(
+													               		"<div class='simple_leader'>" +
+																            "<div class='rank font-effect-shadow-multiple " +
+																            extraClass +
+																            " '>" +
+																            rank +
+																            "</div><div class='profile'><img src='" +
+																            pic +
+																            "'></div>" +
+																            "<div class='name' title='" +
+																            // profile.name +
+																            "'>" +
+																            userid +
+																            "</div><div class='score'>" +
+																            points +
+																            "</div></div>"
+																				);
+
+						// quizas_get_profile_for(userid, function(profile) {
+						// 		console.log(rank + " *** " + pic + " *** " + profile.name + " *** " + points);
+								
+						// });
 				}
     });
+}
+
+function getName() {
+		$('.simple_leader').each(function() {
+				var userid = $(this).find('.name').text();
+				quizas_get_profile_for(userid, function(profile) {
+						var element = $(this).find('.name');
+						element.text(profile.name);
+						element.attr('title', profile.name);
+				});
+		});
 }
