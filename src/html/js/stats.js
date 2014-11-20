@@ -112,7 +112,7 @@ function getUserStats() {
         } else {
             $('.game_details.me').show();
             $('.myChart').show();
-            $('.graphTable.me').show()css('display', 'table');
+            $('.graphTable.me').show().css('display', 'table');
 
             $('.chartTitle').append("Your statistics!<br><span style='color:red'>Play MORE!</span>");
 
