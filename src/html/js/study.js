@@ -151,9 +151,10 @@ $('.challenge_info').on('click', '.button_reject', function() {
     $(this).parent().parent().remove();
 });
 
-$('.challenge_info').on('click', '.info_done.simple_info', function() {
+$('.challenge_info').on('click', '.info_done .simple_info', function() {
     $('.challenge_cover').show();
     $('.challenge_graph').show();
+    $('.graphTable').show();
 
     var gameid = $(this).find('.info_content').attr('id');
     $('#graph_container').empty();

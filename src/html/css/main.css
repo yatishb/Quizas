@@ -1496,6 +1496,10 @@ i.rotate {
     padding-top: 10px;
 }
 
+.info_done .simple_info {
+    cursor: pointer;
+}
+
 .info_profile {
     left: 0;
     height: 60px;
@@ -1896,6 +1900,16 @@ i.rotate {
     margin: 20px auto;
 }
 
+.graphTable {
+    margin: 20px auto;
+    text-align: left;
+    display: none;
+}
+
+.explain {
+    padding-left: 10px;
+}
+
 .game_details.me {
     text-align: center;
     display: none;
@@ -1911,6 +1925,7 @@ i.rotate {
 .game_details.friend {
     text-align: center;
     position: relative;
+    display: none;
 }
 
 .game_buttons.friend {
@@ -1966,6 +1981,14 @@ i.rotate {
     background-color: #ECECEC;
 }
 
+.block.red_2 {
+    background-color: red;
+}
+
+.block.blue_2 {
+    background-color: #4682B4;
+}
+
 .simple_friend.stats:hover {
     background-color: #4DB8DB;
 }
@@ -2005,6 +2028,7 @@ i.rotate {
 
 .friendTable {
     margin: 20px auto;
+    display: table;
 }
 
 .invite_friend {

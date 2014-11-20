@@ -200,6 +200,7 @@ function getUserStats() {
         });
 
         if(response != "") {
+            $('.graphTable me').show().css('display', 'table');
             outputStatsForGame(userid , response[0], 'line_graph_me');
         }
     });
@@ -280,6 +281,8 @@ function getFriendStats(friend_id) {
         }
 
         if(result.played > 0) {
+            $('.game_details').show();
+            $('.graphTable friend').show().css('display', 'table');
             outputStatsForGame(userid , result.commongames[0], 'line_graph_friend');
         }
     })
