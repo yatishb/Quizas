@@ -151,13 +151,32 @@ $('.challenge_info').on('click', '.button_reject', function() {
     $(this).parent().parent().remove();
 });
 
-$('.friend_window .button_close').on("click", function() {
-    $('.friend_window').hide();
+$('.challenge_info').on('click', '.info_done.simple_info', function() {
+    $('.challenge_cover').show();
+    $('.challenge_graph').show();
+
+    var gameid = $(this).find('.info_content').attr('id');
+    $('#graph_container').empty();
+    outputStatsForGame(quizas_user_id(), gameid, 'graph_container');
+});
+
+$('.challenge_graph .button_close').on("click", function() {
+    $('.challenge_graph').hide();
+    $('.chart_cover').hide();
+});
+
+$('.chart_cover').on('click', function() {
+    $('.challenge_graph').hide();
+    $(this).hide();
 });
 
 $('.challenge_info .button_close').on("click", function() {
     $('.grey_cover').hide();
     $('.challenge_info').hide();
+});
+
+$('.friend_window .button_close').on("click", function() {
+    $('.friend_window').hide();
 });
 
 $('.set_info').on("click", '.content_container', function() {

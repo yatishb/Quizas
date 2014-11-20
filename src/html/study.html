@@ -10,10 +10,13 @@
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.4/d3.min.js"></script>
 
     <script src="js/quizas_auth_helper.js"></script>
     <script src="js/quizas_facebook.js"></script>
     <script src="js/socketinit.js"></script>
+    <script src="js/quizas_gamestats_linegraph.js"></script>
+    <script src="js/quizas_gamestats_barchart.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1"> 
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -107,6 +110,11 @@
         <div class="list_bottom">Submit</div>
     </div>
 
+    <div class="chart_cover"></div>
+    <div class="challenge_graph fadeIn">
+        <div class="button_close"><i class="fa fa-plus rotate"></i></div>
+        <div class="graph_container" id="graph_container"></div>
+    </div>
     <div class="challenge_info noselect">
         <div class="button_close"><i class="fa fa-plus rotate"></i></div>
         <div class="challenge_title"><span>Notifications</span></div>

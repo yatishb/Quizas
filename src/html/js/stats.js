@@ -70,11 +70,16 @@ $('.page_me').on('click', '.game_button', function() {
     }
 });
 
-// $('.page_friend').on('click', '.game_button.friend', function() {
-//     var gameid = $(this).attr('id');
-//     $('#line_graph_friend').empty();
-//     outputStatsForGame(userid , gameid, 'line_graph_friend');
-// });
+$('.page_friend').on('click', '.game_button.friend', function() {
+    if(!$(this).hasClass('active')) {
+        $('.game_button.active').removeClass('active');
+        $(this).addClass('active');
+        
+        var gameid = $(this).attr('id');
+        $('#line_graph_friend').empty();
+        outputStatsForGame(quizas_user_id(), gameid, 'line_graph_friend');
+    }
+});
 
 $(document).on('click', '.button_close', function() {
     $('.friendTitle').empty();
@@ -243,23 +248,40 @@ function getFriendStats(friend_id) {
             window.myNewChart = new Chart(ctx).Pie(data);
         }
 
-        // for(var i = 0; i < result.commongames.length; i++) {
-        //     var number = i + 1;
+        $('.friendTable').append(
+            "<tr><td>Total</td><td class='number'>" +
+            result.played +
+            "</td><td class='block white'></tr>" +
+            "<tr><td>Wins</td><td class='number'>" +
+            result.wins +
+            "</td><td class='block red'></td></tr>" +
+            "<tr><td>Draws</td><td class='number'>" +
+            result.draws +
+            "</td><td class='block green'></td></tr>" +
+            "<tr><td>Losses</td><td class='number'>" +
+            result.losses +
+            "</td><td class='block yellow'></td></tr>"
+        );
 
-        //     $('.game_buttons.friend').append(
-        //         "<div class='game_button' id='" +
-        //         result.commongames[i] +
-        //         "'>" +
-        //         number +
-        //         "</div>"
-        //     );
-        // }
+        for(var i = 0; i < result.commongames.length; i++) {
+            var extraClass = ' ';
+            var number = i + 1;
+            if(number == 1) extraClass = 'active';
+            else extraClass = ' ';
+            $('.game_buttons.friend').append(
+                "<div class='game_button " +
+                extraClass +
+                "' id='" +
+                gameId +
+                "'>" +
+                number +
+                "</div>"
+            );
+        }
 
-        // $.get("/api/user/" + userid + "/stats/game/" + result.commongames[0], function(data) {
-        //     // $("#line_graph_friend").text(data);
-        //     // Call on for-each game.
-        //     var response = JSON.parse(data);
-        // });
+        if(result.played > 0) {
+            outputStatsForGame(userid , result.commongames[0], 'line_graph_friend');
+        }
     })
     .fail(function() {
         console.log("error in getFriendStats function");

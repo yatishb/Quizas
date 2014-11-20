@@ -1135,6 +1135,7 @@ i.rotate {
     }
 }
 
+.chart_cover,
 .grey_cover {
     background-color: #000;
     /*background-color: rgba(255, 255, 255, 0.75);*/
@@ -1147,6 +1148,10 @@ i.rotate {
     position: fixed;
     z-index: 99;
     display: none;
+}
+
+.chart_cover {
+    z-index: 101;
 }
 
 .button_container {
@@ -1419,6 +1424,7 @@ i.rotate {
 
 /** The Challenge Notification **/
 @media screen and (max-width: 500px) {
+    .challenge_graph,
     .challenge_info {
         width: 80vw;
         height: 80vh;
@@ -1428,6 +1434,7 @@ i.rotate {
 }
 
 @media screen and (min-width: 501px) {
+    .challenge_graph,
     .challenge_info {
         width: 500px;
         height: 400px;
@@ -1436,6 +1443,7 @@ i.rotate {
     }
 }
 
+.challenge_graph,
 .challenge_info {
     position: fixed;
     z-index: 500;
@@ -1567,6 +1575,15 @@ i.rotate {
 .button_accept i {
     display: table-cell;
     vertical-align: middle;
+}
+
+.challenge_graph {
+    z-index: 501;
+}
+
+.graph_container {
+    width: 90%;
+    height: 90%;
 }
 
 /*** Start of flashcard.html ***/
