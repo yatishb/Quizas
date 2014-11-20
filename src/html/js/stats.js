@@ -110,8 +110,9 @@ function getUserStats() {
         if(result.played == 0) {
             $('.chartTitle').append("No statistics to show!<br><span style='color:red'>START PLAYING!</span>");
         } else {
-            $('.game_details').show();
+            $('.game_details me').show();
             $('.myChart').show();
+            $('.graphTable me').show().css('display', 'table');
 
             $('.chartTitle').append("Your statistics!<br><span style='color:red'>Play MORE!</span>");
 
@@ -200,7 +201,6 @@ function getUserStats() {
         });
 
         if(response != "") {
-            $('.graphTable me').show().css('display', 'table');
             outputStatsForGame(userid , response[0], 'line_graph_me');
         }
     });
@@ -281,7 +281,7 @@ function getFriendStats(friend_id) {
         }
 
         if(result.played > 0) {
-            $('.game_details').show();
+            $('.game_details friend').show();
             $('.graphTable friend').show().css('display', 'table');
             outputStatsForGame(userid , result.commongames[0], 'line_graph_friend');
         }

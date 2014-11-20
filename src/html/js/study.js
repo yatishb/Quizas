@@ -152,11 +152,12 @@ $('.challenge_info').on('click', '.button_reject', function() {
 });
 
 $('.challenge_info').on('click', '.info_done .simple_info', function() {
-    $('.challenge_cover').show();
+    $('.chart_cover').show();
     $('.challenge_graph').show();
     $('.graphTable').show();
 
     var gameid = $(this).find('.info_content').attr('id');
+    console.log(gameid);
     $('#graph_container').empty();
     outputStatsForGame(quizas_user_id(), gameid, 'graph_container');
 });
