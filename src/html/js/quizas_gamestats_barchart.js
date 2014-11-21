@@ -4,8 +4,6 @@ function barChartIdFor(gameId) {
     return "stackedBarGraph_" + fsid.replace(":", "");
 }
 
-
-
 // `outputStatsForGame` assumes that the `graphDivId` already exists.
 // You can create it with jQuery in the following way, appending to
 // #gameLineGraphs (say):
@@ -33,8 +31,6 @@ function outputStatsForFlashset(user_id, fsid, fsGraphId) {
         });
     });
 }
-
-
 
 function outputFlashsetBarGraph (graphId, flashsetResults, flashsetDict) {
 

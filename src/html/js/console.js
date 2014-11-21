@@ -4,7 +4,6 @@ function displayContent() {
         // obj = { data: [{ id: "facebook:xyzw..", points: # }] }
         var obj = JSON.parse(data);
         leaderboard = obj.data;
-        console.log(obj);
 
         // Clear all children DOM elements from leaderboard,
         // so we don't have any mess.
@@ -38,7 +37,6 @@ function displayContent() {
 
             $("<div/>", { class: "score" }).appendTo(rowEl).text(points);
 
-
             // Due to nature of closures,
             // we need to ensure our callback refers to the correct
             // variable!
@@ -46,7 +44,6 @@ function displayContent() {
             var updateProfileCallback = (function(nameDiv, profileImg) {
                 return function(profile) {
                     // profile = { name, picture }
-                    console.log("callback");
                     nameDiv.text(profile.name);
                     profileImg.attr("src", profile.picture);
                 };
@@ -57,17 +54,3 @@ function displayContent() {
         }
     });
 }
-
-// function getName() {
-//     console.log($('.simple_leader'));
-//     $('.simple_leader').each(function() {
-//         var userid = $(this).find('.name').text();
-//         if(userid.indexOf('facebook:') >= 0) {
-//             quizas_get_profile_for(userid, function(profile) {
-//                 var element = $(this).find('.name');
-//                 element.text(profile.name);
-//                 element.attr('title', profile.name);
-//             });
-//         }
-//     });
-// }

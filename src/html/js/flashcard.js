@@ -66,9 +66,6 @@ function getStudySetContent(setid) {
 }
 
 $('.flashcards').on('click', '.simple_card', function() {
-    // var cardID= this.id;
-    // var card = $('#'+cardID).find('.flipper');
-    //this.classList.toggle('hover');
     var card = $(this).find('.flipper');
     if(card.hasClass('flipped')) {
         card.removeClass('flipped');

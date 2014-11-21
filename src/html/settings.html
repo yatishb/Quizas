@@ -117,9 +117,9 @@
 
     <script>
     function doFacebookLogin() {
-      // We want the 'user_friends' permission so that we can access /{user}/friends
-      // See: https://developers.facebook.com/docs/graph-api/reference/v2.2/user/friends
-      FB.login(afterFacebookLogin, {scope: 'public_profile,user_friends'});
+        // We want the 'user_friends' permission so that we can access /{user}/friends
+        // See: https://developers.facebook.com/docs/graph-api/reference/v2.2/user/friends
+        FB.login(afterFacebookLogin, {scope: 'public_profile,user_friends'});
     }
 
     function afterFacebookLogin(response) {

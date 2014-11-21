@@ -157,7 +157,6 @@ $('.challenge_info').on('click', '.info_done .simple_info', function() {
     $('.graphTable').show();
 
     var gameid = $(this).find('.info_content').attr('id');
-    console.log(gameid);
     $('#graph_container').empty();
     outputStatsForGame(quizas_user_id(), gameid, 'graph_container');
 });
@@ -394,7 +393,6 @@ function initializeMultiplayerGame(content) {
     //encounter
     //encounterwin
     //total
-    console.log(content);
     sessionStorage.setItem("initialization", JSON.stringify(content));
     window.location.href="example3.html";
 }
@@ -443,9 +441,6 @@ function getSetContent() {
                 );
             });
         };
-    })
-    .fail(function() {
-        console.log("error in getSetContent call back function");
     });
 }
 
@@ -481,9 +476,6 @@ function getSearchResult(txt) {
             
             plusButton.css('height', containerHeight);
         });
-    })
-    .fail(function() {
-        console.log("error in getSearchResult call back function");
     });
 }
 
@@ -551,9 +543,6 @@ function getNotification() {
                         };
                     })(i));
         }
-    })
-    .fail(function() {
-        console.log("error in getNotification call back function");
     });
 }
 
