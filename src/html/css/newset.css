@@ -76,7 +76,6 @@ body,html{
     border-color: transparent #e3e3e3 transparent transparent;
     line-height: 0px;
     _border-color: #000000 #e3e3e3 #000000 #000000;
-    /*_filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');*/
 }
 
 .back_button:active {
@@ -148,7 +147,6 @@ body,html{
 }
 
 .button {
-    /* Structure */
     display: inline-block;
     *display: inline; /*IE 6/7*/
     zoom: 1;
@@ -169,8 +167,6 @@ body,html{
     padding: 0;
     border: 0;
 }
-
-/*csslint outline-none:false*/
 
 .button {
     font-family: 'Open Sans', sans-serif;
@@ -212,15 +208,33 @@ body,html{
     border: 0;
 }
 
-/*** Page Upload ***/
+.add_button {
+    color: #888;
+    width: 90%;
+    height: 30px;
+    font-size: 15pt;
+    text-align: center;
+    line-height: 28px;
+    margin: 0 auto;
+    cursor: pointer;
+    box-shadow: -1px 1px 3px #888888;
+    -o-box-shadow: -1px 1px 3px #888888;
+    -ms-box-shadow: -1px 1px 3px #888888;
+    -mos-box-shadow: -1px 1px 3px #888888;
+    -webkit-box-shadow: -1px 1px 3px #888888;
+}
 
+.add_button:active {
+    background-color: #B2B2B2;
+}
+
+/*** Page Upload ***/
 .page_upload {
     display: none;
     text-align: center;
 }
 
 /*** Page Create ***/
-
 .page_create {
     display: none;
     text-align: center;
