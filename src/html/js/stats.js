@@ -56,7 +56,6 @@ $('.page_friend').on('click', '.simple_friend', function() {
     $('.friend_stats').addClass('fadeIn');
     $('.chartContainer').append('<canvas class="friendChart"></canvas>');
     getFriendStats(friend_id);
-    // test();
 });
 
 $('.page_me').on('click', '.game_button', function() {
@@ -158,9 +157,6 @@ function getUserStats() {
             result.losses +
             "</td><td class='block yellow'></td></tr>"
         );
-    })
-    .fail(function() {
-        console.log("error in getUserStats function");
     });
 
     // TODO: In order to add linegraphs / barcharts,, you should..
@@ -285,9 +281,6 @@ function getFriendStats(friend_id) {
             $('.graphTable.friend').show().css('display', 'table');
             outputStatsForGame(userid , result.commongames[0], 'line_graph_friend');
         }
-    })
-    .fail(function() {
-        console.log("error in getFriendStats function");
     });
 }
 
@@ -317,6 +310,5 @@ function outputFriends(friends) {
             $(newname).find('.friend_profile img').attr('src', address);
         });
     });
-
     // $('.page_friend').append("<div class='invite_friend'>Invite Friends</div>");
 }
