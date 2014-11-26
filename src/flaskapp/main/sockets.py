@@ -48,7 +48,6 @@ def printSocketsConnected():
 			onlineIDs.append( str(facebookId) )
 
 	emit('online', {'data': onlineIDs})
-	print "sent online users"
 
 
 
@@ -56,7 +55,6 @@ def printSocketsConnected():
 # Read this notification and forward this request to the client C2
 @socketio.on('send notification', namespace='/test')
 def sendNotificationToSocket(message):
-	print "received notification for game request"
 	user = message['user']
 	flashset = message['set']
 	userSendTo = message['opponent']
@@ -64,13 +62,11 @@ def sendNotificationToSocket(message):
 	internalUser = authhelper.lookup(user)
 	internalUserOppo = authhelper.lookup(userSendTo)
 	flagFoundUser = False
-	print "user: %r  requestto: %r" % (internalUser, internalUserOppo)
 
 	# Check if internal user is the same as the id of the socket.
 	# If not return failure
 	if internalUser != session['id'] or internalUser == None or internalUserOppo == None:
 		# return failure
-		print "rejected"
 		flagFoundUser = True
 		gameRejection = {'rejectedby': userSendTo}
 		emit('user non-existent', {'data': json.dumps(gameRejection)})
@@ -81,16 +77,13 @@ def sendNotificationToSocket(message):
 			if client.session['id'] == internalUserOppo:
 				flagFoundUser = True
 				if client.session['room'] != defaultRoom:
-					print "user in another room"
 					gameRejection = {'rejectedby': userSendTo}
 					emit('game rejected', {'data': json.dumps(gameRejection)})
 				else:
-					print "sending request"
 					client.base_emit('game request', {'data': json.dumps(gameRequest)})
 
 	# If user not found
 	if flagFoundUser == False:
-		print "user not found"
 		gameRejection = {'rejectedby': userSendTo}
 		emit('user not online', {'data': json.dumps(gameRejection)})
 
@@ -99,7 +92,6 @@ def sendNotificationToSocket(message):
 # Forward this rejection onto the first client who responded so
 @socketio.on('reject', namespace='/test')
 def gameRejected(message):
-	print "game rejected"
 	userInitiatedReq = message['requester']
 	userReceiver = message['receiver']
 
@@ -116,7 +108,6 @@ def gameRejected(message):
 # Socket reads the two usernames and creates a room for both
 @socketio.on('assignroom', namespace='/test')
 def assignRoom(message):
-	print "assigning game now!"
 	room = str(uuid.uuid1())
 	user1 = message['user1']
 	user2 = message['user2']
@@ -124,7 +115,6 @@ def assignRoom(message):
 	shuffledFlashcards = quizletsets.shuffled_flashset_json(flashset, NUMQUES)
 
 	if authhelper.lookup(user1) != None and authhelper.lookup(user2) != None and shuffledFlashcards.has_key('error') == False:
-		print "should assign room"
 		# Get the internal user ids of the clients
 		user1 = authhelper.lookup(user1)
 		user2 = authhelper.lookup(user2)
@@ -146,7 +136,6 @@ def assignRoom(message):
 			if (client.session['id'] == user1) or (client.session['id'] == user2):
 				if client.session['room'] == defaultRoom:
 					client.session['room'] = room
-					print "Assigned: user:%r room:%r" % (client.session['id'], client.session['room'])
 					client.base_emit('my response', {'data': 'GAME BEGINS...'})
 				
 				else:
@@ -202,14 +191,9 @@ def getGameInit(user, user1, user2, room, setName):
 					 "encounterWin": encounterwin, 
 					 "room":room,
 					 "playerPoints": playerPoints,
-					 # "playerWin": userwinpercent,
-					 # "playerTotal": userStats['played'],
 					 "enemyID": authhelper.lookupInternalFacebook(opponent),
 					 "enemyPoints": oppoPoints,
-					 # "enemyWin": winpercent,
-					 # "enemyTotal": oppoStats['played'],
 					 "matchName":setName}
-	print gameInitData
 	return gameInitData
 
 
@@ -222,7 +206,6 @@ def getGameInit(user, user1, user2, room, setName):
 @socketio.on('gameinitialised', namespace='/test')
 def gameInitialisedByClient(message):
 	roomShouldBe = str(message['room'])
-	print "game initialized by one client:%r room: %r" % (session['id'],session['room'])
 
 	# Check if user part of the room
 	# If so then add room information to the connection
@@ -244,7 +227,6 @@ def gameInitialisedByClient(message):
 	userid = session['id']
 	join_room(room)
 	time.sleep(1)
-	print "the client %r now belongs to room %r" % (session['id'], session['room'])
 
 	HASH_INIT = "ROOM_INIT"
 
@@ -271,7 +253,6 @@ def gameInitialisedByClient(message):
 @socketio.on('clearroom', namespace='/test')
 def clearRoom():
 	room = session['room']
-	print room
 
 	# Handle for when/if the second client
 	if room == defaultRoom:
@@ -333,7 +314,6 @@ def clearRoom():
 @socketio.on('readanswer', namespace='/test')
 def readAnswerByClient(message):
 	message = json.loads(message)
-	print "room %r " % session['room']
 	room = session['room']
 	idClient = session['id']
 
@@ -385,7 +365,6 @@ def sendNextQuesInfoToClient(hashSend, hashSendTime, room, done):
 		# For each client in game, send customized message
 		for client in clients:
 			if client.session['id'] == int(eachClient):
-				print "next question: %r" % dataToSend[eachClient]
 				client.base_emit('nextQuestion', {'data': json.dumps(dataToSend[eachClient])})
 
 		# If messages have been sent to the client in the room
@@ -411,11 +390,6 @@ def sendFirstQuestionInfoToClient(room, usersInRoom):
 
 	# There is no customized message for the first question
 	# Hence broadcast across room can be used to send the details of the next question
-	print "Start game: %r" % commonDataToSend
-	# for client in clients:
-	# 	if (client.session['id'] == int(usersInRoom[0])) or (client.session['id'] == int(usersInRoom[1])):
-	# 		print "client found id:%r random:%r room:%r" % (client.session['id'], client.session['random'], client.session['room'])
-	# 		client.emit('nextQuestion', {'data': json.dumps(commonDataToSend)})
 	emit('nextQuestion', {'data': json.dumps(commonDataToSend)}, room = room)
 
 
@@ -429,7 +403,6 @@ def getNextQuestionForRoom(room, done):
 		return {}
 
 	# When there are questions left in the game, retrieve the next game and send
-	print "loading cards for room %r" % room
 	flashcardsJson = json.loads(redis.hget("ROOMS_CARDS", room))
 	nextQues = flashcardsJson[done]['question']
 	nextAns = flashcardsJson[done]['answers']
