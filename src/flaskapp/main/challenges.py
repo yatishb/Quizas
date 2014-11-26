@@ -140,6 +140,50 @@ def finish_challenge(challengerId, gameId):
 		return "Invalid request"
 
 
+# GET /user/<userid>/challenges/reject/<gameId>
+# When the second user rejects a challenge, they can post to this to finish it.
+@main.route('/user/<challengerId>/challenges/reject/<gameId>')
+def reject_challenge(challengerId, gameId):
+	current_id = authhelper.get_current_id()
+	chgr_id = authhelper.lookup(challengerId)
+
+	if current_id != chgr_id:
+		return "Challenger must be logged in"
+
+	result = UserChallenge.query.get(gameId)
+
+	def lookupSetForGameId(gameId):
+		return FlashGame.query.filter_by(gameId = gameId).first()
+	
+	if result != None:
+		questionsData = QuestionsChallenge.query.get(gameId)
+		questionsJson = json.loads(questionsData.questions)['questions']
+		receivedData = {'flashset':lookupSetForGameId(gameId).flashsetId}
+		allCardData = []
+		for eachques in questionsJson:
+			cardData = {}
+			cardData["flashcard"] = eachques['question']['id']
+			cardData['result'] = 'null'
+			cardData['time'] = 10000
+			allCardData.append(cardData)
+		receivedData['cards'] = allCardData
+
+		# Post the results, using `internalstats`
+		# (since it's FlashGame, FlashCardInGame)
+		gameId = internalstats.soloGameResultsWriteDbWithGameId(chgr_id,
+		                                                        gameId,
+		                                                        receivedData)
+
+		# Now that the recipient of the challenge has logged in, update the
+		# status of the challenge to "waiting for challenger to see the results"
+		result.status = STATUS_PENDING_SEEN
+		db.session.commit()
+
+		return "Successfully updated"
+	else:
+		return "Invalid request"
+
+
 
 # POST /user/<userid>/challenges/seen/<gameid>
 # Acknowledge that the user has seen the result of a challenge.
