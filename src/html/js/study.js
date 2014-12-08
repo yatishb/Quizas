@@ -149,6 +149,11 @@ $('.challenge_info').on('click', '.button_accept', function() {
 
 $('.challenge_info').on('click', '.button_reject', function() {
     $(this).parent().parent().remove();
+
+    var grandparent = $(this).parent().parent();
+    var gameid = grandparent.find('.info_content').attr('id');
+
+    rejectChallenge(gameid);
 });
 
 $('.challenge_info').on('click', '.info_done .simple_info', function() {
@@ -578,6 +583,14 @@ function deleteSet(id) {
 
 function favoriteSet(id, flag) {
     
+}
+
+function rejectChallenge(gameid) {
+    var userid = quizas_user_id();
+
+    $.get("/api/user/" + userid + "/challenges/reject/" + gameid, function(data) {
+        console.log("Rejected the challenge.");
+    });
 }
 
 function splitFriend(listOnlineUsers) {
